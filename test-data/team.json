@@ -1,0 +1,15 @@
+{
+  "members": [
+    { "name": "Maya Chen", "email": "abiralameddine@gmail.com", "role": "lead" },
+    { "name": "Priya Shah", "email": "ikaytazov@gmail.com", "role": "member" },
+    { "name": "Jordan Lee", "email": "tellyonu@gmail.com", "role": "member" },
+    { "name": "Alex Romero", "email": "jerry.yeoh1270@gmail.com", "role": "member" },
+    { "name": "Sam Okafor", "email": "david.kigundu@gmail.com", "role": "member" }
+  ],
+  "workstreams": [
+    {"name": "Product launch", "goal": "Launch a clear pricing offer and a reliable onboarding journey.", "owner": "Priya Shah", "target_date": "2026-11-06"},
+    {"name": "Customer onboarding", "goal": "Get new customers live in their first week.", "owner": "Jordan Lee", "target_date": "2026-11-13"},
+    {"name": "Fundraising", "goal": "Close the seed extension.", "owner": "Maya Chen", "target_date": "2026-11-30"},
+    {"name": "Operations", "goal": "Keep vendors, payroll and tools running.", "owner": "Alex Romero", "target_date": "2026-11-20"}
+  ]
+}

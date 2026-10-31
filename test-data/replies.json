@@ -1,0 +1,383 @@
+[
+  {
+    "from": "ikaytazov@gmail.com",
+    "received_date": "2026-11-03",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Launch the new pricing page",
+        "status": "in_progress",
+        "due_date": "2026-11-05",
+        "priority": "high"
+      },
+      {
+        "n": 2,
+        "title": "Finish the partner deck",
+        "status": "not_started",
+        "due_date": "2026-11-05",
+        "priority": "high"
+      },
+      {
+        "n": 3,
+        "title": "Draft the help center FAQ",
+        "status": "not_started",
+        "due_date": "2026-11-09",
+        "priority": "medium"
+      }
+    ],
+    "reply": "Pricing page is live. The partner deck needs until next Wednesday, I'm waiting on numbers from finance.",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "done",
+        "blocker": null,
+        "requested_due_date": null
+      },
+      {
+        "task_number": 2,
+        "new_status": "blocked",
+        "blocker": "numbers from finance",
+        "requested_due_date": "2026-11-11"
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "tellyonu@gmail.com",
+    "received_date": "2026-11-03",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Write the onboarding email sequence",
+        "status": "in_progress",
+        "due_date": "2026-11-04",
+        "priority": "high"
+      },
+      {
+        "n": 2,
+        "title": "Run five customer interviews",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      }
+    ],
+    "reply": "1 done!",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "done",
+        "blocker": null,
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "jerry.yeoh1270@gmail.com",
+    "received_date": "2026-11-03",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Own the launch checklist",
+        "status": "not_started",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Renew the vendor contract",
+        "status": "not_started",
+        "due_date": "2026-11-13",
+        "priority": "medium"
+      }
+    ],
+    "reply": "Started on the checklist. 2 is blocked - waiting on the vendor to send the new terms.",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "in_progress",
+        "blocker": null,
+        "requested_due_date": null
+      },
+      {
+        "task_number": 2,
+        "new_status": "blocked",
+        "blocker": "vendor to send the new terms",
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "abiralameddine@gmail.com",
+    "received_date": "2026-11-03",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Refresh the data room",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "high"
+      }
+    ],
+    "reply": "need till monday for the data room, the new pricing isn't final yet",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "unchanged",
+        "blocker": null,
+        "requested_due_date": "2026-11-09"
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "tellyonu@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Run five customer interviews",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Script the welcome call",
+        "status": "not_started",
+        "due_date": "2026-11-10",
+        "priority": "low"
+      }
+    ],
+    "reply": "Interviews: 3 of 5 done, still on track for Friday. Also started the welcome call script last night.",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "unchanged",
+        "blocker": null,
+        "requested_due_date": null
+      },
+      {
+        "task_number": 2,
+        "new_status": "in_progress",
+        "blocker": null,
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "ikaytazov@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Finish the partner deck",
+        "status": "blocked",
+        "due_date": "2026-11-11",
+        "priority": "high"
+      },
+      {
+        "n": 2,
+        "title": "Draft the help center FAQ",
+        "status": "not_started",
+        "due_date": "2026-11-09",
+        "priority": "medium"
+      }
+    ],
+    "reply": "The FAQ is done, sending it to Jordan to look over.",
+    "expected": [
+      {
+        "task_number": 2,
+        "new_status": "done",
+        "blocker": null,
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "jerry.yeoh1270@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Own the launch checklist",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Renew the vendor contract",
+        "status": "blocked",
+        "due_date": "2026-11-13",
+        "priority": "medium"
+      }
+    ],
+    "reply": "checklsit is dnoe. vendr still stuck",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "done",
+        "blocker": null,
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "abiralameddine@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Refresh the data room",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "high"
+      }
+    ],
+    "reply": "Actually ignore my last email, I'll make Friday after all.",
+    "expected": [],
+    "should_be_unsure": true
+  },
+  {
+    "from": "tellyonu@gmail.com",
+    "received_date": "2026-11-05",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Run five customer interviews",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Script the welcome call",
+        "status": "in_progress",
+        "due_date": "2026-11-10",
+        "priority": "low"
+      }
+    ],
+    "reply": "Interviews all done (did six in the end). Swamped this week though - can the welcome call script slip to the 17th?",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "done",
+        "blocker": null,
+        "requested_due_date": null
+      },
+      {
+        "task_number": 2,
+        "new_status": "unchanged",
+        "blocker": null,
+        "requested_due_date": "2026-11-17"
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "ikaytazov@gmail.com",
+    "received_date": "2026-11-05",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Finish the partner deck",
+        "status": "blocked",
+        "due_date": "2026-11-11",
+        "priority": "high"
+      }
+    ],
+    "reply": "ugh, finance again 🙄",
+    "expected": [],
+    "should_be_unsure": true
+  },
+  {
+    "from": "jerry.yeoh1270@gmail.com",
+    "received_date": "2026-11-05",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Renew the vendor contract",
+        "status": "blocked",
+        "due_date": "2026-11-13",
+        "priority": "medium"
+      }
+    ],
+    "reply": "Vendor finally sent the terms over, I'll sign them tomorrow.",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "in_progress",
+        "blocker": null,
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  },
+  {
+    "from": "abiralameddine@gmail.com",
+    "received_date": "2026-11-05",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Refresh the data room",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "high"
+      }
+    ],
+    "reply": "All good here, on track.",
+    "expected": [],
+    "should_be_unsure": false
+  },
+  {
+    "from": "tellyonu@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Run five customer interviews",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Script the welcome call",
+        "status": "in_progress",
+        "due_date": "2026-11-10",
+        "priority": "low"
+      }
+    ],
+    "reply": "Is 3 the FAQ one? Pretty sure that's Priya's, not mine.",
+    "expected": [],
+    "should_be_unsure": true
+  },
+  {
+    "from": "ikaytazov@gmail.com",
+    "received_date": "2026-11-06",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Finish the partner deck",
+        "status": "blocked",
+        "due_date": "2026-11-11",
+        "priority": "high"
+      }
+    ],
+    "reply": "Finance sent the numbers this morning, back on the deck. Should still make Wednesday.",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "in_progress",
+        "blocker": null,
+        "requested_due_date": null
+      }
+    ],
+    "should_be_unsure": false
+  }
+]

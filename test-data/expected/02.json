@@ -1,0 +1,67 @@
+{
+  "tasks": [
+    {
+      "title": "Book the two partner calls",
+      "owner_name": "Maya Chen",
+      "due_date": "2026-10-30",
+      "priority": "high",
+      "workstream_name": "Fundraising",
+      "source_sentence": "I'll book the two partner calls by Friday.",
+      "flags": []
+    },
+    {
+      "title": "Send the investor update",
+      "owner_name": "Maya Chen",
+      "due_date": "2026-10-29",
+      "priority": "high",
+      "workstream_name": "Fundraising",
+      "source_sentence": "I'll get the investor update out tomorrow, it's mostly written, I just need the October revenue line.",
+      "flags": []
+    },
+    {
+      "title": "Pull together the cap table summary",
+      "owner_name": "Alex Romero",
+      "due_date": "2026-11-02",
+      "priority": "medium",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Alex, can you pull the cap table summary together by Monday?",
+      "flags": []
+    },
+    {
+      "title": "Update the financial model with October numbers",
+      "owner_name": null,
+      "due_date": null,
+      "priority": "medium",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Someone should update the financial model with the October numbers.",
+      "flags": [
+        "no_owner",
+        "no_date"
+      ]
+    },
+    {
+      "title": "Gather customer quotes for the deck",
+      "owner_name": "Priya Shah",
+      "due_date": null,
+      "priority": "low",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Priya, maybe you can grab a couple of customer quotes for the deck at some point?",
+      "flags": [
+        "no_date"
+      ]
+    },
+    {
+      "title": "Sort out the lawyer paperwork",
+      "owner_name": null,
+      "due_date": null,
+      "priority": "low",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Oh, and the thing with the lawyer, we should probably sort that out at some point.",
+      "flags": [
+        "no_owner",
+        "no_date",
+        "unclear"
+      ]
+    }
+  ]
+}

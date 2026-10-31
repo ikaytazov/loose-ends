@@ -1,0 +1,68 @@
+{
+  "tasks": [
+    {
+      "title": "Set up payroll for the two new hires",
+      "owner_name": "Alex Romero",
+      "due_date": "2026-10-30",
+      "priority": "high",
+      "workstream_name": "Operations",
+      "source_sentence": "alex - payroll for 2 new hires by fri",
+      "flags": []
+    },
+    {
+      "title": "Audit and cancel unused tool subscriptions",
+      "owner_name": "Jordan Lee",
+      "due_date": "2026-10-31",
+      "priority": "low",
+      "workstream_name": "Operations",
+      "source_sentence": "jordan to audit the tool subscriptions and cancel the ones nobody uses, end of month",
+      "flags": []
+    },
+    {
+      "title": "Handle the hosting contract renewal",
+      "owner_name": null,
+      "due_date": "2026-11-13",
+      "priority": "medium",
+      "workstream_name": "Operations",
+      "source_sentence": "need someone to handle the hosting contract renewal by nov 13",
+      "flags": [
+        "no_owner"
+      ]
+    },
+    {
+      "title": "Order laptops for the new hires",
+      "owner_name": "Maya Chen",
+      "due_date": null,
+      "priority": "high",
+      "workstream_name": "Operations",
+      "source_sentence": "maya to order laptops for the new hires asap",
+      "flags": [
+        "no_date"
+      ]
+    },
+    {
+      "title": "Look into the double Stripe charges",
+      "owner_name": null,
+      "due_date": null,
+      "priority": "high",
+      "workstream_name": "Operations",
+      "source_sentence": "the stripe thing - jordan? or alex? TBD who looks into it",
+      "flags": [
+        "no_owner",
+        "no_date",
+        "unclear"
+      ]
+    },
+    {
+      "title": "Script the welcome call",
+      "owner_name": "Jordan Lee",
+      "due_date": null,
+      "priority": "low",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "jordan will script the welcome call next wk",
+      "flags": [
+        "no_date"
+      ]
+    }
+  ]
+}

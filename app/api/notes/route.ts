@@ -1,5 +1,5 @@
 // POST /api/notes — paste meeting notes, get proposed tasks back (docs/api.md).
-// The AI part is still a STUB (lib/notes/extract.ts). Saving to the database is real.
+// The AI reads the notes (lib/notes/extract.ts); this route saves the meeting and the proposed tasks.
 import { PasteNotesRequest, type PasteNotesResponse } from "@/lib/contracts/api";
 import type { Task, TeamMember, Workstream } from "@/lib/contracts/domain";
 import { extractTasks } from "@/lib/notes/extract";

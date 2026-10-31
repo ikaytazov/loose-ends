@@ -16,6 +16,11 @@ export function supabaseReplyRepo(sb: SupabaseClient): ReplyRepo {
       throwIf(error, "find lead");
       return data as TeamMember | null;
     },
+    async getMember(id) {
+      const { data, error } = await sb.from("team_members").select("*").eq("id", id).maybeSingle();
+      throwIf(error, "get member");
+      return data as TeamMember | null;
+    },
     async findMorningEmailByCode(code) {
       const { data, error } = await sb.from("emails").select("id, member_id, task_refs").eq("reply_code", code).maybeSingle();
       throwIf(error, "find morning email");

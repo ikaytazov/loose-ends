@@ -12,6 +12,7 @@ export type NewActivity = Omit<ActivityLogEntry, "id" | "created_at">;
 export interface ReplyRepo {
   findMemberByEmail(email: string): Promise<TeamMember | null>;
   findLead(): Promise<TeamMember | null>;
+  getMember(id: string): Promise<TeamMember | null>;
   findMorningEmailByCode(code: string): Promise<MorningEmailRef | null>;
   latestMorningEmailFor(memberId: string): Promise<MorningEmailRef | null>;
   getTasks(ids: string[]): Promise<Task[]>;

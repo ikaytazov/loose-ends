@@ -11,6 +11,7 @@ import type { NewActivity, ReplyRepo } from "@/lib/replies/repo";
 import { pickApprover } from "@/lib/replies/approver";
 import { findReplyCode, replyAddress, stripQuoted, bareAddress } from "@/lib/email/address";
 import { orderForEmail } from "@/lib/email/ordering";
+import { buildFollowUp, confirmationLine, isAutoReply, shortDate, FALLBACK_QUESTION, type FollowUp } from "@/lib/replies/follow-up";
 
 const MAYA = "m-maya", PRIYA = "m-priya", JORDAN = "m-jordan";
 
@@ -43,6 +44,7 @@ function makeWorld() {
   const repo: ReplyRepo = {
     async findMemberByEmail(e) { return members.find((m) => m.email === e.toLowerCase()) ?? null; },
     async findLead() { return members.find((m) => m.role === "lead") ?? null; },
+    async getMember(id) { return members.find((m) => m.id === id) ?? null; },
     async findMorningEmailByCode(c) { const e = emails.find((x) => x.reply_code === c); return e ? { id: e.id, member_id: e.member_id, task_refs: e.task_refs } : null; },
     async latestMorningEmailFor(id) { const e = emails.filter((x) => x.member_id === id && x.kind === "morning").at(-1); return e ? { id: e.id, member_id: e.member_id, task_refs: e.task_refs } : null; },
     async getTasks(ids) { return tasks.filter((t) => ids.includes(t.id)); },
@@ -197,4 +199,70 @@ test("helpers", () => {
     "2026-11-03",
   );
   assert.deepEqual(ordered.map((t) => t.title), ["overdue", "high", "low later"]);
+});
+
+// ---------- Confirmation and clarifying emails (issue #15) ----------
+
+function capture() {
+  const sent: FollowUp[] = [];
+  return { sent, notify: async (m: FollowUp) => { sent.push(m); } };
+}
+
+test("an applied reply gets a one-line confirmation", async () => {
+  const w = makeWorld();
+  const box = capture();
+  await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notify: box.notify });
+  assert.equal(box.sent.length, 1);
+  const m = box.sent[0];
+  assert.equal(m.kind, "confirmation");
+  assert.equal(m.to, "priya@x.com");
+  assert.ok(m.subject.includes("Loose Ends"), "the bridge only picks up replies whose subject says Loose Ends");
+  assert.equal(
+    m.text.split("\n")[0],
+    'Marked "Launch the new pricing page" as done; marked "Finish the partner deck" as blocked (waiting on numbers from finance); asked Maya to move "Finish the partner deck" to Wed 11 Nov.',
+  );
+  assert.deepEqual(m.task_refs, [{ n: 1, task_id: "t-pricing" }, { n: 2, task_id: "t-deck" }, { n: 3, task_id: "t-faq" }]);
+});
+
+test("a question from the reply reader is emailed instead of a confirmation", async () => {
+  const w = makeWorld();
+  const box = capture();
+  await handleInbound(w.repo, fakeAI({ changes: [{ task_number: 2, new_status: "done", blocker: null, requested_due_date: null, reason: null, quote: "that one's sorted", confidence: "unsure" }], question: "Which task is sorted: the partner deck or the FAQ?" }), priyaReply, { today: "2026-11-03", notify: box.notify });
+  assert.equal(box.sent.length, 1);
+  assert.equal(box.sent[0].kind, "question");
+  assert.ok(box.sent[0].subject.includes("Loose Ends"));
+  assert.ok(box.sent[0].text.startsWith("Hi Priya. Which task is sorted: the partner deck or the FAQ?"));
+  assert.ok(box.sent[0].text.includes("2. Finish the partner deck"), "lists the numbered tasks so they can answer by number");
+});
+
+test("a reply with nothing understood gets a short clarifying question", () => {
+  const f = buildFollowUp({ to: "p@x.com", member_id: PRIYA, memberName: "Priya", in_reply_to_email_id: "e1", numbered: [], items: [], question: null });
+  assert.equal(f.kind, "question");
+  assert.ok(f.text.includes(FALLBACK_QUESTION));
+});
+
+test("no follow-up for duplicates, unknown senders, errors or automatic replies", async () => {
+  const w = makeWorld();
+  const box = capture();
+  await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notify: box.notify });
+  await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notify: box.notify });
+  await handleInbound(w.repo, fakeAI(demoParse), { ...priyaReply, gmail_message_id: "g8", from: "stranger@y.com" }, { today: "2026-11-03", notify: box.notify });
+  await handleInbound(w.repo, async () => { throw new Error("AI down"); }, { ...priyaReply, gmail_message_id: "g7" }, { today: "2026-11-03", notify: box.notify });
+  await handleInbound(w.repo, fakeAI(demoParse), { ...priyaReply, gmail_message_id: "g6", subject: "Automatic reply: Re: Loose Ends: quick question" }, { today: "2026-11-03", notify: box.notify });
+  assert.equal(box.sent.length, 1);
+});
+
+test("a failed follow-up send does not undo the update", async () => {
+  const w = makeWorld();
+  const res = await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notify: async () => { throw new Error("Gmail down"); } });
+  assert.equal(res.status, "applied");
+  assert.equal(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
+});
+
+test("follow-up wording helpers", () => {
+  assert.equal(shortDate("2026-11-04"), "Wed 4 Nov");
+  assert.equal(confirmationLine([]), null);
+  assert.equal(confirmationLine([{ type: "date_request", title: "Partner deck", date: "2026-11-04", approverName: "Maya" }]), 'Asked Maya to move "Partner deck" to Wed 4 Nov.');
+  assert.ok(isAutoReply("Out of Office: Re: Your 3 open tasks"));
+  assert.ok(!isAutoReply("Re: Your 3 open tasks for Tuesday"));
 });

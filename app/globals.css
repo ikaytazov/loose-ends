@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* Loose Ends design tokens (docs/handoff/design/tokens.css). Classes like bg-forest, text-muted, border-line. */
+@theme {
+  --color-forest: #123C30;
+  --color-forest-2: #215846;
+  --color-ink: #18201D;
+  --color-ink-2: #2D3833;
+  --color-canvas: #F7F6F2;
+  --color-paper: #FFFFFF;
+  --color-lime: #D8EE79;
+  --color-lime-soft: #EDF5CC;
+  --color-lime-wash: #F5F8E8;
+  --color-line: #E3E6DF;
+  --color-line-2: #EDEFEA;
+  --color-muted: #64736D;
+  --color-danger-bg: #FBE9E5;
+  --color-danger: #8E3426;
+  --color-danger-line: #F1CFC7;
+  --color-warn-bg: #FFF0CF;
+  --color-warn: #8A5E13;
+  --color-warn-line: #F2DDA8;
+  --color-ok-bg: #E7F1E3;
+  --color-ok: #2D6A3E;
+  --color-grey-bg: #F0F1ED;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
+  /* Fonts fall back to system faces: the app does not load Google Fonts (see app/layout.tsx). */
+  --font-serif: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --shadow-card: 0 1px 2px rgba(18, 60, 48, 0.04), 0 6px 18px -10px rgba(18, 60, 48, 0.1);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-canvas);
+  color: var(--color-ink);
   font-family: var(--font-sans);
+  font-size: 15.5px;
+  line-height: 1.5;
+}
+
+:focus-visible {
+  outline: 2.5px solid var(--color-forest-2);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

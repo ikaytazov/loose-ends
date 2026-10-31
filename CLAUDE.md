@@ -37,7 +37,7 @@ we stay one system. Read it fully before changing anything.
 4. **Statuses and labels are fixed:** task status `proposed | not_started | in_progress | blocked | done`; priority `high | medium | low`; workstream health `on_track | blocked | decision_needed | update_needed`. Show them with the labels and colors in the mockups.
 5. **Due dates never change from a reply.** A reply creates a date request; only `POST /api/date-requests/[id]/decide` moves a date.
 6. **No secrets in the repo.** Keys go in `.env.local` (laptop) or Vercel settings. `.env.example` lists the names.
-7. **Work on your own branch** (`fe-jerry`, `fe-valerie`, `be-iliyan`, `data-david`, ...), open a pull request, Iliyan merges to `main`.
+7. **Every task is a GitHub issue** (https://github.com/ikaytazov/loose-ends/issues). Work on a branch for that issue, open a pull request whose description says `Closes #<issue number>`, and Iliyan merges to `main`. Stay inside the issue's scope; if you find other work, open a new issue instead of doing it.
 8. Before pushing: `npm run build` must pass. Back-end: `npm test` must pass.
 9. Keep it simple. This is a 3-day demo with one workspace and no login. Do not add libraries without a reason.
 

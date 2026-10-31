@@ -9,7 +9,7 @@ Types for every request and response: `lib/contracts/api.ts`. Every error comes 
 | `POST /api/meetings/[id]/approve` | Lead approves the reviewed list | Real |
 | `POST /api/tasks/[id]/assign` | Give a task an owner | Real |
 | `POST /api/date-requests/[id]/decide` | Approve or decline a new date | Real |
-| `POST /api/emails/send-morning` | "Send morning emails now" | **Stub** (preview only, sends nothing) |
+| `POST /api/emails/send-morning` | "Send morning emails now" (also `GET` for the 8 am job) | Real |
 | `POST /api/inbound` | Gmail bridge delivers a reply | Real (not for screens) |
 | `GET /api/health` | Shows missing settings and database status | Real |
 
@@ -59,9 +59,10 @@ Returns 409 if the request was already decided.
 ```json
 // request: everyone with open tasks, or one person
 {}            or            { "member_id": "uuid" }
-// response (stub)
-{ "stub": true, "sent": 0, "recipients": ["priya@example.com"], "preview": [ { "to": "priya@example.com", "tasks": ["1. high – Launch the new pricing page – due 2026-11-05"] } ] }
+// response: recipients = who was sent an email; failed = who was not, and why
+{ "sent": 1, "recipients": ["priya@example.com"], "failed": [] }
 ```
+The 8 am job is `GET` on the same address, called by Vercel (`vercel.json`) with `Authorization: Bearer <CRON_SECRET>`.
 
 ### POST /api/inbound  (Gmail bridge only)
 Header `x-bridge-secret: <BRIDGE_SECRET>`.

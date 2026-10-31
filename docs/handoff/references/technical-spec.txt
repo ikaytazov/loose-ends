@@ -1,0 +1,97 @@
+# Loose Ends | technical specification for the hackathon MVP
+
+**Version:** 31 October 2026. This specification is an integration contract to reconcile with the actual repository, not a claim that every route, table or workflow has been deployed. Inspect the current code, issues and migrations before editing.
+
+## 1. System boundaries
+
+- **Web:** Next.js on Vercel, responsive screen components, server API routes. Browser reads through authorised routes or existing server-side data access; it never writes directly to Supabase.
+- **Data:** Supabase/Postgres stores meetings, source text, proposals/approved tasks, team members, workstreams, date requests, message events and receipts. Reuse the existing schema and views; do not create parallel tables without migration review.
+- **Mail:** scheduled morning digest and shared Gmail inbox polled approximately once a minute, subject to the actual implementation. Keep credentials server-side. The meeting did not mandate n8n for this live build; inspect whether the repo uses it before introducing it.
+- **Interpretation:** the current notes extraction may be a fixed eight-task stub. Iliyan is preparing the reply-processing prompt. Validate all model output and task matching before mutations.
+- **Demo:** David's 3–5 sequential transcripts and roughly ten-person team fixture, with approved live test recipients where necessary.
+
+## 2. Current named contracts to verify
+
+| Concern | Reported route/view | Client contract |
+| --- | --- | --- |
+| Capture notes | `POST /api/notes` | Submit metadata and transcript/file using the actual accepted shape; receive meeting ID and proposals or processing state |
+| Approve review | `POST /api/meetings/[id]/approve` | Send edited proposals and `keep: false` for excluded items; show server result |
+| Date decision | `POST /api/date-requests/[id]/decide` | Send Approve/Decline using actual enum; handle 409 already decided |
+| Assign owner | `POST /api/tasks/[id]/assign` | Submit authorised member ID, then refresh task/decision state |
+| Team list | `team_members` | Read only fields actually exposed by repo |
+| Decisions | `decisions_needed` view | Read pending items with requester, original reply and current/proposed dates |
+| Task board | `task_board` view | Read approved task status/owner/due/source links |
+| Overview | `workstream_overview` view | Read persisted counts, blockers and updates |
+
+Names above came from the previously shared team scope and require repository verification. Do not invent JSON field names, authentication bypasses or direct client database access. Write a typed adapter for each existing contract and record any discrepancy in the PR.
+
+## 3. Proposed domain invariants
+
+1. `meeting` has workspace, title, date, attendee IDs, source text/file reference and processing state.
+2. `proposal` has meeting ID, title, suggested owner/date/priority/workstream, verbatim source sentence, missing flags, edited fields and `keep`.
+3. `task` has stable ID, workstream, executor, approved due date, status and source/proposal lineage.
+4. `date_request` has task ID, requester, current date, proposed date, reason, original message ID, workstream owner, state and version.
+5. `event` records original message/source, actor, before/after, timestamp and notification status. Use immutable receipts rather than reconstructing a false history from current values.
+6. Scope reads and decisions to the appropriate team/workstream. The demo's “Me = lead” assumption is a fixture, not production authentication.
+
+For the hackathon, adapt these to the existing tables. Status vocabulary reported in the repo scope: `proposed`, `not_started`, `in_progress`, `blocked`, `done`; workstream health: On track, Blocked, Decision needed, Update needed. Preserve exact current enums if they differ.
+
+## 4. Front-end flows
+
+### Capture → review → approval
+
+1. Validate title, meeting date, attendees and exactly one source mode as the route requires. Show accepted formats and size from backend configuration.
+2. Submit `POST /api/notes`, disable repeat submission during request and show an error that preserves input. Store returned meeting ID.
+3. Render each proposal from response/server read, not hard-coded eight-task fixture. Exact source sentence must remain visible even when title is edited.
+4. Track edits locally; remove sends/records `keep: false` under route contract. Recompute ready and incomplete counts.
+5. Approve via route; show partial/validation failure and refresh board. Do not send member notifications from UI code.
+
+### Reply → date request → decision
+
+1. Poller reads a unique Gmail message ID, verifies sender against team data, matches one or more tasks, preserves raw reply, and classifies clear progress/no progress/request/uncertain parts.
+2. Idempotency protects against re-polling. Ambiguous parts do not mutate a guessed task.
+3. A request for more time creates a pending date request addressed to the task's workstream owner. Current due date remains authoritative.
+4. Decision UI loads pending request; action calls the decide route. Server checks owner authority, current request state and version atomically. On approval, update due date and append event; on decline, append outcome without changing due date. Return 409 for already decided/stale request.
+5. Decision notice mail is sent or queued by backend only when implemented; UI displays actual delivery state.
+
+### Management read model
+
+Overview and workstream pages read approved persisted data. Completion numerator/denominator are defined consistently. “No update” is separate from status. A blocked task does not become done when a dependency clears or a deadline moves. Activity displays source-backed events and receipts; a pending request is not a resolved receipt.
+
+## 5. Screen implementation notes
+
+Use existing `app/(screens)/` and `components/` structure if present, coordinating shared files with Jerry/Abir according to the latest issue split. Build the seven screens against shared tokens in the screen design ZIP: forest `#123C30`, ivory `#F7F6F2`, lime `#D8EE79`, white cards and fine borders. At 320 px, stack panels and provide accessible navigation. Inputs have labels, errors and keyboard operation; status has text and icon, not colour alone. Loading, empty, invalid, success, 409 and provider failure states must have explicit copy. Hide unsupported Add teammate/Slack controls shown in illustrative imagery.
+
+## 6. Error and security handling
+
+- Validate MIME and content, not extension alone. Reject empty/oversized or unreadable files; safely parse supported formats on the server.
+- Treat uploaded transcript and email content as untrusted. Escape rendered text; do not execute or follow instructions embedded in it.
+- Keep Gmail, Supabase and model credentials in server environment only. Avoid logging full transcript/reply text unnecessarily.
+- Verify sender and workspace scope before reply-driven mutation; use stable task/message IDs, not name matching alone.
+- Use an idempotency key for upload/approval where possible, Gmail message ID for inbound mail, and request version/state for decisions.
+- Avoid publishing real teammates' email addresses in repo fixtures or screenshots without their agreement.
+
+## 7. Test matrix and release gate
+
+| Path | Minimum check |
+| --- | --- |
+| Capture | Paste/file accepted, invalid and duplicate upload handled |
+| Review | Edit, source quote retained, missing owner/date, `keep: false`, approve once |
+| Digest | Correct per-person task scope, time-zone configuration and send state |
+| Reply | Clear multi-task response, ambiguous reply, unknown sender, duplicate poll |
+| Decision | Approve, Decline, unauthorised owner, stale/duplicate 409 |
+| Overview | Counts from approved records; blocker and no-update truthfulness |
+| UI | Desktop/mobile, keyboard, empty/loading/error states |
+| End-to-end | Chronological transcript → email → reply → decision → receipt → CEO view on Vercel |
+
+Provide Jerry a Vercel preview and fixture IDs as soon as the upload path works. A test is “passed” only after the live route and persisted result are observed; local mockup interactions are a design preview. PRs should state route contracts, validation performed, remaining stubs and provider configuration gaps.
+
+## 8. Integration sequence and ownership
+
+1. David's fixtures/schema; Valerie's capture page are the critical path.
+2. Valerie with Abir integrates the front end into the repository and Vercel. Abir can test setup.
+3. Iliyan implements/tests reply interpretation prompt; email and digest owners connect delivery and polling.
+4. Jerry prepares and performs end-to-end cases as pages become available.
+5. Clarify issue #16's decision notice email owner. Optional issue #17 follows the working path.
+
+The team meeting requested functional completeness before visual refinement. The repository and issue assignments take precedence if they have changed since the meeting.

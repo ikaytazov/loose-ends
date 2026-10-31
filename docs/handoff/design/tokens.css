@@ -1,0 +1,37 @@
+/* Loose Ends design tokens. Paste into app/globals.css after `@import "tailwindcss";`
+   Then use Tailwind classes like bg-forest, text-muted, border-line, bg-lime-soft, font-serif. */
+
+@theme {
+  --color-forest: #123C30;        /* sidebar, primary buttons */
+  --color-forest-2: #215846;      /* links, selected, focus ring */
+  --color-ink: #18201D;           /* main text */
+  --color-ink-2: #2D3833;
+  --color-canvas: #F7F6F2;        /* app background (warm ivory) */
+  --color-paper: #FFFFFF;         /* cards */
+  --color-lime: #D8EE79;          /* small highlights only */
+  --color-lime-soft: #EDF5CC;     /* proposed / decision pills, icon discs */
+  --color-lime-wash: #F5F8E8;     /* requested-date box, banners */
+  --color-line: #E3E6DF;          /* 1px borders */
+  --color-line-2: #EDEFEA;        /* row dividers */
+  --color-muted: #64736D;         /* secondary text */
+  --color-danger-bg: #FBE9E5;  --color-danger: #8E3426;  --color-danger-line: #F1CFC7;   /* blocked */
+  --color-warn-bg: #FFF0CF;    --color-warn: #8A5E13;    --color-warn-line: #F2DDA8;     /* update needed / no owner */
+  --color-ok-bg: #E7F1E3;      --color-ok: #2D6A3E;                                       /* done / on track */
+  --color-grey-bg: #F0F1ED;
+
+  --font-serif: "Newsreader", "Iowan Old Style", Georgia, serif;   /* headlines, card titles, numbers */
+  --font-sans: "Figtree", ui-sans-serif, system-ui, sans-serif;     /* body, labels, controls */
+
+  --radius-card: 14px;
+  --radius-control: 10px;
+  --shadow-card: 0 1px 2px rgba(18,60,48,.04), 0 6px 18px -10px rgba(18,60,48,.10);
+}
+
+body { background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-sans); font-size: 15.5px; line-height: 1.5; }
+:focus-visible { outline: 2.5px solid var(--color-forest-2); outline-offset: 2px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+
+/* Fonts: load with next/font/google in app/layout.tsx
+   import { Figtree, Newsreader } from "next/font/google";
+   Figtree({ subsets:["latin"], weight:["400","500","600","700"], variable:"--font-sans" })
+   Newsreader({ subsets:["latin"], weight:["400","500"], variable:"--font-serif" }) */

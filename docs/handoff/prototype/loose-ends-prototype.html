@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loose Ends — clickable prototype (demo data)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#123C30; --forest-2:#215846; --forest-hover:rgba(255,255,255,.07); --forest-active:rgba(255,255,255,.11);
+  --ink:#18201D; --ink-2:#2D3833; --canvas:#F7F6F2; --paper:#FFFFFF; --lime:#D8EE79; --lime-soft:#EDF5CC; --lime-wash:#F5F8E8;
+  --line:#E3E6DF; --line-2:#EDEFEA; --muted:#64736D; --muted-2:#83908A;
+  --danger-bg:#FBE9E5; --danger:#8E3426; --danger-line:#F1CFC7;
+  --warn-bg:#FFF0CF; --warn:#8A5E13; --warn-line:#F2DDA8;
+  --ok-bg:#E7F1E3; --ok:#2D6A3E; --grey-bg:#F0F1ED;
+  --serif:"Newsreader", "Iowan Old Style", Georgia, serif;
+  --sans:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r:14px; --r-sm:10px;
+  --shadow:0 1px 2px rgba(18,60,48,.04), 0 6px 18px -10px rgba(18,60,48,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--sans);font-size:15.5px;line-height:1.5;color:var(--ink);background:var(--canvas);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--forest-2)}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+:focus-visible{outline:2.5px solid var(--forest-2);outline-offset:2px;border-radius:6px}
+.sidebar :focus-visible{outline-color:var(--lime)}
+.ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ic.sm{width:16px;height:16px}.ic.xs{width:14px;height:14px}.ic.lg{width:24px;height:24px}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--forest);color:#E9EFEA;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:26px 14px 18px;overflow:hidden;z-index:30}
+.brand{display:flex;flex-direction:column;gap:2px;padding:0 12px 26px;color:#F4F6F1;text-decoration:none}
+.brand svg{width:56px;height:46px;margin-bottom:2px}
+.brand .wm{font-family:var(--serif);font-size:38px;line-height:.92;letter-spacing:-.01em}
+.nav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;position:relative;z-index:2}
+.nav a{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:10px;color:#DCE5DF;text-decoration:none;font-size:16px;position:relative}
+.nav a:hover{background:var(--forest-hover);color:#fff}
+.nav a[aria-current="page"]{background:var(--forest-active);color:#fff}
+.nav a[aria-current="page"]::before{content:"";position:absolute;left:-2px;top:10px;bottom:10px;width:3px;border-radius:3px;background:var(--lime)}
+.nav .badge{margin-left:auto;background:var(--lime);color:var(--forest);font-size:12.5px;font-weight:700;min-width:22px;height:22px;border-radius:11px;display:grid;place-items:center;padding:0 6px}
+.side-thread{position:absolute;left:0;right:0;bottom:150px;height:190px;pointer-events:none;z-index:1}
+.side-foot{position:relative;z-index:2;display:flex;align-items:center;gap:12px;padding:10px 10px 0;border-top:1px solid rgba(255,255,255,.08);padding-top:16px}
+.side-foot .who{font-size:14.5px;line-height:1.25}
+.side-foot .who small{display:block;color:#A9BBB1;font-size:13px}
+.side-tag{margin-top:auto;position:relative;z-index:2;font-family:var(--serif);font-size:19px;line-height:1.2;color:#CFDCD3;padding:0 12px 18px}
+
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(247,246,242,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:14px 32px;min-height:72px}
+.ctx{display:flex;align-items:center;gap:14px;min-width:0}
+.ctx .page{font-weight:600;font-size:17px;white-space:nowrap}
+.ctx .sep{width:1px;height:24px;background:var(--line)}
+.ws-btn{display:flex;align-items:center;gap:6px;background:none;border:0;padding:6px 8px;border-radius:8px;font-size:15px;color:var(--ink-2);white-space:nowrap}
+.ws-btn:hover{background:var(--grey-bg)}
+.search{position:relative;flex:1;max-width:440px;margin-left:auto}
+.search input{width:100%;height:42px;border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:0 14px 0 42px;font-size:14.5px}
+.search .ic{position:absolute;left:14px;top:11px;color:var(--muted)}
+.search input::placeholder{color:var(--muted-2)}
+.top-actions{display:flex;align-items:center;gap:10px}
+.chip-demo{background:var(--lime);color:var(--forest);border:1px solid #C7DF62;font-weight:600;font-size:13.5px;padding:7px 12px;border-radius:9px;white-space:nowrap}
+.icon-btn{position:relative;width:42px;height:42px;border-radius:10px;border:1px solid transparent;background:none;display:grid;place-items:center;color:var(--ink-2)}
+.icon-btn:hover{background:var(--grey-bg)}
+.icon-btn .dot{position:absolute;top:9px;right:9px;width:9px;height:9px;border-radius:50%;background:#9BC23A;border:2px solid var(--canvas)}
+.tools-btn{display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--paper);font-weight:600;font-size:14px;color:var(--forest)}
+.tools-btn:hover{border-color:#CDD3CA}
+.menu-btn{display:none}
+.pop{position:absolute;top:calc(100% + 8px);right:0;background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px -18px rgba(18,32,29,.28);padding:8px;min-width:300px;z-index:50}
+.pop h4{margin:6px 10px 6px;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.pop .item{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;background:none;border:0;padding:10px;border-radius:9px}
+.pop .item:hover:not(:disabled){background:var(--canvas)}
+.pop .item:disabled{opacity:.45;cursor:not-allowed}
+.pop .item b{display:block;font-weight:600;font-size:14.5px}
+.pop .item span{display:block;color:var(--muted);font-size:13px;line-height:1.35}
+.pop .note{font-size:12.5px;color:var(--muted);padding:8px 10px 4px;border-top:1px solid var(--line-2);margin-top:6px}
+.rel{position:relative}
+.search-pop{left:0;right:auto;width:100%;min-width:0}
+
+.content{padding:40px 40px 64px;max-width:1380px;width:100%;margin:0 auto;position:relative}
+.page-head{position:relative;margin-bottom:28px}
+.page-head h1{font-family:var(--serif);font-weight:400;font-size:clamp(36px,4.4vw,56px);line-height:1.04;letter-spacing:-.02em;margin:0;outline:none}
+.page-head p.sub{font-size:clamp(17px,1.7vw,22px);color:var(--muted);margin:10px 0 0;max-width:760px}
+.head-thread{position:absolute;right:-40px;top:-30px;width:360px;height:150px;pointer-events:none}
+.crumb{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2);text-decoration:none;font-size:15px;margin-bottom:14px}
+.crumb:hover{color:var(--forest-2)}
+.demo-banner{display:flex;gap:12px;align-items:center;background:var(--lime-wash);border:1px solid #DCE8B4;border-radius:12px;padding:12px 16px;margin-bottom:22px;font-size:14.5px}
+.demo-banner .ic{color:var(--forest-2)}
+.demo-banner .grow{flex:1}
+
+/* ---------- primitives ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card-pad{padding:24px}
+.h2{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:-.01em;margin:0}
+.h3{font-family:var(--serif);font-weight:400;font-size:22px;letter-spacing:-.005em;margin:0;line-height:1.2}
+.muted{color:var(--muted)}
+.small{font-size:13.5px}
+.label{font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:10px;border:1px solid transparent;font-weight:600;font-size:15px;white-space:nowrap;text-decoration:none}
+.btn-primary{background:var(--forest);color:#fff}
+.btn-primary:hover{background:#0D3026}
+.btn-secondary{background:var(--paper);border-color:#CED5CB;color:var(--forest)}
+.btn-secondary:hover{border-color:var(--forest-2)}
+.btn-ghost{background:none;color:var(--forest-2);padding:0 10px;height:36px}
+.btn-ghost:hover{background:var(--grey-bg)}
+.btn-sm{height:36px;padding:0 14px;font-size:14px;border-radius:9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link{background:none;border:0;padding:0;color:var(--forest-2);text-decoration:underline;text-underline-offset:3px;font-weight:500}
+.link:hover{color:var(--forest)}
+.av{width:32px;height:32px;border-radius:50%;display:inline-grid;place-items:center;font-size:12.5px;font-weight:700;color:#2C3A34;flex:none;border:1px solid rgba(0,0,0,.04)}
+.av.lg{width:42px;height:42px;font-size:14px}
+.av.none{background:var(--grey-bg);color:var(--muted)}
+.person{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.person .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:999px;font-size:13.5px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.pill .ic{width:15px;height:15px;stroke-width:2}
+.p-blocked{background:var(--danger-bg);color:var(--danger);border-color:var(--danger-line)}
+.p-decision{background:var(--lime-soft);color:#45570F;border-color:#D7E79A}
+.p-update{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}
+.p-ok{background:var(--ok-bg);color:var(--ok);border-color:#CFE3C8}
+.p-done{background:var(--ok-bg);color:var(--ok);border-color:#CFE3C8}
+.p-progress{background:#E9F2EC;color:#2A5C46;border-color:#D2E4D9}
+.p-notstarted{background:var(--paper);color:var(--muted);border-color:var(--line)}
+.p-proposed{background:var(--lime-soft);color:#45570F;border-color:#D7E79A}
+.p-grey{background:var(--grey-bg);color:var(--ink-2);border-color:var(--line)}
+.p-declined{background:var(--grey-bg);color:var(--ink-2);border-color:var(--line)}
+.pill.lead{background:var(--forest);color:#fff}
+
+.quote{position:relative;background:var(--canvas);border-left:3px solid var(--lime);border-radius:4px 10px 10px 4px;padding:12px 16px 12px 18px;font-size:15px;color:var(--ink-2)}
+.quote .src{display:block;margin-top:6px;font-size:13px;color:var(--muted)}
+mark{background:var(--lime-soft);color:inherit;padding:1px 2px;border-radius:3px;box-shadow:inset 0 -2px 0 #CFE27C}
+mark.hl-active{background:var(--lime)}
+.ai-tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--muted);background:var(--grey-bg);border:1px dashed #C9CFC5;padding:2px 8px;border-radius:6px}
+.inf-tag{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--warn);background:#FFF8E6;border:1px dashed #E3C77F;padding:2px 8px;border-radius:6px}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat{display:flex;align-items:center;gap:16px;padding:18px 20px}
+.stat .ico{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;flex:none}
+.stat .n{font-family:var(--serif);font-size:34px;line-height:1}
+.stat .l{color:var(--muted);font-size:14.5px;margin-top:2px}
+.ico-lime{background:var(--lime-soft);color:var(--forest)}
+.ico-red{background:var(--danger-bg);color:var(--danger)}
+.ico-amber{background:var(--warn-bg);color:var(--warn)}
+.ico-green{background:#E6EFE4;color:var(--forest)}
+.bar{height:9px;border-radius:9px;background:#E9ECE6;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--forest-2);border-radius:9px;transition:width .5s ease}
+
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-bottom:22px}
+.tab{background:none;border:0;padding:10px 6px 12px;margin-right:22px;font-size:16.5px;color:var(--muted);position:relative;font-weight:500}
+.tab[aria-selected="true"]{color:var(--ink);font-weight:600}
+.tab[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--lime)}
+.filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.fpill{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:999px;border:1px solid var(--line);background:var(--paper);font-size:15px;color:var(--ink-2)}
+.fpill[aria-pressed="true"]{background:var(--lime-soft);border-color:#D2E395;color:var(--forest);font-weight:600}
+.fpill .dot{width:9px;height:9px;border-radius:50%}
+.fpill .ct{color:var(--muted);font-weight:500}
+
+.field label,.field .flabel{display:block;font-weight:600;font-size:14.5px;margin-bottom:8px}
+.input,.select,.textarea{width:100%;height:46px;border:1px solid #D9DED5;border-radius:10px;background:var(--paper);padding:0 14px;font-size:15px}
+.textarea{height:auto;min-height:260px;padding:14px 16px;line-height:1.6;resize:vertical}
+.select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2318201D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.input:hover,.select:hover,.textarea:hover{border-color:#C3CABF}
+.input.warn,.select.warn{border-color:#E2B85A;background-color:#FFFAEE}
+.ferr{color:var(--danger);font-size:13.5px;margin-top:6px;display:flex;gap:6px;align-items:center}
+.fwarn{color:var(--warn);font-size:13px;margin-top:5px;display:flex;gap:5px;align-items:center;font-weight:600}
+
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty .h3{color:var(--ink);margin:14px 0 6px}
+.empty svg.loopart{width:120px;height:70px}
+
+.skel{background:linear-gradient(90deg,#EEEFEA 25%,#F6F6F2 50%,#EEEFEA 75%);background-size:200% 100%;animation:sh 1.3s infinite linear;border-radius:8px}
+@keyframes sh{to{background-position:-200% 0}}
+
+.toast-wrap{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:100;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--forest);color:#fff;padding:12px 18px;border-radius:12px;box-shadow:0 14px 30px -12px rgba(0,0,0,.4);display:flex;gap:10px;align-items:center;font-size:14.5px;max-width:min(560px,92vw);pointer-events:auto;animation:tin .25s ease}
+.toast.warn{background:#5B3E0A}
+.toast .ic{color:var(--lime)}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+
+.overlay{position:fixed;inset:0;background:rgba(18,32,29,.36);z-index:60;display:grid;place-items:center;padding:20px}
+.modal{background:var(--paper);border-radius:16px;max-width:520px;width:100%;padding:28px;box-shadow:0 30px 60px -20px rgba(0,0,0,.35)}
+.modal .h2{margin-bottom:10px}
+.modal ul{margin:12px 0 0;padding-left:20px;color:var(--ink-2)}
+.modal ul li{margin:6px 0}
+.modal .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;flex-wrap:wrap}
+
+/* ---------- overview ---------- */
+.ov-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;align-items:start}
+.sec-title{display:flex;align-items:center;gap:10px;margin:28px 0 14px}
+.count{display:inline-grid;place-items:center;min-width:26px;height:26px;padding:0 7px;border-radius:13px;background:var(--grey-bg);font-size:13.5px;font-weight:600;color:var(--ink-2);font-family:var(--sans)}
+.ws-list{display:flex;flex-direction:column;gap:14px}
+.ws-card{display:grid;grid-template-columns:56px minmax(0,1fr);gap:18px;padding:22px 24px;cursor:pointer;transition:border-color .15s, box-shadow .15s;text-align:left;width:100%;font:inherit;color:inherit}
+.ws-card:hover{border-color:#C9D1C4;box-shadow:0 10px 28px -16px rgba(18,60,48,.25)}
+.ws-icon{width:52px;height:52px;border-radius:50%;background:var(--lime-soft);display:grid;place-items:center;color:var(--forest)}
+.ws-top{display:flex;align-items:flex-start;gap:12px;justify-content:space-between}
+.ws-top .h3{font-size:26px}
+.ws-sub{color:var(--muted);font-size:15px;margin-top:2px}
+.ws-prog{display:flex;align-items:center;gap:16px;margin:16px 0 12px}
+.ws-prog .bar{flex:1}
+.ws-prog .t{font-size:14px;color:var(--muted);white-space:nowrap}
+.reason{display:flex;align-items:center;gap:10px;border-radius:10px;padding:10px 14px;font-size:15px;margin-bottom:14px}
+.reason.blocked{background:var(--danger-bg);color:#5E2219}
+.reason.update{background:var(--warn-bg);color:#5C3F0C}
+.reason.decision{background:var(--lime-wash);color:#3C4C0D}
+.reason.ok{background:#F0F5EE;color:#28513C}
+.ws-meta{display:flex;flex-wrap:wrap;gap:10px 26px;align-items:center;font-size:14px;color:var(--muted)}
+.ws-meta .kv{display:flex;align-items:center;gap:8px}
+.ws-meta .kv b{color:var(--ink);font-weight:600}
+.owners{display:flex;gap:4px}
+.owners .av{width:28px;height:28px;font-size:11.5px;margin-left:-6px;border:2px solid #fff}
+.owners .av:first-child{margin-left:0}
+.nup{display:inline-flex;align-items:center;gap:6px;color:var(--warn);font-weight:600}
+.foot-note{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:14px;margin-top:18px}
+.rail{display:flex;flex-direction:column;gap:20px}
+.rail-card{padding:22px 22px 10px}
+.rail-head{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.rail-head .h3{flex:1}
+.dq{display:flex;gap:14px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line-2);padding:16px 2px;align-items:flex-start;border-radius:0}
+.dq:first-of-type{border-top:0}
+.dq:hover .dq-t{text-decoration:underline;text-underline-offset:3px}
+.dq .ico{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--lime-soft);color:var(--forest)}
+.dq-t{font-weight:600;font-size:15.5px}
+.dq-s{color:var(--muted);font-size:14px;line-height:1.4;margin-top:2px}
+.dq .chev{margin-left:auto;color:var(--muted);align-self:center}
+.mv{list-style:none;margin:0;padding:0 0 8px;position:relative}
+.mv li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:12px;padding:10px 0;position:relative}
+.mv li::before{content:"";position:absolute;left:8px;top:28px;bottom:-10px;width:1px;background:#DCE5CF}
+.mv li:last-child::before{display:none}
+.mv .dt{width:11px;height:11px;border-radius:50%;margin-top:6px;margin-left:3px;background:#9DC14B;box-shadow:0 0 0 4px #F1F6E1}
+.mv .dt.red{background:#E59A8C;box-shadow:0 0 0 4px #FBEDEA}
+.mv .dt.amber{background:#E5B653;box-shadow:0 0 0 4px #FDF4DF}
+.mv .dt.grey{background:#B8BFB6;box-shadow:0 0 0 4px #F0F1EE}
+.mv b{font-weight:600;font-size:15px}
+.mv .q{color:var(--ink-2);font-size:14.5px}
+.mv .m{color:var(--muted);font-size:13.5px}
+
+/* ---------- workstream detail ---------- */
+.wsd{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:24px;align-items:start}
+.wsd.nopanel{grid-template-columns:minmax(0,1fr)}
+.ws-facts{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;margin:18px 0 24px}
+.ws-facts .f{display:flex;align-items:center;gap:10px;font-size:15px}
+.ws-facts .f small{display:block;color:var(--muted);font-size:13px;line-height:1.2}
+.progress-card{padding:20px 24px;margin:20px 0}
+.progress-card .row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+.progress-card .big{font-family:var(--serif);font-size:24px}
+.legend{display:flex;gap:18px;font-size:14px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.table-card{padding:6px 0 4px;overflow-x:auto}
+.tbl-tools{display:flex;align-items:center;gap:12px;padding:16px 22px 10px;flex-wrap:wrap}
+.tbl-tools .h3{flex:1;min-width:120px}
+.mini-search{position:relative}
+.mini-search input{height:40px;border:1px solid var(--line);border-radius:999px;padding:0 14px 0 38px;width:220px;background:var(--canvas)}
+.mini-search .ic{position:absolute;left:13px;top:12px;color:var(--muted)}
+table.tt{width:100%;border-collapse:collapse}
+table.tt th{font-size:13.5px;font-weight:500;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+table.tt td{padding:14px 12px;border-bottom:1px solid var(--line-2);font-size:15px;vertical-align:middle}
+table.tt tr:last-child td{border-bottom:0}
+table.tt th:first-child,table.tt td:first-child{padding-left:22px}
+table.tt th:last-child,table.tt td:last-child{padding-right:22px}
+table.tt tbody tr{cursor:pointer;transition:background .12s}
+table.tt tbody tr:hover{background:#FAFAF7}
+table.tt tbody tr.sel{background:#F3F7E6}
+table.tt tbody tr.row-blocked:not(.sel){background:#FDF6F4}
+.tname{display:flex;align-items:center;gap:12px;background:none;border:0;padding:0;text-align:left;font-family:var(--serif);font-size:17.5px;min-width:180px;line-height:1.25;color:var(--ink)}
+.tname small{display:block;font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:2px}
+.tcirc{width:22px;height:22px;flex:none}
+.tcirc circle{fill:none;stroke:#AEB6AB;stroke-width:1.6}
+.tcirc.done circle{stroke:var(--ok)}
+.tcirc.done path{stroke:var(--ok);stroke-width:2;fill:none}
+.tcirc.anim circle{stroke-dasharray:60;stroke-dashoffset:60;animation:draw .7s ease forwards}
+.tcirc.anim path{stroke-dasharray:20;stroke-dashoffset:20;animation:draw .4s .5s ease forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.due-sub{display:block;font-size:12.5px;color:#45570F;font-weight:600;margin-top:2px}
+.due-over{color:var(--danger);font-weight:600}
+.lu{font-size:14px;color:var(--muted)}
+.lu.warn{color:var(--warn);font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.panel-scrim{display:none}
+.panel{position:sticky;top:96px;padding:22px 22px 18px;max-height:calc(100vh - 116px);overflow:auto}
+.panel-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+.panel-head .h2{font-size:28px;line-height:1.1}
+.panel-head .x{margin-left:auto}
+.kv-list{border-top:1px solid var(--line-2)}
+.kv-row{display:grid;grid-template-columns:24px 128px minmax(0,1fr);gap:10px;padding:13px 0;border-bottom:1px solid var(--line-2);align-items:start;font-size:15px}
+.kv-row .ic{color:var(--muted);margin-top:1px}
+.kv-row .k{color:var(--ink-2);font-weight:500}
+.kv-row .v small{display:block;color:var(--muted);font-size:13px}
+.tl{list-style:none;margin:8px 0 0;padding:0}
+.tl li{display:grid;grid-template-columns:14px minmax(0,1fr);gap:12px;padding:6px 0 10px;position:relative}
+.tl li::before{content:"";position:absolute;left:6px;top:20px;bottom:-4px;width:1px;background:var(--line)}
+.tl li:last-child::before{display:none}
+.tl .dt{width:11px;height:11px;border-radius:50%;margin-top:6px;background:#9DC14B}
+.tl .dt.red{background:#E59A8C}.tl .dt.amber{background:#E5B653}.tl .dt.grey{background:#B8BFB6}
+.tl b{font-weight:600;font-size:14.5px;display:block}
+.tl small{color:var(--muted);font-size:13px}
+.sect-label{display:flex;align-items:center;gap:10px;margin:20px 0 8px;font-weight:600;font-size:15.5px}
+.dep-card{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);gap:12px;align-items:center;padding:18px 20px;margin-bottom:12px}
+.dep-node{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.dep-node b{font-family:var(--serif);font-weight:400;font-size:19px;display:block}
+.dep-arrow{color:var(--muted);display:grid;place-items:center}
+
+/* ---------- decisions ---------- */
+.dec-grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:24px;align-items:start}
+.dec-card{padding:26px 28px;margin-bottom:18px}
+.dec-top{display:flex;gap:14px;align-items:flex-start;justify-content:space-between}
+.dec-top .h2{font-size:30px}
+.req-by{display:flex;gap:12px;align-items:center;margin:16px 0 18px;padding-bottom:18px;border-bottom:1px solid var(--line-2)}
+.req-by b{font-weight:600}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dbox{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--canvas)}
+.dbox.req{background:var(--lime-wash);border-color:#E0EAB9}
+.dbox .dv{font-family:var(--serif);font-size:28px;line-height:1.15;margin:4px 0}
+.dbox .dn{font-size:13.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.dec-section{margin-top:18px}
+.dec-section .k{font-weight:600;font-size:14.5px;margin-bottom:4px}
+.linked{display:flex;gap:12px;align-items:center;border:1px solid var(--danger-line);background:#FEF8F6;border-radius:12px;padding:12px 14px;font-size:14.5px}
+.linked .ic{color:var(--danger)}
+.dec-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.dec-actions .btn{flex:1;min-width:200px}
+.confirm-row{margin-top:20px;border:1px solid #D6E3A6;background:var(--lime-wash);border-radius:12px;padding:16px 18px}
+.confirm-row p{margin:0 0 12px}
+.confirm-row .actions{display:flex;gap:10px;flex-wrap:wrap}
+.resolved-card{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:16px;align-items:center;padding:18px 22px;margin-bottom:12px}
+.rcpt{padding:24px}
+.rcpt .from-to{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);gap:8px;align-items:center;margin:12px 0 16px}
+.ft{border-radius:10px;padding:12px 14px;background:var(--grey-bg);border:1px solid var(--line)}
+.ft.after{background:var(--lime-wash);border-color:#E0EAB9}
+.ft small{display:block;color:var(--muted);font-size:12.5px}
+.ft b{font-family:var(--serif);font-weight:400;font-size:20px}
+.rc-rows{display:grid;grid-template-columns:130px minmax(0,1fr);gap:10px 14px;font-size:14.5px;margin:6px 0 14px}
+.rc-rows dt{color:var(--muted)}
+.rc-rows dd{margin:0}
+.notif{display:flex;gap:12px;align-items:flex-start;padding:14px 0 4px;border-top:1px solid var(--line-2)}
+.notif .ico{width:38px;height:38px;border-radius:50%;background:var(--lime-soft);display:grid;place-items:center;color:var(--forest);flex:none}
+.loop-card{position:relative;background:var(--lime-soft);border:1px solid #DCE9A8;border-radius:var(--r);min-height:220px;overflow:hidden;padding:26px}
+.loop-card svg{position:absolute;inset:0;width:100%;height:100%}
+.loop-card .t{position:relative;font-family:var(--serif);font-size:34px;line-height:1.05;margin-top:110px;max-width:240px}
+.loop-card .s{position:relative;color:#3E4B2C;margin-top:8px;font-size:15px}
+.loop-card path.thr{stroke:var(--forest);stroke-width:1.6;fill:none}
+.loop-card.play path.thr{stroke-dasharray:900;stroke-dashoffset:900;animation:draw 1.6s ease forwards}
+.loop-card circle.knot{fill:var(--lime);stroke:#B9D45A;stroke-width:1.5}
+.loop-card.play circle.knot{opacity:0;animation:fadein .3s 1.4s forwards}
+@keyframes fadein{to{opacity:1}}
+
+/* ---------- capture / review ---------- */
+.cap-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:stretch}
+.cap-card{padding:30px}
+.meta-row{display:grid;grid-template-columns:1.3fr .7fr 1.3fr;gap:18px;margin-bottom:24px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:46px;border:1px solid #D9DED5;border-radius:10px;padding:6px 8px;background:var(--paper)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--lime-soft);border:1px solid #DBE9A6;border-radius:999px;padding:3px 6px 3px 11px;font-size:14px}
+.chip button{background:none;border:0;padding:2px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2)}
+.chip button:hover{background:rgba(0,0,0,.06)}
+.chips select{border:0;background:transparent;font-size:14px;color:var(--muted);height:30px;padding:0 4px;max-width:120px}
+.notes-row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:22px}
+.drop{border:1.5px dashed #C6CEC2;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:26px;min-height:260px;gap:12px;background:#FCFCFA;transition:background .15s,border-color .15s}
+.drop.over{background:var(--lime-wash);border-color:var(--forest-2)}
+.drop .h3{font-size:22px}
+.drop label.btn{display:inline-flex;margin:0;font-size:14px;font-weight:600}
+.cap-actions{display:flex;gap:12px;align-items:center;margin-top:26px;flex-wrap:wrap}
+.steps-card{background:var(--lime-wash);border:1px solid #E2EBC2;border-radius:var(--r);padding:30px 26px;position:relative;overflow:hidden}
+.steps-card ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:46px;position:relative}
+.steps-card li{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px;position:relative;z-index:1}
+.steps-card .num{width:44px;height:44px;border-radius:50%;background:var(--lime);display:grid;place-items:center;font-weight:700;color:var(--forest);font-size:17px}
+.steps-card b{display:block;font-size:17.5px;font-weight:600;margin:9px 0 4px}
+.steps-card span{color:var(--muted);font-size:14.5px}
+.steps-card svg.st{position:absolute;left:47px;top:60px;width:30px;height:calc(100% - 120px);z-index:0}
+.rv-head{display:flex;gap:24px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.rv-stats{display:flex;gap:12px;flex-wrap:wrap}
+.rv-stat{min-width:150px;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;gap:20px;border:1px solid}
+.rv-stat .n{font-family:var(--serif);font-size:30px;line-height:1}
+.rv-stat .l{font-size:14px;color:var(--ink-2)}
+.rv-stat.a{background:var(--lime-soft);border-color:#DAE8A3}
+.rv-stat.b{background:#FFF6E2;border-color:var(--warn-line)}
+.rv-grid{display:grid;grid-template-columns:330px minmax(0,1fr);gap:24px;align-items:start;margin-top:30px}
+.src-panel{padding:22px;position:sticky;top:96px;max-height:calc(100vh - 210px);overflow:auto}
+.src-text{white-space:pre-wrap;font-size:14.5px;line-height:1.7;color:var(--ink-2);margin-top:12px}
+.src-text mark{cursor:pointer}
+.prop{padding:20px 22px;margin-bottom:14px;transition:border-color .15s, opacity .15s}
+.prop.focus{border-color:#B9D45A;box-shadow:0 0 0 3px #EEF6CF}
+.prop.removed{opacity:.6;background:#FBFBF9}
+.prop-top{display:flex;gap:14px;align-items:center}
+.prop-num{width:34px;height:34px;border-radius:50%;background:var(--lime-soft);display:grid;place-items:center;font-weight:700;color:var(--forest);flex:none}
+.title-input{flex:1;min-width:0;border:1px solid transparent;border-radius:8px;background:none;font-family:var(--serif);font-size:24px;padding:2px 8px;margin-left:-8px}
+.title-input:hover{border-color:var(--line)}
+.title-input:focus{border-color:#C3CABF;background:var(--paper)}
+.prop-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:16px 0 14px}
+.prop-fields .label{display:block;margin-bottom:6px}
+.prop-fields .select,.prop-fields .input{height:42px;font-size:14.5px}
+.prop .from{border-top:1px solid var(--line-2);padding-top:12px}
+.prop .from .label{display:block;margin-bottom:6px}
+.prop .dep{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--ink-2);margin:0 0 12px}
+.prop .flagline{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;align-items:center}
+.rv-foot{position:sticky;bottom:0;z-index:15;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-top:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:14px 40px;margin-top:auto}
+.rv-foot .sum{flex:1;font-size:16px}
+.rv-foot .att{color:#B5531F;font-weight:600}
+.target-card{padding:16px 20px;margin-bottom:14px;display:flex;gap:14px;align-items:flex-start;background:var(--canvas)}
+
+/* ---------- activity ---------- */
+.act-grid{display:grid;grid-template-columns:minmax(0,1fr) 460px;gap:24px;align-items:start}
+.day{font-family:var(--serif);font-size:24px;margin:8px 0 6px}
+.ev{display:grid;grid-template-columns:52px 44px minmax(0,1fr) 20px;gap:12px;align-items:start;width:100%;text-align:left;background:none;border:0;padding:16px 10px;border-bottom:1px solid var(--line-2);border-radius:10px}
+.ev:hover{background:#FAFAF7}
+.ev.sel{background:var(--lime-wash)}
+.ev .tm{color:var(--muted);font-size:14px;padding-top:10px}
+.ev .ico{width:42px;height:42px;border-radius:50%;display:grid;place-items:center}
+.ev b{font-family:var(--serif);font-weight:400;font-size:20px;display:block;line-height:1.25}
+.ev .s{color:var(--muted);font-size:14.5px;line-height:1.4;margin-top:2px}
+.ev .tag{display:inline-flex;gap:6px;align-items:center;font-size:13.5px;color:var(--forest-2);margin-top:6px;text-decoration:underline;text-underline-offset:3px}
+.ev .chev{color:var(--muted);margin-top:12px}
+.email{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:12px}
+.email .hd{background:var(--canvas);padding:12px 16px;font-size:13.5px;color:var(--muted);border-bottom:1px solid var(--line);display:grid;grid-template-columns:62px 1fr;gap:3px 8px}
+.email .hd b{color:var(--ink);font-weight:600}
+.email .bd{padding:16px;font-size:15.5px;white-space:pre-wrap}
+.readas{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.readas div{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;background:var(--paper)}
+
+/* ---------- team ---------- */
+.team-head{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+.team-head .filters{margin:0}
+td .email-t{color:var(--muted)}
+.lr{display:inline-flex;align-items:center;gap:8px;font-size:14.5px}
+.lr .dot{width:9px;height:9px;border-radius:50%;background:#56A25E}
+.lr.warn{color:var(--warn);font-weight:600}
+.lr.warn .dot{background:#E2A93B}
+table.tt.team tbody tr{cursor:default}
+
+/* ---------- responsive ---------- */
+@media (max-width:1240px){
+  .ov-grid,.dec-grid{grid-template-columns:minmax(0,1fr) 340px}
+  .act-grid{grid-template-columns:minmax(0,1fr) 400px}
+  .wsd{grid-template-columns:minmax(0,1fr) 380px}
+  .prop-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:1080px){
+  .ov-grid,.dec-grid,.act-grid,.wsd{grid-template-columns:minmax(0,1fr)}
+  .wsd .panel{position:fixed;right:0;top:0;bottom:0;max-height:none;width:min(440px,100vw);z-index:70;border-radius:16px 0 0 16px;box-shadow:-20px 0 40px -20px rgba(0,0,0,.3)}
+  .panel-scrim{display:block;position:fixed;inset:0;background:rgba(18,32,29,.3);z-index:65}
+  .rv-grid{grid-template-columns:minmax(0,1fr)}
+  .src-panel{position:static;max-height:280px}
+  .cap-grid{grid-template-columns:minmax(0,1fr)}
+  .steps-card ol{flex-direction:row;gap:18px}
+  .steps-card li{grid-template-columns:1fr}
+  .steps-card svg.st{display:none}
+  .head-thread{display:none}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .sidebar{position:fixed;left:0;top:0;bottom:0;width:272px;transform:translateX(-100%);transition:transform .25s ease;box-shadow:20px 0 40px -20px rgba(0,0,0,.4)}
+  .sidebar.open{transform:none}
+  .nav-scrim{position:fixed;inset:0;background:rgba(18,32,29,.36);z-index:25}
+  .menu-btn{display:grid}
+  .topbar{padding:10px 16px;flex-wrap:wrap;gap:10px}
+  .ctx .sep,.ws-btn{display:none}
+  .ctx{flex:1;min-width:0}
+  .ctx .page{overflow:hidden;text-overflow:ellipsis}
+  .demo-banner{flex-wrap:wrap}
+  .demo-banner .grow{flex-basis:calc(100% - 40px)}
+  .search{order:5;flex-basis:100%;max-width:none}
+  .top-actions{margin-left:auto;flex:none}
+  .content{padding:26px 18px 48px}
+  .rv-foot{padding:12px 18px}
+}
+@media (max-width:720px){
+  .meta-row,.notes-row{grid-template-columns:minmax(0,1fr)}
+  .drop{min-height:160px}
+  .steps-card ol{flex-direction:column;gap:18px}
+  .steps-card li{grid-template-columns:44px minmax(0,1fr)}
+  .dates{grid-template-columns:minmax(0,1fr)}
+  .prop-fields{grid-template-columns:minmax(0,1fr)}
+  .dep-card{grid-template-columns:minmax(0,1fr)}
+  .dep-arrow{transform:rotate(90deg)}
+  .ws-card{grid-template-columns:minmax(0,1fr)}
+  .ws-icon{display:none}
+  .ws-top{flex-wrap:wrap}
+  .stat{padding:14px}
+  .stat .ico{width:38px;height:38px}
+  .stat .n{font-size:28px}
+  table.tt thead{display:none}
+  table.tt,table.tt tbody,table.tt tr,table.tt td{display:block;width:100%}
+  table.tt tr{border-bottom:1px solid var(--line);padding:12px 18px}
+  table.tt td{border:0;padding:5px 0!important;display:flex;gap:12px;align-items:center}
+  table.tt td[data-l]:not([data-l=""])::before{content:attr(data-l);color:var(--muted);font-size:13px;min-width:92px}
+  .ev{grid-template-columns:40px minmax(0,1fr) 16px}
+  .ev .tm{display:none}
+  .rc-rows{grid-template-columns:minmax(0,1fr)}
+  .rc-rows dt{margin-top:6px}
+  .rv-foot{flex-wrap:wrap}
+  .rv-foot .sum{flex-basis:100%}
+  .rv-foot .btn{flex:1}
+  .tools-btn .lbl{display:none}
+  .chip-demo{padding:6px 9px;font-size:12.5px}
+  .resolved-card{grid-template-columns:minmax(0,1fr)}
+  .kv-row{grid-template-columns:22px minmax(0,1fr)}
+  .kv-row .v{grid-column:2}
+  .dec-card{padding:20px}
+  .dec-top .h2{font-size:25px}
+}
+@media (max-width:360px){
+  .top-actions .icon-btn.bell{display:none}
+  .content{padding:22px 14px 40px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z"/><path d="m3 13 9 5 9-5"/><path d="m3 17.5 9 4.5 9-4.5" opacity=".0"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><path d="M3 12h4l2.5-6 4 12 2.5-6H21"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-5L15.5 4.5a2.1 2.1 0 0 1 3 3L8 18z"/><path d="M13.5 6.5l3 3"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M17.5 14.8c2.2.6 3.6 2.4 4 5.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-chevr" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.3 2.8 2.8L16.2 9.6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.3 2"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M20 12H5M11 6l-6 6 6 6"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M10 7c-3 1-4.5 3.3-4.5 6.5V17H10v-4H7.5c0-2 .9-3.3 2.5-4zM19 7c-3 1-4.5 3.3-4.5 6.5V17H19v-4h-2.5c0-2 .9-3.3 2.5-4z"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/><path d="m13 11 7-7M17 4h3v3"/></symbol>
+  <symbol id="i-dollar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9.2c-.4-1.1-1.6-1.8-3-1.8-1.7 0-3 .9-3 2.2 0 3 6 1.6 6 4.6 0 1.3-1.3 2.3-3 2.3-1.5 0-2.7-.7-3.1-1.9M12 5.8v1.6M12 16.5v1.7"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H6V3z" /><path d="M14 3v4h4M12 17v-6M9.5 13.5 12 11l2.5 2.5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8v.3"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13"/><path d="M10 11v5.5M14 11v5.5"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7 4.5 11.5 9 16"/><path d="M5 11.5h9.5a5 5 0 0 1 0 10H11"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 20.5c.8-4 3.8-6 7.5-6s6.7 2 7.5 6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3 10 14"/><path d="M21 3 14.5 21l-4.5-7-7-4.5z"/></symbol>
+  <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6L4.5 19a1.5 1.5 0 0 0 1.3 2h12.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/><path d="M7.5 15h9"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M10 9v6M14 9v6"/></symbol>
+</svg>
+
+<div id="app"></div>
+<div class="toast-wrap" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+/* =========================================================
+   Loose Ends — clickable prototype. Local demo data only.
+   No backend, no AI, no email is sent.
+   ========================================================= */
+const DOW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const DOWL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const at=(mo,d,h,mi)=>new Date(2026,mo,d,h,mi);
+const OCT=9, NOV=10;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic=(n,c='')=>`<svg class="ic ${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const pad=n=>String(n).padStart(2,'0');
+const parseD=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const isoD=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fmtDue=s=>{if(!s)return '';const d=parseD(s);return `${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`};
+const fmtDueL=s=>{if(!s)return '';const d=parseD(s);return `${DOWL[d.getDay()]}, ${d.getDate()} ${MON[d.getMonth()]}`};
+const hm=d=>`${pad(d.getHours())}:${pad(d.getMinutes())}`;
+const stamp=d=>`${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}, ${hm(d)}`;
+const dayStart=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+function rel(d){
+  const now=S.now, mins=Math.round((now-d)/60000);
+  if(mins<1) return 'Just now';
+  if(mins<60) return `${mins} min ago`;
+  const dd=Math.round((dayStart(now)-dayStart(d))/86400000);
+  if(dd===0) return `Today, ${hm(d)}`;
+  if(dd===1) return `Yesterday, ${hm(d)}`;
+  if(dd<7) return `${dd} days ago`;
+  return stamp(d);
+}
+const daysBetween=(a,b)=>Math.floor((b-a)/86400000);
+
+/* ---------- people & workstreams ---------- */
+const TEAM=[
+ {id:'maya',name:'Maya Jackson',first:'Maya',ini:'MJ',email:'maya@northstar.demo',role:'lead',title:'Founder & CEO',bg:'#E3EED3'},
+ {id:'priya',name:'Priya Shah',first:'Priya',ini:'PS',email:'priya@northstar.demo',role:'member',title:'Head of Revenue',bg:'#F6E1D9'},
+ {id:'alex',name:'Alex Chen',first:'Alex',ini:'AC',email:'alex@northstar.demo',role:'member',title:'Partnerships',bg:'#DCE7F2'},
+ {id:'jordan',name:'Jordan Mills',first:'Jordan',ini:'JM',email:'jordan@northstar.demo',role:'member',title:'Customer Success',bg:'#EBE1F2'},
+ {id:'leah',name:'Leah Kim',first:'Leah',ini:'LK',email:'leah@northstar.demo',role:'member',title:'Engineering',bg:'#D9EEE7'},
+ {id:'samir',name:'Samir Khan',first:'Samir',ini:'SK',email:'samir@northstar.demo',role:'member',title:'Finance & Ops',bg:'#F2E9D2'},
+ {id:'casey',name:'Casey Park',first:'Casey',ini:'CP',email:'casey@northstar.demo',role:'member',title:'Marketing',bg:'#F1DFE8'},
+];
+const P=id=>TEAM.find(p=>p.id===id);
+const WS=[
+ {id:'product-launch',name:'Product launch',goal:'Partner beta',target:'2026-11-06',targetText:'Launch partner beta',owner:'maya',icon:'target'},
+ {id:'customer-onboarding',name:'Customer onboarding',goal:'First 10 customers',target:'2026-11-20',targetText:'First 10 customers onboarded',owner:'jordan',icon:'users'},
+ {id:'fundraising',name:'Fundraising',goal:'Seed extension',target:'2026-12-18',targetText:'Seed extension closed',owner:'maya',icon:'dollar'},
+ {id:'operations',name:'Operations',goal:'Ready for new hires',target:'2026-11-16',targetText:'Ready for two new hires',owner:'leah',icon:'gear'},
+];
+const W=id=>WS.find(w=>w.id===id);
+
+const SAMPLE_NOTES=`Weekly launch meeting, Mon 2 Nov
+Attendees: Maya, Priya, Alex, Jordan, Leah
+
+Quick round of updates. Leah confirmed the beta environment is nearly ready.
+
+Priya will send approved pricing figures by Tuesday. Alex will finish the partner deck by Wednesday once Priya's figures arrive. Jordan will publish the onboarding checklist by Thursday. Our goal is the partner beta on Friday.
+
+Someone should draft the customer comms for partners once the deck is ready.`;
+
+const SAMPLE_NOTES_2=`Ops stand-up, Fri 30 Oct
+Attendees: Maya, Leah, Samir, Casey
+
+Leah will renew the cloud contract by next Wednesday. Casey will draft the launch announcement by Thursday. Samir will set up the partner billing account by Wednesday.
+
+Someone needs to book the partner kickoff call.`;
+const TEAM_ADDR='signalridgeco@gmail.com';
+const MEETINGS0=[
+ {id:'M-10',title:'Ops check-in',date:'2026-10-26'},
+ {id:'M-11',title:'Launch planning',date:'2026-10-29'},
+ {id:'M-12',title:'Weekly launch meeting',date:'2026-11-02',notes:SAMPLE_NOTES},
+];
+
+/* ---------- seed ---------- */
+function seed(scn){
+  const ap11=at(OCT,29,11,20), ap12=at(NOV,2,10,42);
+  const tasks=[
+   {id:'T-101',ws:'customer-onboarding',title:'Write onboarding email sequence',owner:'jordan',due:'2026-10-30',priority:'medium',status:'done',meeting:'M-11',quote:'Jordan will write the onboarding email sequence by Friday.',approvedAt:ap11},
+   {id:'T-102',ws:'customer-onboarding',title:'Record product walkthrough',owner:'jordan',due:'2026-11-04',priority:'medium',status:'in_progress',meeting:'M-11',quote:'Jordan will record the product walkthrough by next Wednesday.',approvedAt:ap11},
+   {id:'T-103',ws:'customer-onboarding',title:'Set up support inbox',owner:'samir',due:'2026-11-05',priority:'medium',status:'in_progress',meeting:'M-11',quote:'Samir will set up the support inbox by next Thursday.',approvedAt:ap11},
+   {id:'T-104',ws:'product-launch',title:'Set up beta environment',owner:'leah',due:'2026-11-05',priority:'high',status:'done',meeting:'M-11',quote:'Leah will have the beta environment ready by next Thursday.',approvedAt:ap11},
+   {id:'T-105',ws:'fundraising',title:'Book three investor follow-up calls',owner:'maya',due:'2026-10-30',priority:'medium',status:'done',meeting:'M-11',quote:'Maya will book three investor follow-up calls by Friday.',approvedAt:ap11},
+   {id:'T-106',ws:'fundraising',title:'Update investor data room',owner:'samir',due:'2026-11-06',priority:'medium',status:'in_progress',meeting:'M-11',quote:'Samir will update the investor data room by next Friday.',approvedAt:ap11},
+   {id:'T-107',ws:'fundraising',title:'Send November investor update',owner:'maya',due:'2026-11-09',priority:'low',status:'not_started',meeting:'M-11',quote:'Maya will send the November investor update on the 9th.',approvedAt:ap11},
+   {id:'T-108',ws:'operations',title:'Renew cloud contract',owner:'leah',due:'2026-11-04',priority:'high',status:'in_progress',meeting:'M-11',quote:'Leah will renew the cloud contract by next Wednesday.',approvedAt:ap11},
+   {id:'T-109',ws:'operations',title:'Set up payroll for new hires',owner:'samir',due:'2026-11-06',priority:'high',status:'not_started',meeting:'M-11',quote:'Samir will get payroll set up for the new hires by next Friday.',approvedAt:ap11},
+   {id:'T-110',ws:'operations',title:'Finish office move checklist',owner:'leah',due:'2026-10-27',priority:'low',status:'done',meeting:'M-10',quote:'Leah will finish the office move checklist by Tuesday.',approvedAt:at(OCT,26,11,0)},
+   {id:'T-111',ws:'product-launch',title:'Send approved pricing figures',owner:'priya',due:'2026-11-03',priority:'high',status:'in_progress',meeting:'M-12',quote:'Priya will send approved pricing figures by Tuesday.',approvedAt:ap12},
+   {id:'T-112',ws:'product-launch',title:'Finish partner deck',owner:'alex',due:'2026-11-04',priority:'high',status:'blocked',blocker:"Waiting for Priya's pricing figures",dependsOn:'T-111',meeting:'M-12',quote:"Alex will finish the partner deck by Wednesday once Priya's figures arrive.",approvedAt:ap12},
+   {id:'T-113',ws:'product-launch',title:'Publish onboarding checklist',owner:'jordan',due:'2026-11-05',priority:'medium',status:'not_started',meeting:'M-12',quote:'Jordan will publish the onboarding checklist by Thursday.',approvedAt:ap12},
+   {id:'T-114',ws:'product-launch',title:'Draft customer comms for partners',owner:null,due:null,priority:'medium',status:'not_started',meeting:'M-12',quote:'Someone should draft the customer comms for partners once the deck is ready.',approvedAt:ap12,flags:['no_owner','no_date']},
+  ];
+  const ev=[
+   {id:'E-01',type:'reply',at:at(OCT,27,10,10),from:'leah',via:'email',taskId:'T-110',text:'Checklist done, keys handed over.',change:{to:'done'}},
+   {id:'E-02',type:'approve_batch',at:ap11,actor:'maya',meeting:'M-11',count:9},
+   {id:'E-03',type:'reply',at:at(OCT,29,16,40),from:'leah',via:'email',taskId:'T-108',text:'Talking to the vendor. Quote expected next week.',change:{to:'in_progress'}},
+   {id:'E-04',type:'reply',at:at(OCT,30,11,0),from:'maya',via:'app',taskId:'T-105',text:'Three calls booked for next week.',change:{to:'done'}},
+   {id:'E-05',type:'reply',at:at(OCT,30,14,5),from:'jordan',via:'email',taskId:'T-101',text:'Email sequence is done and loaded into the tool.',change:{to:'done'}},
+   {id:'E-06',type:'reply',at:at(OCT,30,15,0),from:'leah',via:'email',taskId:'T-104',text:'Environment will be ready Monday.',change:{to:'in_progress'}},
+   {id:'E-07',type:'reply',at:at(OCT,31,10,0),from:'maya',via:'app',taskId:'T-107',text:'Drafting over the weekend, sending on the 9th.'},
+   {id:'E-08',type:'reply',at:at(OCT,31,12,20),from:'samir',via:'email',taskId:'T-106',text:'Data room is about 70% there. Waiting on the final cap table.',change:{to:'in_progress'}},
+   {id:'E-09',type:'reply',at:at(NOV,1,17,30),from:'samir',via:'email',taskId:'T-103',text:'Inbox is live. Adding the reply templates this week.',change:{to:'in_progress'}},
+   {id:'E-10',type:'reply',at:at(NOV,2,9,15),from:'jordan',via:'email',taskId:'T-102',text:'Walkthrough recorded, editing today.',change:{to:'in_progress'}},
+  ];
+  const tueEvents=[
+   {id:'E-11',type:'approve_batch',at:ap12,actor:'maya',meeting:'M-12',count:4},
+   {id:'E-12',type:'reply',at:at(NOV,2,15,20),from:'leah',via:'email',taskId:'T-104',text:'Beta environment is up and tested, ready for partners.',change:{from:'in_progress',to:'done'}},
+   {id:'E-13',type:'reply',at:at(NOV,2,16,10),from:'priya',via:'email',taskId:'T-111',text:"On it. Finance signs off tomorrow morning and I'll send the figures to Alex straight after.",change:{from:'not_started',to:'in_progress'}},
+   {id:'E-14',type:'digest',at:at(NOV,3,8,0),to:['priya','alex','jordan','leah','samir','maya']},
+   {id:'E-15',type:'reply',at:at(NOV,3,8,42),from:'alex',via:'email',taskId:'T-112',subject:'Re: Your 1 open task for Tuesday',text:"I'm blocked until Priya sends the figures. Can I move the deck to Friday?",change:{from:'not_started',to:'blocked'},read:{blocker:"Waiting for Priya's pricing figures",dependency:'T-111',dateRequest:'2026-11-06'}},
+   {id:'E-16',type:'date_request',at:at(NOV,3,8,42),actor:'alex',taskId:'T-112',requestId:'DR-21'},
+  ];
+  const s={scn,now:at(NOV,3,9,30),tasks,events:[...ev],meetings:JSON.parse(JSON.stringify(MEETINGS0)),requests:[],receipts:[],seq:{T:115,E:17,RC:41,DR:22,M:13},
+    review:null,draft:{title:'Weekly launch meeting',date:'2026-11-02',attendees:['maya','priya','alex','jordan','leah'],notes:SAMPLE_NOTES,error:'',queue:[]},
+    ui:{wsFilter:'all',teamFilter:'all',decTab:'waiting',actFilter:'all',selTask:null,selEvent:null,wsTab:'tasks',taskFilter:'all',taskQuery:'',teamQuery:'',pop:null,confirm:null,busy:null,nav:false,loading:true,lastRc:null,loopPlay:false,animTask:null,modal:null,focusProp:null,searchQ:'',actingAs:'maya'}};
+  s.clarify=[];
+  if(scn==='tuesday'){
+    s.events.push(...tueEvents);
+    s.requests.push({id:'DR-21',taskId:'T-112',by:'alex',current:'2026-11-04',requested:'2026-11-06',reason:'Blocked until Priya sends the pricing figures',replyEvent:'E-15',approver:'maya',status:'waiting',at:at(NOV,3,8,42)});
+  } else {
+    s.now=at(NOV,2,10,30);
+    s.tasks=s.tasks.filter(t=>!['T-111','T-112','T-113','T-114'].includes(t.id));
+    s.tasks.find(t=>t.id==='T-104').status='in_progress';
+    s.meetings=s.meetings.filter(m=>m.id!=='M-12');
+  }
+  return s;
+}
+let S=seed('tuesday');
+
+/* ---------- derived ---------- */
+const T=id=>S.tasks.find(t=>t.id===id);
+const wsTasks=id=>S.tasks.filter(t=>t.ws===id);
+const isOpen=t=>t.status!=='done';
+const replies=t=>S.events.filter(e=>e.type==='reply'&&(e.taskId===t.id||(e.parts||[]).some(x=>x.taskId===t.id))).sort((a,b)=>b.at-a.at);
+const lastReply=t=>replies(t)[0]||null;
+function staleDays(t){ if(!isOpen(t)) return 0; const lr=lastReply(t); return daysBetween(lr?lr.at:t.approvedAt,S.now); }
+const pendingReq=t=>S.requests.find(r=>r.taskId===t.id&&r.status==='waiting');
+const ownerNeeded=()=>S.tasks.filter(t=>!t.owner&&isOpen(t));
+const waitingReqs=()=>S.requests.filter(r=>r.status==='waiting');
+const decisionsFor=wsId=>[...waitingReqs().filter(r=>T(r.taskId).ws===wsId),...ownerNeeded().filter(t=>t.ws===wsId)];
+const decisionCount=()=>waitingReqs().length+ownerNeeded().length;
+function health(w){
+  const ts=wsTasks(w.id), open=ts.filter(isOpen);
+  const bl=open.filter(t=>t.status==='blocked');
+  if(bl.length){const t=bl[0];return {k:'blocked',label:'Blocked',reason:`${t.owner?P(t.owner).first:'Someone'} is ${t.blocker?t.blocker.charAt(0).toLowerCase()+t.blocker.slice(1):'blocked'}.`};}
+  const dec=decisionsFor(w.id);
+  if(dec.length) return {k:'decision',label:'Decision needed',reason:`${dec.length} item${dec.length>1?'s':''} waiting for your decision.`};
+  const st=open.filter(t=>staleDays(t)>=3);
+  if(st.length){const mx=Math.max(...st.map(staleDays));return {k:'update',label:'Update needed',reason:`No update on ${st.length} task${st.length>1?'s':''} for ${mx} days. That's unknown, not on track.`};}
+  return {k:'ok',label:'On track',reason:open.length?'Recent updates on every open task.':'All recorded tasks are done.'};
+}
+const HPILL={blocked:['p-blocked','alert'],decision:['p-decision','doc'],update:['p-update','clock'],ok:['p-ok','checkc']};
+const hpill=h=>`<span class="pill ${HPILL[h.k][0]}">${ic(HPILL[h.k][1])}${h.label}</span>`;
+const SPILL={done:['p-done','check','Done'],in_progress:['p-progress','circle','In progress'],blocked:['p-blocked','alert','Blocked'],not_started:['p-notstarted','circle','Not started'],proposed:['p-proposed','spark','Proposed']};
+const spill=s=>`<span class="pill ${SPILL[s][0]}">${ic(SPILL[s][1])}${SPILL[s][2]}</span>`;
+function wsLastUpdate(w){
+  const rs=S.events.filter(e=>e.type==='reply'&&T(e.taskId)?.ws===w.id).sort((a,b)=>b.at-a.at);
+  return rs[0]||null;
+}
+const av=(id,c='')=>{if(!id)return `<span class="av none ${c}" aria-hidden="true">${ic('user','xs')}</span>`;const p=P(id);return `<span class="av ${c}" style="background:${p.bg}" aria-hidden="true">${p.ini}</span>`};
+const person=(id,sub)=>id?`<span class="person">${av(id)}<span><span class="nm">${esc(P(id).name)}</span>${sub?`<small class="muted" style="display:block;font-size:13px">${esc(sub)}</small>`:''}</span></span>`:`<span class="person">${av(null)}<span class="nm muted">Unassigned</span></span>`;
+const nextId=k=>{const n=S.seq[k]++;return k==='RC'?`RC-${String(n).padStart(4,'0')}`:`${k}-${n}`};
+function tick(m=1){S.now=new Date(S.now.getTime()+m*60000);return new Date(S.now)}
+
+/* ---------- toast & routing ---------- */
+function toast(msg,kind=''){const w=document.getElementById('toasts');while(w.children.length>=2)w.firstChild.remove();const el=document.createElement('div');el.className='toast '+kind;el.innerHTML=`${ic(kind==='warn'?'alert':'checkc')}<span>${msg}</span>`;w.appendChild(el);setTimeout(()=>el.remove(),4200)}
+const ROUTES=['overview','workstreams','decisions','activity','capture','review','team'];
+function route(){const h=(location.hash||'#overview').slice(1);if(h.startsWith('ws-')&&W(h.slice(3)))return {v:'ws',id:h.slice(3)};return {v:ROUTES.includes(h)?h:'overview'}}
+function go(h){if(location.hash==='#'+h){render(true)}else{location.hash=h}}
+
+/* ---------- shell ---------- */
+const NAV=[['overview','Overview','home'],['workstreams','Workstreams','layers'],['decisions','Decisions','doc'],['activity','Activity','activity'],['capture','Capture notes','pen'],['team','Team','users']];
+function sidebar(r){
+  const cur=r.v==='ws'?'workstreams':r.v==='review'?'capture':r.v;
+  const dc=decisionCount();
+  return `<nav class="sidebar ${S.ui.nav?'open':''}" id="sidebar" aria-label="Main">
+  <a class="brand" href="#overview" aria-label="Loose Ends, go to overview">
+    <svg viewBox="0 0 60 48" fill="none" stroke="#F4F6F1" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 42c8 0 16-3 22-9 8-8 12-17 8-24-3-5-10-4-12 2-3 8 6 16 14 22 6 4 13 6 20 6"/><path d="M4 42c-1-6 6-12 14-11 7 1 9 7 6 11"/></svg>
+    <span class="wm">Loose<br>Ends</span>
+  </a>
+  <ul class="nav">${NAV.map(([h,l,i])=>`<li><a href="#${h}" ${cur===h?'aria-current="page"':''}>${ic(i)}<span>${l}</span>${h==='decisions'&&dc?`<span class="badge" aria-label="${dc} waiting">${dc}</span>`:''}</a></li>`).join('')}</ul>
+  <svg class="side-thread" viewBox="0 0 244 190" fill="none" aria-hidden="true"><path d="M-4 118c40-10 92-30 120-58 22-22 30-50 12-54-20-4-30 26-14 56 16 30 54 46 134 44" stroke="#D8EE79" stroke-width="1.5" stroke-linecap="round" opacity=".9"/></svg>
+  <div class="side-tag">Ideas move forward together.</div>
+  <div class="side-foot">${av('maya')}<span class="who">Maya Jackson<small>Founder · Lead</small></span></div>
+</nav>${S.ui.nav?'<div class="nav-scrim" data-a="nav-close"></div>':''}`;
+}
+const PAGE_NAMES={overview:'Overview',workstreams:'Workstreams',ws:'Workstreams',decisions:'Decisions',activity:'Activity',capture:'Capture notes',review:'Review & approve',team:'Team'};
+function topbar(r){
+  const notifs=notifications();
+  const q=S.ui.searchQ;
+  return `<header class="topbar">
+  <button class="icon-btn menu-btn" data-a="nav-open" aria-label="Open menu" aria-expanded="${S.ui.nav}" aria-controls="sidebar">${ic('menu')}</button>
+  <div class="ctx"><span class="page">${PAGE_NAMES[r.v]}</span><span class="sep" aria-hidden="true"></span>
+    <div class="rel"><button class="ws-btn" data-a="pop" data-p="ws" aria-haspopup="true" aria-expanded="${S.ui.pop==='ws'}">Northstar Labs · Launch team ${ic('chev','sm')}</button>
+    ${S.ui.pop==='ws'?`<div class="pop" style="left:0;right:auto" role="menu"><h4>Workspace</h4><button class="item" role="menuitem" data-a="pop-close">${ic('check','sm')}<span><b>Northstar Labs</b><span>Demo workspace · 7 people · 4 workstreams</span></span></button><div class="note">Only one workspace in this prototype.</div></div>`:''}</div>
+  </div>
+  <div class="search rel">${ic('search')}<label class="sr-only" for="gsearch">Search tasks, workstreams or people</label><input id="gsearch" type="search" placeholder="Search tasks, workstreams or people…" value="${esc(q)}" autocomplete="off" aria-controls="search-results">
+    ${q.trim()?searchResults(q):''}
+  </div>
+  <div class="top-actions">
+    <span class="chip-demo" title="Every record in this prototype is synthetic demo data">Demo data</span>
+    <div class="rel"><button class="tools-btn" data-a="pop" data-p="demo" aria-haspopup="true" aria-expanded="${S.ui.pop==='demo'}">${ic('flask','sm')}<span class="lbl">Demo tools</span></button>${S.ui.pop==='demo'?demoMenu():''}</div>
+    <div class="rel"><button class="icon-btn bell" data-a="pop" data-p="bell" aria-label="Notifications log, ${notifs.length} queued" aria-expanded="${S.ui.pop==='bell'}">${ic('bell')}${notifs.length?'<span class="dot"></span>':''}</button>
+    ${S.ui.pop==='bell'?`<div class="pop" style="width:360px"><h4>Outgoing notifications</h4>${notifs.length?notifs.slice(0,6).map(n=>`<div class="item">${ic('send','sm')}<span><b>${esc(n.title)}</b><span>${esc(n.sub)}</span><span style="color:var(--warn);font-weight:600;margin-top:3px">Queued · demo, not sent</span></span></div>`).join(''):'<div class="item"><span><span>Nothing queued yet.</span></span></div>'}<div class="note">This prototype has no email connection. Nothing is reported as delivered.</div></div>`:''}</div>
+  </div>
+</header>`;
+}
+function notifications(){
+  const out=[];
+  (S.clarify||[]).slice().reverse().forEach(c=>out.push({title:`To ${P(c.to).name}`,sub:c.text}));
+  S.receipts.slice().reverse().forEach(rc=>out.push({title:`To ${P(rc.notify.to).name}`,sub:rc.notify.text}));
+  S.events.filter(e=>e.type==='digest').sort((a,b)=>b.at-a.at).forEach(e=>out.push({title:'Morning emails',sub:`${e.to.length} people · ${stamp(e.at)}`}));
+  return out;
+}
+function searchResults(q){
+  const k=q.trim().toLowerCase();
+  const rs=[];
+  S.tasks.filter(t=>t.title.toLowerCase().includes(k)).slice(0,4).forEach(t=>rs.push({a:'open-task',id:t.id,ic:'doc',t:t.title,s:`${W(t.ws).name} · ${t.owner?P(t.owner).name:'Unassigned'}`}));
+  WS.filter(w=>w.name.toLowerCase().includes(k)).forEach(w=>rs.push({a:'open-ws',id:w.id,ic:'layers',t:w.name,s:'Workstream'}));
+  TEAM.filter(p=>p.name.toLowerCase().includes(k)).slice(0,3).forEach(p=>rs.push({a:'open-person',id:p.id,ic:'user',t:p.name,s:p.title}));
+  return `<div class="pop search-pop" id="search-results" role="listbox">${rs.length?rs.map(r=>`<button class="item" data-a="${r.a}" data-id="${r.id}">${ic(r.ic,'sm')}<span><b>${esc(r.t)}</b><span>${esc(r.s)}</span></span></button>`).join(''):`<div class="item"><span><span>No matches for “${esc(q)}”.</span></span></div>`}</div>`;
+}
+function demoMenu(){
+  const deck=S.tasks.find(t=>t.owner==='alex'&&/deck/i.test(t.title));
+  const alexDone=deck&&S.requests.some(r=>r.taskId===deck.id);
+  const pricing=S.tasks.find(t=>t.owner==='priya'&&/pricing/i.test(t.title));
+  const decided=S.requests.find(r=>r.status!=='waiting');
+  const samirDone=S.events.some(e=>e.from==='samir'&&e.parts);
+  return `<div class="pop" role="menu" style="width:350px">
+  <h4>Simulated email replies</h4>
+  <button class="item" role="menuitem" data-a="sim-alex" ${!deck||alexDone?'disabled':''}>${ic('mail','sm')}<span><b>Alex replies: blocked, asks for Friday</b><span>${!deck?'Capture and approve Monday’s notes first.':alexDone?'Already received.':'“I’m blocked until Priya sends the figures. Can I move the deck to Friday?”'}</span></span></button>
+  <button class="item" role="menuitem" data-a="sim-priya" ${!pricing||pricing.status==='done'?'disabled':''}>${ic('mail','sm')}<span><b>Priya replies: figures sent</b><span>${!pricing?'Capture and approve Monday’s notes first.':pricing.status==='done'?'Already done.':'Marks the pricing task done. Alex stays blocked until he confirms.'}</span></span></button>
+  <button class="item" role="menuitem" data-a="sim-dup" ${!decided?'disabled':''}>${ic('undo','sm')}<span><b>Retry the last decision (duplicate)</b><span>${decided?'Sends the same decision again to show nothing changes twice.':'Make a decision first.'}</span></span></button>
+  <button class="item" role="menuitem" data-a="sim-samir" ${samirDone?'disabled':''}>${ic('mail','sm')}<span><b>Samir replies about two tasks</b><span>${samirDone?'Already received.':'One email: inbox done, payroll untouched, asks for three more days. Goes to Leah, not Maya.'}</span></span></button>
+  <button class="item" role="menuitem" data-a="sim-jordan">${ic('mail','sm')}<span><b>Jordan replies: “I’m working on it”</b><span>Unclear which of his tasks he means. Nothing changes and he’s asked to clarify.</span></span></button>
+  <button class="item" role="menuitem" data-a="sim-unknown">${ic('alert','sm')}<span><b>Reply from an unknown address</b><span>Not on the team list. Logged, nothing changes.</span></span></button>
+  <h4 style="margin-top:12px">Restart the story</h4>
+  <button class="item" role="menuitem" data-a="reset" data-scn="tuesday">${ic('clock','sm')}<span><b>Tue 3 Nov, 09:30: Alex’s request waiting</b><span>Default. Go straight to the decision.</span></span></button>
+  <button class="item" role="menuitem" data-a="reset" data-scn="monday">${ic('pen','sm')}<span><b>Mon 2 Nov, 10:30: right after the meeting</b><span>Full story: capture, review, reply, decide.</span></span></button>
+  <div class="note">Demo clock: ${stamp(S.now)} Pacific (TEAM_TIMEZONE). No AI, email or database is connected.</div>
+</div>`;
+}
+
+/* ---------- views ---------- */
+const headThread=`<svg class="head-thread" viewBox="0 0 360 150" fill="none" aria-hidden="true"><path d="M0 120c70-6 130-14 170-40 30-20 40-56 20-62-22-6-34 30-12 56 26 30 90 38 182 18" stroke="#B9CF6A" stroke-width="1.4" stroke-linecap="round"/></svg>`;
+function skeleton(){return `<div class="content"><div class="skel" style="height:58px;width:56%;margin-bottom:14px"></div><div class="skel" style="height:24px;width:38%;margin-bottom:34px"></div><div class="stats">${'<div class="skel" style="height:88px"></div>'.repeat(4)}</div><div class="ov-grid" style="margin-top:28px"><div>${'<div class="skel" style="height:180px;margin-bottom:14px"></div>'.repeat(3)}</div><div><div class="skel" style="height:300px"></div></div></div><p class="sr-only">Loading workspace…</p></div>`}
+
+function wsCard(w){
+  const ts=wsTasks(w.id), done=ts.filter(t=>t.status==='done').length, h=health(w);
+  const owners=[...new Set(ts.filter(isOpen).map(t=>t.owner).filter(Boolean))];
+  const lu=wsLastUpdate(w); const luDays=lu?daysBetween(lu.at,S.now):99;
+  const bl=ts.filter(t=>t.status==='blocked').length, dc=decisionsFor(w.id).length;
+  return `<button class="card ws-card" data-a="open-ws" data-id="${w.id}" aria-label="${esc(w.name)}: ${h.label}. ${done} of ${ts.length} recorded tasks done.">
+   <span class="ws-icon">${ic(w.icon,'lg')}</span>
+   <span style="min-width:0">
+     <span class="ws-top"><span><span class="h3" style="display:block">${esc(w.name)}</span><span class="ws-sub">${esc(w.goal)} · target ${fmtDue(w.target)}</span></span>${hpill(h)}</span>
+     <span class="ws-prog"><span class="bar" role="img" aria-label="${done} of ${ts.length} recorded tasks done"><i style="width:${ts.length?done/ts.length*100:0}%"></i></span><span class="t">${done} of ${ts.length} recorded tasks done</span></span>
+     ${h.k!=='ok'?`<span class="reason ${h.k}">${ic(h.k==='blocked'?'msg':h.k==='update'?'clock':'doc','sm')}${esc(h.reason)}</span>`:''}
+     <span class="ws-meta">
+       <span class="kv">Owner ${av(w.owner)} <b>${esc(P(w.owner).name)}</b></span>
+       ${owners.length?`<span class="kv">Doing the work <span class="owners">${owners.map(o=>av(o)).join('')}</span></span>`:''}
+       <span class="kv">${ic('alert','xs')} <b>${bl}</b> blocked</span>
+       <span class="kv">${ic('doc','xs')} <b>${dc}</b> decision${dc===1?'':'s'}</span>
+       <span class="kv">${luDays>=3?`<span class="nup">${ic('clock','xs')}No update · ${luDays} days</span>`:`Last update <b>${rel(lu.at)}</b>`}</span>
+     </span>
+   </span></button>`;
+}
+function vOverview(){
+  const open=S.tasks.filter(isOpen), blocked=open.filter(t=>t.status==='blocked');
+  const stale=open.filter(t=>staleDays(t)>=3);
+  const f=S.ui.wsFilter;
+  const list=WS.filter(w=>{const h=health(w);if(f==='attention')return h.k==='blocked'||h.k==='decision'||decisionsFor(w.id).length;if(f==='updates')return wsTasks(w.id).some(t=>staleDays(t)>=3);return true});
+  const hr=S.now.getHours();
+  const greet=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+  const cnt=k=>WS.filter(w=>{const h=health(w);return k==='attention'?(h.k==='blocked'||h.k==='decision'||decisionsFor(w.id).length):wsTasks(w.id).some(t=>staleDays(t)>=3)}).length;
+  return `<div class="content">
+  <div class="page-head">${headThread}<h1 tabindex="-1">${greet}, Maya.</h1><p class="sub">Here is what moved, what is blocked and where you are needed.</p></div>
+  <div class="stats">
+    <div class="card stat"><span class="ico ico-lime">${ic('layers')}</span><span><span class="n">${WS.length}</span><span class="l" style="display:block">workstreams</span></span></div>
+    <div class="card stat"><span class="ico ico-red">${ic('alert')}</span><span><span class="n">${blocked.length}</span><span class="l" style="display:block">blocked task${blocked.length===1?'':'s'}</span></span></div>
+    <div class="card stat"><span class="ico ico-green">${ic('doc')}</span><span><span class="n">${decisionCount()}</span><span class="l" style="display:block">awaiting your decision</span></span></div>
+    <div class="card stat"><span class="ico ico-amber">${ic('clock')}</span><span><span class="n">${stale.length}</span><span class="l" style="display:block">no update in 3+ days</span></span></div>
+  </div>
+  <div class="ov-grid" style="margin-top:8px">
+   <section aria-labelledby="ws-h">
+    <div class="sec-title"><h2 class="h2" id="ws-h">Active workstreams</h2></div>
+    <div class="filters" role="group" aria-label="Filter workstreams">
+      <button class="fpill" data-a="wsf" data-f="all" aria-pressed="${f==='all'}">All workstreams <span class="ct">${WS.length}</span></button>
+      <button class="fpill" data-a="wsf" data-f="attention" aria-pressed="${f==='attention'}"><span class="dot" style="background:#E59A8C"></span>Needs attention <span class="ct">${cnt('attention')}</span></button>
+      <button class="fpill" data-a="wsf" data-f="updates" aria-pressed="${f==='updates'}"><span class="dot" style="background:#E5B653"></span>Awaiting updates <span class="ct">${cnt('updates')}</span></button>
+    </div>
+    <div class="ws-list">${list.length?list.map(wsCard).join(''):`<div class="card empty">${loopArt()}<p class="h3">Nothing here right now.</p><p>No workstream matches this filter.</p></div>`}</div>
+    <p class="foot-note">${ic('info','sm')}Completion = recorded done tasks ÷ approved tasks. It is not a measure of effort. A missing reply is shown as unknown.</p>
+   </section>
+   <aside class="rail" aria-label="Needs your attention">
+    <div class="card rail-card">
+      <div class="rail-head">${ic('doc')}<h2 class="h3">Needs your decision</h2><span class="count">${decisionCount()}</span></div>
+      ${decisionItems()}
+      <div style="padding:6px 0 12px"><a class="link" href="#decisions">Open decisions</a></div>
+    </div>
+    <div class="card rail-card">
+      <div class="rail-head">${ic('activity')}<h2 class="h3">Recent movement</h2><a class="link small" href="#activity">View all</a></div>
+      <ul class="mv">${S.events.slice().sort((a,b)=>b.at-a.at).slice(0,5).map(e=>{const d=evDesc(e);return `<li><span class="dt ${d.dot}"></span><span><b>${esc(d.title)}</b>${d.quote?`<div class="q">“${esc(d.quote)}”</div>`:''}<div class="m">${esc(d.ctx)} · ${rel(e.at)}</div></span></li>`}).join('')}</ul>
+    </div>
+   </aside>
+  </div></div>`;
+}
+function decisionItems(){
+  const reqs=waitingReqs(), on=ownerNeeded();
+  if(!reqs.length&&!on.length) return `<div class="empty" style="padding:22px 6px">${loopArt()}<p style="margin:6px 0 0">Nothing is waiting on you.</p></div>`;
+  return reqs.map(r=>{const t=T(r.taskId);return `<button class="dq" data-a="goto" data-h="decisions"><span class="ico">${ic('cal','sm')}</span><span><span class="dq-t" style="display:block">Move “${esc(t.title)}”?</span><span class="dq-s" style="display:block">${esc(P(r.by).first)} asked for ${fmtDue(r.requested)}. Approved date stays <b>${fmtDue(r.current)}</b> until you decide.</span><span class="dq-s" style="display:block">${esc(W(t.ws).name)} · ${r.approver===S.ui.actingAs?'you decide':`${esc(P(r.approver).first)} decides`} · ${rel(r.at)}</span></span><span class="chev">${ic('chevr','sm')}</span></button>`}).join('')+
+   on.map(t=>`<button class="dq" data-a="goto" data-h="decisions"><span class="ico">${ic('user','sm')}</span><span><span class="dq-t" style="display:block">Assign an owner</span><span class="dq-s" style="display:block">“${esc(t.title)}” has no owner, so no one is emailed about it.</span><span class="dq-s" style="display:block">${esc(W(t.ws).name)}</span></span><span class="chev">${ic('chevr','sm')}</span></button>`).join('');
+}
+function loopArt(){return `<svg class="loopart" viewBox="0 0 120 70" fill="none" aria-hidden="true"><path d="M4 56c26-2 44-8 54-22 8-12 4-26-6-24-11 2-11 20 2 30 14 11 36 12 62 6" stroke="#9DB94B" stroke-width="1.6" stroke-linecap="round"/><circle cx="114" cy="46" r="4" fill="#D8EE79" stroke="#9DB94B"/></svg>`}
+
+function evDesc(e){
+  const t=e.taskId?T(e.taskId):null, ctx=t?W(t.ws).name:'';
+  switch(e.type){
+    case 'reply':{
+      if(e.unknown) return {title:'Reply from an unknown address',quote:e.text,ctx:`${e.sender} · no task changed`,dot:'grey',icon:'alert',ib:'ico-amber',kind:'replies'};
+      if(e.ambiguous) return {title:`${P(e.from).first}’s reply needs clarifying`,quote:e.text,ctx:'No task changed · asked which task',dot:'amber',icon:'msg',ib:'ico-amber',kind:'replies'};
+      if(e.parts) return {title:`${P(e.from).first} replied about ${e.parts.length} tasks`,quote:e.text,ctx:[...new Set(e.parts.map(x=>W(T(x.taskId).ws).name))].join(' · '),dot:e.parts.some(x=>x.dateRequest)?'amber':'',icon:'mail',ib:'ico-lime',kind:'replies'};
+      const p=P(e.from);const done=e.change&&e.change.to==='done';const bl=e.change&&e.change.to==='blocked';
+      return {title:e.via==='app'?`${p.first} added a lead update`:done?`${p.first} completed “${t.title}”`:bl?`${p.first} reported a blocker`:`${p.first} replied by email`,quote:e.text,ctx,dot:bl?'red':'',icon:bl?'alert':done?'check':'mail',ib:bl?'ico-red':'ico-lime',kind:'replies'};}
+    case 'approve_batch':{const m=S.meetings.find(x=>x.id===e.meeting);return {title:`Maya approved ${e.count} task${e.count>1?'s':''}`,quote:null,ctx:`From “${m?m.title:'meeting'}”`,dot:'',icon:'checkc',ib:'ico-green',kind:'tasks'};}
+    case 'digest':return {title:'Morning emails queued',quote:null,ctx:`${e.to.length} people · demo, not sent`,dot:'grey',icon:'send',ib:'ico-green',kind:'tasks'};
+    case 'date_request':{const r=S.requests.find(x=>x.id===e.requestId);return {title:'Date change requested',quote:null,ctx:`${P(r.by).first} asked to move “${t.title}” from ${fmtDue(r.current)} to ${fmtDue(r.requested)}`,dot:'amber',icon:'cal',ib:'ico-amber',kind:'decisions'};}
+    case 'decision':{const rc=S.receipts.find(x=>x.id===e.receiptId);return {title:`${P(rc.actor).first} ${rc.outcome==='approved'?'approved a new date':'declined a date change'}`,quote:null,ctx:`${t.title}: ${rc.outcome==='approved'?`${fmtDue(rc.before)} → ${fmtDue(rc.after)}`:`stays ${fmtDue(rc.before)}`}`,dot:'',icon:'checkc',ib:'ico-green',kind:'decisions'};}
+    case 'assign':{const rc=S.receipts.find(x=>x.id===e.receiptId);return {title:'Maya assigned an owner',quote:null,ctx:`${t.title} → ${P(rc.after).name}`,dot:'',icon:'user',ib:'ico-green',kind:'decisions'};}
+  }
+  return {title:e.type,ctx:'',dot:'grey',icon:'info',ib:'ico-green',kind:'tasks'};
+}
+
+function vWorkstreams(){
+  return `<div class="content"><div class="page-head">${headThread}<h1 tabindex="-1">Every workstream. One clear view.</h1><p class="sub">Each workstream has one owner, who approves any date change in it.</p></div>
+  <div class="ws-list">${WS.map(wsCard).join('')}</div>
+  <p class="foot-note">${ic('info','sm')}Health is worked out from the tasks: Blocked → Decision needed → Update needed (3+ days without a reply) → On track.</p></div>`;
+}
+
+function vWsDetail(id){
+  const w=W(id), ts=wsTasks(id), h=health(w);
+  const done=ts.filter(t=>t.status==='done').length, prog=ts.filter(t=>t.status==='in_progress').length, ns=ts.filter(t=>t.status==='not_started').length, bl=ts.filter(t=>t.status==='blocked').length;
+  const dc=decisionsFor(id).length;
+  const sel=S.ui.selTask&&T(S.ui.selTask)&&T(S.ui.selTask).ws===id?T(S.ui.selTask):null;
+  const tab=S.ui.wsTab;
+  const f=S.ui.taskFilter, q=S.ui.taskQuery.toLowerCase();
+  const rows=ts.filter(t=>{if(q&&!t.title.toLowerCase().includes(q))return false;if(f==='open')return isOpen(t);if(f==='blocked')return t.status==='blocked';if(f==='noupdate')return staleDays(t)>=1&&!lastReplySince(t);if(f==='done')return t.status==='done';return true});
+  return `<div class="content"><a class="crumb" href="#workstreams">${ic('back','sm')}Back to workstreams</a>
+  <div class="wsd ${sel?'':'nopanel'}"><div style="min-width:0">
+   <div class="page-head" style="margin-bottom:0">${sel?'':headThread}<h1 tabindex="-1">${esc(w.name)}</h1><p class="sub">${esc(w.targetText)} · target ${fmtDueL(w.target)}</p></div>
+   <div class="ws-facts">
+     <span class="f">${av(w.owner,'lg')}<span>${esc(P(w.owner).name)}<small>Workstream owner · approves date changes</small></span></span>
+     <span class="f">${hpill(h)}</span>
+     <span class="f">${ic('cal')}<span>Target: ${fmtDue(w.target)}<small>${esc(w.targetText)}</small></span></span>
+   </div>
+   ${h.k!=='ok'?`<div class="reason ${h.k}" style="margin:0 0 18px">${ic(h.k==='blocked'?'msg':'clock','sm')}<span><b>Why ${h.label.toLowerCase()}:</b> ${esc(h.reason)}</span></div>`:''}
+   <div class="stats">
+     <div class="card stat"><span class="ico ico-lime">${ic('layers')}</span><span><span class="n">${ts.length}</span><span class="l" style="display:block">approved tasks</span></span></div>
+     <div class="card stat"><span class="ico ico-green">${ic('checkc')}</span><span><span class="n">${done}</span><span class="l" style="display:block">done</span></span></div>
+     <div class="card stat"><span class="ico ico-red">${ic('alert')}</span><span><span class="n">${bl}</span><span class="l" style="display:block">blocked</span></span></div>
+     <div class="card stat"><span class="ico ico-amber">${ic('doc')}</span><span><span class="n">${dc}</span><span class="l" style="display:block">decision${dc===1?'':'s'} needed</span></span></div>
+   </div>
+   <div class="card progress-card"><div class="row"><span class="big">${done} of ${ts.length} recorded tasks done</span><span class="legend"><span><i style="background:var(--forest-2)"></i>${done} done</span><span><i style="background:#9FC6AF"></i>${prog} in progress</span><span><i style="background:#E59A8C"></i>${bl} blocked</span><span><i style="background:#D3D8D0"></i>${ns} not started</span></span></div>
+   <div class="bar" role="img" aria-label="${done} of ${ts.length} recorded tasks done"><i style="width:${ts.length?done/ts.length*100:0}%"></i></div></div>
+   <div class="tabs" role="tablist" aria-label="Workstream views">
+     ${[['tasks','Tasks'],['deps','Dependencies'],['updates','Updates']].map(([k,l])=>`<button class="tab" role="tab" id="tab-${k}" aria-selected="${tab===k}" aria-controls="panel-${k}" tabindex="${tab===k?0:-1}" data-a="wstab" data-t="${k}">${l}</button>`).join('')}
+   </div>
+   <div role="tabpanel" id="panel-${tab}" aria-labelledby="tab-${tab}">
+   ${tab==='tasks'?`<div class="card table-card">
+     <div class="tbl-tools"><h2 class="h3">Tasks</h2>
+       <div class="mini-search">${ic('search','sm')}<label class="sr-only" for="tq">Search tasks</label><input id="tq" placeholder="Search tasks…" value="${esc(S.ui.taskQuery)}"></div>
+       <label class="sr-only" for="tf">Filter tasks</label><select id="tf" class="select" style="width:auto;height:40px"><option value="all" ${f==='all'?'selected':''}>All tasks</option><option value="open" ${f==='open'?'selected':''}>Open</option><option value="blocked" ${f==='blocked'?'selected':''}>Blocked</option><option value="noupdate" ${f==='noupdate'?'selected':''}>No reply yet</option><option value="done" ${f==='done'?'selected':''}>Done</option></select>
+     </div>
+     ${rows.length?`<table class="tt"><thead><tr><th>Task</th><th>Owner</th><th>Approved due</th><th>Status</th><th>Last update</th></tr></thead><tbody>
+     ${rows.map(t=>taskRow(t,sel)).join('')}</tbody></table>`:`<div class="empty">${loopArt()}<p class="h3">No tasks match.</p><p>Try another filter or search.</p></div>`}
+   </div>
+   <p class="foot-note">${ic('info','sm')}A missing reply is shown as unknown. It never counts as done or on track.</p>`:''}
+   ${tab==='deps'?depsView(ts):''}
+   ${tab==='updates'?updatesView(id):''}
+   </div>
+  </div>
+  ${sel?taskPanel(sel):''}
+  </div></div>`;
+}
+const lastReplySince=t=>replies(t).length>0;
+function taskRow(t,sel){
+  const lr=lastReply(t), sd=staleDays(t), pr=pendingReq(t);
+  const overdue=t.due&&isOpen(t)&&parseD(t.due)<dayStart(S.now);
+  const anim=S.ui.animTask===t.id;
+  return `<tr class="${sel&&sel.id===t.id?'sel':''} ${t.status==='blocked'?'row-blocked':''}" data-a="sel-task" data-id="${t.id}">
+   <td data-l=""><button class="tname" data-a="sel-task" data-id="${t.id}" aria-label="Open details for ${esc(t.title)}">
+     <svg class="tcirc ${t.status==='done'?'done':''} ${anim?'anim':''}" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9.5"/>${t.status==='done'?'<path d="m6.5 11.3 3 3 6-6.2"/>':''}</svg>
+     <span>${esc(t.title)}${t.dependsOn?`<small>${ic('link','xs')} depends on ${esc(T(t.dependsOn)?.title||'')}</small>`:''}</span></button></td>
+   <td data-l="Owner">${t.owner?person(t.owner):`<span class="pill p-update">${ic('user')}Needs owner</span>`}</td>
+   <td data-l="Due">${t.due?`<span class="${overdue?'due-over':''}">${fmtDue(t.due)}${overdue?' · overdue':''}</span>`:'<span class="pill p-update">'+ic('cal')+'No date</span>'}${pr?`<span class="due-sub">Requested ${fmtDue(pr.requested)} · not approved</span>`:''}</td>
+   <td data-l="Status">${spill(t.status)}</td>
+   <td data-l="Last update">${t.status==='done'&&lr?`<span class="lu">${rel(lr.at)} · ${lr.via==='app'?'Lead':'Email'}</span>`:lr&&sd<3?`<span class="lu">${rel(lr.at)} · ${lr.via==='app'?'Lead':'Email'}</span>`:sd>=3?`<span class="lu warn">${ic('clock','xs')}No update · ${sd} days</span>`:`<span class="lu">${ic('clock','xs')} No reply yet${t.owner?'':' (no owner)'}</span>`}</td>
+  </tr>`;
+}
+function taskPanel(t){
+  const lr=lastReply(t), pr=pendingReq(t), m=S.meetings.find(x=>x.id===t.meeting), dep=t.dependsOn?T(t.dependsOn):null;
+  const evs=S.events.filter(e=>e.taskId===t.id).sort((a,b)=>b.at-a.at);
+  const rcs=S.receipts.filter(r=>r.taskId===t.id);
+  const sd=staleDays(t);
+  return `${S.ui.selTask?'<div class="panel-scrim" data-a="close-panel"></div>':''}<aside class="card panel" aria-labelledby="panel-title" role="complementary">
+   <div class="panel-head"><span class="ws-icon" style="width:46px;height:46px">${ic(t.status==='done'?'checkc':'doc')}</span><div style="min-width:0"><h2 class="h2" id="panel-title">${esc(t.title)}</h2><div class="muted small">${esc(t.id)} · in ${esc(W(t.ws).name)}</div></div><button class="icon-btn x" data-a="close-panel" aria-label="Close details">${ic('x')}</button></div>
+   ${lr?`<div class="sect-label" style="margin-top:4px">${ic('mail','sm')}Latest update</div><div class="quote">“${esc(lr.text)}”<span class="src">${esc(P(lr.from).name)} · ${lr.via==='app'?'lead update in app':'email reply'} · ${stamp(lr.at)}</span></div>`:`<div class="reason update" style="margin-top:4px">${ic('clock','sm')}<span>${t.owner?`No reply from ${esc(P(t.owner).first)} since this was approved ${sd?`${sd} day${sd>1?'s':''} ago`:'today'}. Status is unknown.`:'No owner yet, so nobody has been emailed.'}</span></div>`}
+   <div class="kv-list" style="margin-top:16px">
+     <div class="kv-row">${ic('user','sm')}<span class="k">Owner</span><span class="v">${t.owner?person(t.owner):'<span class="pill p-update">'+ic('user')+'Needs owner</span>'}</span></div>
+     <div class="kv-row">${ic('cal','sm')}<span class="k">Approved due date</span><span class="v">${t.due?fmtDueL(t.due):'Not set'}</span></div>
+     ${pr?`<div class="kv-row">${ic('cal','sm')}<span class="k">Requested date</span><span class="v">${fmtDueL(pr.requested)}<small>Requested by ${esc(P(pr.by).first)}. Not approved, so the date above still applies.</small></span></div>`:''}
+     <div class="kv-row">${ic('circle','sm')}<span class="k">Status</span><span class="v">${spill(t.status)}</span></div>
+     ${t.blocker?`<div class="kv-row">${ic('alert','sm')}<span class="k">Blocker</span><span class="v">${esc(t.blocker)}${dep&&dep.status==='done'?'<small>The dependency is done. Waiting for '+esc(P(t.owner).first)+' to confirm he is unblocked.</small>':''}</span></div>`:''}
+     ${dep?`<div class="kv-row">${ic('link','sm')}<span class="k">Dependency</span><span class="v"><button class="link" data-a="sel-task" data-id="${dep.id}">${esc(dep.title)}</button><small>${esc(P(dep.owner).name)} · due ${fmtDue(dep.due)} · ${SPILL[dep.status][2]}</small></span></div>`:''}
+     <div class="kv-row">${ic('flag','sm')}<span class="k">Priority</span><span class="v" style="text-transform:capitalize">${t.priority}</span></div>
+   </div>
+   ${pr?`<div class="dec-section" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--line-2)">${ic('clock','sm')}<span style="flex:1">Request for more time</span><span class="pill p-update">${ic('pause')}Pending</span><button class="btn btn-primary btn-sm" data-a="goto" data-h="decisions">Review date request</button></div>`:''}
+   ${rcs.length?`<div class="dec-section" style="padding:12px 0;border-bottom:1px solid var(--line-2)">${rcs.map(rc=>`<button class="link" data-a="open-rc" data-id="${rc.id}">Change receipt ${rc.id}: ${rc.kind==='owner'?'owner assigned':rc.outcome}</button>`).join('<br>')}</div>`:''}
+   <div class="sect-label">${ic('activity','sm')}Evidence timeline</div>
+   <ul class="tl">${evs.map(e=>{const d=evDesc(e);return `<li><span class="dt ${d.dot}"></span><span><b>${esc(d.title)}</b>${d.quote?`<span class="muted small" style="display:block">“${esc(d.quote)}”</span>`:''}<small>${stamp(e.at)}</small></span></li>`}).join('')}<li><span class="dt grey"></span><span><b>Approved by Maya from meeting notes</b><small>${stamp(t.approvedAt)}</small></span></li></ul>
+   <div class="sect-label">${ic('doc','sm')}Source in meeting notes</div>
+   <div class="quote">“${esc(t.quote)}”<span class="src">${esc(m?m.title:'Meeting')} · ${m?fmtDue(m.date):''} · exact words from the notes</span></div>
+  </aside>`;
+}
+function depsView(ts){
+  const deps=ts.filter(t=>t.dependsOn);
+  if(!deps.length) return `<div class="card empty">${loopArt()}<p class="h3">No dependencies recorded.</p><p>Dependencies come from the notes (“once…”) or from a reply that names a blocker.</p></div>`;
+  return deps.map(t=>{const d=T(t.dependsOn);const risk=d.status!=='done'&&t.due&&d.due&&parseD(d.due)>=parseD(t.due);
+   const late=d.status!=='done'&&d.due&&parseD(d.due)<=dayStart(S.now);
+   return `<div class="card dep-card"><div class="dep-node"><span class="label">Needed first</span><b>${esc(d.title)}</b><span class="muted small">${esc(P(d.owner).name)} · due ${fmtDue(d.due)}</span><div style="margin-top:8px">${spill(d.status)}</div></div><span class="dep-arrow">${ic('arrow','lg')}</span><div class="dep-node"><span class="label">Then</span><b>${esc(t.title)}</b><span class="muted small">${esc(P(t.owner).name)} · approved due ${fmtDue(t.due)}</span><div style="margin-top:8px">${spill(t.status)}</div></div></div>
+   ${d.status!=='done'?`<p class="small" style="margin:-4px 0 18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="inf-tag">${ic('spark','xs')}Inference</span>${late?`“${esc(d.title)}” is due ${parseD(d.due)<dayStart(S.now)?'and overdue':'today'}. If it slips, “${esc(t.title)}” (${fmtDue(t.due)}) is at risk.`:`“${esc(t.title)}” can’t finish before “${esc(d.title)}”.`} This is worked out from linked dates, not reported by anyone.</p>`:`<p class="small muted" style="margin:-4px 0 18px">Dependency recorded as done ${rel(lastReply(d).at)}.</p>`}`}).join('');
+}
+function updatesView(id){
+  const evs=S.events.filter(e=>e.taskId&&T(e.taskId)?.ws===id).sort((a,b)=>b.at-a.at);
+  if(!evs.length) return `<div class="card empty">${loopArt()}<p class="h3">No updates yet.</p><p>Replies to morning emails will appear here.</p></div>`;
+  return `<div class="card" style="padding:8px 14px">${evs.map(e=>evRow(e)).join('')}</div>`;
+}
+
+/* ---------- decisions ---------- */
+function vDecisions(){
+  const tab=S.ui.decTab, reqs=waitingReqs(), on=ownerNeeded();
+  const resolvedRcs=S.receipts.slice().reverse();
+  const waitingN=reqs.length+on.length;
+  const lastRc=S.receipts[S.receipts.length-1];
+  return `<div class="content"><div class="page-head"><h1 tabindex="-1">A few decisions. Work moving again.</h1><p class="sub">A requested date is not an approved date. Nothing moves until you decide.</p></div>
+  <div class="tabs" role="tablist" aria-label="Decisions">
+    <button class="tab" role="tab" id="dt-w" aria-selected="${tab==='waiting'}" tabindex="${tab==='waiting'?0:-1}" data-a="dectab" data-t="waiting">Waiting · ${waitingN}</button>
+    <button class="tab" role="tab" id="dt-r" aria-selected="${tab==='resolved'}" tabindex="${tab==='resolved'?0:-1}" data-a="dectab" data-t="resolved">Resolved · ${resolvedRcs.length}</button>
+  </div>
+  <div class="dec-grid"><div role="tabpanel" aria-labelledby="${tab==='waiting'?'dt-w':'dt-r'}">
+   ${tab==='waiting'?(waitingN?reqs.map(reqCard).join('')+on.map(ownerCard).join(''):`<div class="card empty">${loopArt()}<p class="h3">Nothing is waiting on you.</p><p>New date requests and unowned tasks will show up here.</p>${lastRc?`<button class="btn btn-secondary btn-sm" data-a="open-rc" data-id="${lastRc.id}" style="margin-top:8px">View the latest receipt</button>`:''}</div>`)
+   :(resolvedRcs.length?resolvedRcs.map(rc=>{const t=T(rc.taskId);return `<div class="card resolved-card"><span class="ws-icon" style="width:44px;height:44px">${ic(rc.kind==='owner'?'user':'cal')}</span><span><span class="h3" style="display:block">${esc(t.title)}</span><span class="muted small">${rc.kind==='owner'?`Owner: none → ${esc(P(rc.after).name)}`:rc.outcome==='approved'?`Approved due date: ${fmtDue(rc.before)} → ${fmtDue(rc.after)}`:`Declined. Stays ${fmtDue(rc.before)}`} · ${esc(P(rc.actor).name)} · ${stamp(rc.at)}</span></span><span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">${rc.kind==='owner'?`<span class="pill p-ok">${ic('check')}Assigned</span>`:rc.outcome==='approved'?`<span class="pill p-ok">${ic('check')}Approved</span>`:`<span class="pill p-declined">${ic('x')}Declined</span>`}<button class="btn btn-secondary btn-sm" data-a="open-rc" data-id="${rc.id}">Receipt</button></span></div>`}).join(''):`<div class="card empty">${loopArt()}<p class="h3">No decisions resolved yet.</p><p>Approve or decline a request and its receipt appears here.</p></div>`)}
+  </div>
+  <aside class="rail" aria-label="Latest change receipt">
+    <div class="card rcpt">${lastRc?rcSummary(lastRc):`<h2 class="h3">Latest change receipt</h2><div class="empty" style="padding:26px 6px 10px">${ic('doc','lg')}<p style="margin:10px 0 0">No changes yet. When you approve or decline, the receipt shows here with who, when and what changed.</p></div>`}</div>
+    <div class="loop-card ${S.ui.loopPlay?'play':''}"><svg viewBox="0 0 400 230" preserveAspectRatio="none" aria-hidden="true"><path class="thr" d="M-10 18C70 50 150 100 230 92c70-7 86-52 54-66-30-13-58 16-38 44 22 30 96 26 152-30"/><circle class="knot" cx="396" cy="42" r="9"/></svg><div class="t">${lastRc?'One less loose end.':'Every decision leaves a trail.'}</div><div class="s">${lastRc?'Your team keeps moving things forward.':'Approve or decline to close the loop.'}</div></div>
+  </aside></div></div>`;
+}
+function reqCard(r){
+  const t=T(r.taskId), rep=S.events.find(e=>e.id===r.replyEvent), dep=t.dependsOn?T(t.dependsOn):null, w=W(t.ws);
+  const conf=S.ui.confirm&&S.ui.confirm.id===r.id?S.ui.confirm:null, busy=S.ui.busy===r.id;
+  const onTarget=r.requested===w.target;
+  return `<article class="card dec-card" aria-labelledby="rq-${r.id}">
+   <div class="dec-top"><div><h2 class="h2" id="rq-${r.id}">${esc(t.title)}</h2><div class="muted">${esc(w.name)} · ${esc(t.id)}</div></div><span class="pill p-decision">${ic('cal')}Date change</span></div>
+   <div class="req-by">${av(r.by,'lg')}<span>Requested by <b>${esc(P(r.by).name)}</b><br><span class="muted small">By email reply · ${stamp(r.at)} · decision goes to ${esc(P(r.approver).name)} (workstream owner)</span></span></div>
+   <div class="dates">
+     <div class="dbox"><span class="label">Current date · approved</span><div class="dv">${fmtDueL(r.current)}</div><span class="dn">${ic('check','xs')}This date applies until ${r.approver===S.ui.actingAs?'you decide':esc(P(r.approver).first)+' decides'}.</span></div>
+     <div class="dbox req"><span class="label">Requested date · not approved</span><div class="dv">${fmtDueL(r.requested)}</div><span class="dn">${ic('pause','xs')}Proposed by ${esc(P(r.by).first)}.</span></div>
+   </div>
+   <div class="dec-section"><div class="k">Reason given</div><div>${esc(r.reason)}</div></div>
+   ${dep?`<div class="dec-section"><div class="k">Linked blocker</div><div class="linked">${ic('alert','sm')}<span style="flex:1">Waiting on <b>${esc(dep.title)}</b>. ${esc(P(dep.owner).name)}, due ${fmtDue(dep.due)}, ${SPILL[dep.status][2].toLowerCase()}.</span><button class="link small" data-a="open-task" data-id="${dep.id}">Open</button></div><p class="small muted" style="margin:6px 0 0">Approving a new date does not clear the blocker. It stays until ${esc(P(t.owner).first)} confirms.</p></div>`:''}
+   <div class="dec-section"><div class="k">Original reply <span class="ai-tag">${ic('spark','xs')}Simulated interpretation</span></div>
+     <div class="quote">“${esc(rep.text)}”<span class="src">${esc(P(rep.from).name)} via email · ${stamp(rep.at)} · <button class="link small" data-a="open-ev" data-id="${rep.id}">View original email</button></span></div></div>
+   ${onTarget?`<p class="small" style="margin:14px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="inf-tag">${ic('spark','xs')}Inference</span>${fmtDue(r.requested)} is also the launch target, so approving leaves no buffer for the deck.</p>`:''}
+   ${r.approver!==S.ui.actingAs?'':`<div class="field" style="margin-top:18px"><label for="note-${r.id}">Note to ${esc(P(r.by).first)} <span class="muted" style="font-weight:400">(optional, goes in the confirmation)</span></label><input class="input" id="note-${r.id}" data-a="note" data-id="${r.id}" value="${esc(S.ui.notes?.[r.id]||'')}" placeholder="e.g. Approved. Let’s lock pricing first thing Tuesday."></div>`}
+   ${r.approver!==S.ui.actingAs?`<div class="confirm-row" style="background:var(--canvas);border-color:var(--line)"><p style="display:flex;gap:10px;align-items:flex-start">${ic('user','sm')}<span>Only <b>${esc(P(r.approver).name)}</b> (${esc(W(t.ws).name)} owner) can decide this. You can see it as ${P(S.ui.actingAs).role==='lead'?'CEO':'a team member'}, but you can’t approve or decline it.</span></p><div class="actions"><button class="btn btn-secondary btn-sm" data-a="act-as" data-id="${r.approver}">${ic('flask','sm')}Switch to ${esc(P(r.approver).first)}’s view (demo)</button></div></div>`:
+   conf?`<div class="confirm-row" role="group" aria-label="Confirm decision"><p>${conf.o==='approved'?`Move the approved date for “${esc(t.title)}” from <b>${fmtDue(r.current)}</b> to <b>${fmtDue(r.requested)}</b>? ${esc(P(r.by).first)} gets a confirmation.`:`Decline and keep <b>${fmtDue(r.current)}</b>? ${esc(P(r.by).first)} is told the date stays the same.`}</p><div class="actions"><button class="btn btn-primary btn-sm" data-a="decide" data-id="${r.id}" data-o="${conf.o}" ${busy?'disabled':''} id="confirm-btn">${busy?'Recording…':conf.o==='approved'?'Confirm approval':'Confirm decline'}</button><button class="btn btn-secondary btn-sm" data-a="cancel-confirm" ${busy?'disabled':''}>Cancel</button></div></div>`
+   :`<div class="dec-actions"><button class="btn btn-primary" data-a="ask" data-id="${r.id}" data-o="approved">${ic('check','sm')}Approve ${fmtDue(r.requested)}</button><button class="btn btn-secondary" data-a="ask" data-id="${r.id}" data-o="declined">Decline, keep ${fmtDue(r.current)}</button></div>`}
+   ${r.calNote?`<p class="small" style="margin:12px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="inf-tag">${ic('spark','xs')}Open policy</span>${esc(r.calNote)}</p>`:''}
+  </article>`;
+}
+function ownerCard(t){
+  const pick=S.ui.ownerPick?.[t.id]||'';
+  return `<article class="card dec-card" aria-labelledby="on-${t.id}">
+   <div class="dec-top"><div><h2 class="h2" id="on-${t.id}">${esc(t.title)}</h2><div class="muted">${esc(W(t.ws).name)} · ${esc(t.id)}</div></div><span class="pill p-update">${ic('user')}Owner needed</span></div>
+   <p style="margin:14px 0 8px">This task was approved without an owner, so no one gets it in their morning email.</p>
+   <div class="quote">“${esc(t.quote)}”<span class="src">From your notes · ${esc(S.meetings.find(m=>m.id===t.meeting)?.title||'')}</span></div>
+   <div style="display:flex;gap:12px;align-items:flex-end;margin-top:18px;flex-wrap:wrap"><div class="field" style="flex:1;min-width:220px"><label for="pick-${t.id}">Assign owner</label><select class="select" id="pick-${t.id}" data-a="owner-pick" data-id="${t.id}"><option value="">Choose a team member…</option>${TEAM.map(p=>`<option value="${p.id}" ${pick===p.id?'selected':''}>${esc(p.name)} · ${esc(p.title)}</option>`).join('')}</select></div><button class="btn btn-primary" data-a="assign" data-id="${t.id}" ${pick?'':'disabled'}>Assign owner</button></div>
+  </article>`;
+}
+function rcSummary(rc){
+  const t=T(rc.taskId);
+  return `<div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 class="h3">Latest change receipt</h2>${rc.kind==='owner'?`<span class="pill p-ok">${ic('check')}Assigned</span>`:rc.outcome==='approved'?`<span class="pill p-ok">${ic('check')}Approved</span>`:`<span class="pill p-declined">${ic('x')}Declined</span>`}</div>
+  <div style="margin-top:14px"><b style="font-family:var(--serif);font-weight:400;font-size:21px">${esc(t.title)}</b><div class="muted small">${esc(W(t.ws).name)} · ${rc.id}</div></div>
+  <div class="from-to"><div class="ft"><small>Before · ${rc.field}</small><b>${rc.kind==='owner'?'No owner':fmtDue(rc.before)}</b></div><span aria-hidden="true">${ic('arrow','sm')}</span><div class="ft after"><small>After</small><b>${rc.kind==='owner'?esc(P(rc.after).first):fmtDue(rc.after)}</b></div></div>
+  <dl class="rc-rows"><dt>${rc.kind==='owner'?'Assigned':'Decided'} by</dt><dd>${esc(P(rc.actor).name)}</dd><dt>When</dt><dd>${stamp(rc.at)}</dd></dl>
+  <div class="notif"><span class="ico">${ic('mail','sm')}</span><span><b>Confirmation email queued</b><div class="muted small">To ${esc(P(rc.notify.to).name)}: ${esc(rc.notify.text)}. Demo, not sent.</div></span></div>
+  <div style="margin-top:12px"><button class="btn btn-secondary btn-sm" data-a="open-rc" data-id="${rc.id}">Open full receipt</button></div>`;
+}
+
+/* ---------- activity ---------- */
+function evRow(e){
+  const d=evDesc(e), t=e.taskId?T(e.taskId):null, sel=S.ui.selEvent===e.id;
+  return `<button class="ev ${sel?'sel':''}" data-a="open-ev" data-id="${e.id}" aria-pressed="${sel}"><span class="tm">${hm(e.at)}</span><span class="ico ${d.ib}">${ic(d.icon,'sm')}</span><span style="min-width:0"><b>${esc(d.title)}</b><span class="s" style="display:block">${d.quote?`“${esc(d.quote)}”`:esc(d.ctx)}</span>${t?`<span class="tag">${ic('layers','xs')}${esc(t.title)}</span>`:''}</span><span class="chev">${ic('chevr','sm')}</span></button>`;
+}
+function vActivity(){
+  const f=S.ui.actFilter;
+  const evs=S.events.filter(e=>f==='all'||evDesc(e).kind===f).sort((a,b)=>b.at-a.at);
+  const groups=[];evs.forEach(e=>{const k=isoD(e.at);let g=groups.find(x=>x.k===k);if(!g){g={k,d:e.at,items:[]};groups.push(g)}g.items.push(e)});
+  const dl=d=>{const dd=Math.round((dayStart(S.now)-dayStart(d))/86400000);return dd===0?'Today':dd===1?'Yesterday':`${DOWL[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}`};
+  let selE=S.ui.selEvent?S.events.find(e=>e.id===S.ui.selEvent):null;
+  return `<div class="content"><div class="page-head">${headThread}<h1 tabindex="-1">Every change has a trail.</h1><p class="sub">See what moved, who asked, who decided and where it came from.</p></div>
+  <p class="small muted" style="margin:-12px 0 18px;display:flex;gap:8px;align-items:center">${ic('mail','xs')}Replies go to the team address ${TEAM_ADDR}. The inbox is checked every minute (simulated here).</p>
+  <div class="filters" role="group" aria-label="Filter activity">${[['all','All activity'],['decisions','Decisions'],['replies','Replies'],['tasks','Tasks']].map(([k,l])=>`<button class="fpill" data-a="actf" data-f="${k}" aria-pressed="${f===k}">${l}</button>`).join('')}</div>
+  <div class="act-grid"><div class="card" style="padding:14px 18px">${groups.length?groups.map(g=>`<h2 class="day">${dl(g.d)}</h2>${g.items.map(evRow).join('')}`).join(''):`<div class="empty">${loopArt()}<p class="h3">No activity of this kind yet.</p></div>`}</div>
+  <aside class="card rcpt" aria-label="Details">${selE?evDetail(selE):`<h2 class="h3">Pick an event</h2><p class="muted">Select anything on the left to see its source. Decisions open a full change receipt.</p>${S.receipts.length?`<button class="btn btn-secondary btn-sm" data-a="open-rc" data-id="${S.receipts[S.receipts.length-1].id}">Open latest receipt</button>`:''}`}</aside></div></div>`;
+}
+function evDetail(e){
+  const t=e.taskId?T(e.taskId):null;
+  if(e.type==='decision'||e.type==='assign') return fullReceipt(S.receipts.find(r=>r.id===e.receiptId));
+  if(e.type==='reply'&&e.unknown) return `<h2 class="h3">Reply from an unknown address</h2><div class="email"><div class="hd"><span>From</span><b>${esc(e.sender)}</b><span>To</span><span>${TEAM_ADDR}</span><span>Received</span><span>${stamp(e.at)}</span></div><div class="bd">${esc(e.text)}</div></div><div class="readas"><div>${ic('alert','sm')}<span>The sender isn’t on the team list. <b>No task was changed.</b> Logged here for audit only.</span></div></div>`;
+  if(e.type==='reply'&&(e.parts||e.ambiguous)){const p=P(e.from);
+    return `<div style="display:flex;justify-content:space-between;gap:10px"><h2 class="h3">Email reply</h2><span class="pill p-grey">${ic('mail')}Email</span></div>
+    <div class="email"><div class="hd"><span>From</span><b>${esc(p.name)} &lt;${esc(p.email)}&gt;</b><span>To</span><span>${TEAM_ADDR} (team address)</span><span>Subject</span><span>${esc(e.subject||'Re: Your open tasks')}</span><span>Received</span><span>${stamp(e.at)}</span></div><div class="bd">${esc(e.text)}</div></div>
+    <div class="sect-label">${ic('spark','sm')}What Loose Ends recorded <span class="ai-tag">Simulated interpretation</span></div>
+    <div class="readas">${e.ambiguous?`<div>${ic('msg','sm')}<span>${esc(p.first)} has ${e.ambiguous.length} open tasks and the reply doesn’t say which one: ${e.ambiguous.map(id=>`<button class="link" data-a="open-task" data-id="${id}">${esc(T(id).title)}</button>`).join(' or ')}. <b>No task was changed.</b></span></div><div>${ic('send','sm')}<span>Clarifying email to ${esc(p.first)}: “Which task is this about?” <span style="color:var(--warn);font-weight:600">Queued · demo, not sent</span></span></div>`
+    :e.parts.map(x=>{const t=T(x.taskId);return `<div>${ic(x.dateRequest?'cal':x.change?.to==='done'?'check':'circle','sm')}<span><b>“${esc(x.fragment)}”</b><br>→ <button class="link" data-a="open-task" data-id="${t.id}">${esc(t.title)}</button>: ${x.change?`${SPILL[x.change.from][2]} → <b>${SPILL[x.change.to][2]}</b>`:'no status change'}${x.note?`. ${esc(x.note)}`:''}${x.dateRequest?`. Date request for ${fmtDue(x.dateRequest)} sent to ${esc(P(W(t.ws).owner).name)} (${esc(W(t.ws).name)} owner). <b>Not applied.</b>`:''}</span></div>`}).join('')}</div>
+    <p class="small muted" style="margin-top:12px">Each part is applied only where the task match is clear. The original email stays the source.</p>`;}
+  if(e.type==='reply'){const p=P(e.from);
+    return `<div style="display:flex;justify-content:space-between;gap:10px"><h2 class="h3">${e.via==='app'?'Lead update':'Email reply'}</h2><span class="pill p-grey">${ic(e.via==='app'?'pen':'mail')}${e.via==='app'?'In app':'Email'}</span></div>
+    ${e.via==='email'?`<div class="email"><div class="hd"><span>From</span><b>${esc(p.name)} &lt;${esc(p.email)}&gt;</b><span>To</span><span>${TEAM_ADDR} (team address)</span><span>Subject</span><span>${esc(e.subject||'Re: Your open tasks')}</span><span>Received</span><span>${stamp(e.at)}</span></div><div class="bd">${esc(e.text)}</div></div>`:`<div class="quote" style="margin-top:12px">“${esc(e.text)}”<span class="src">${esc(p.name)} · ${stamp(e.at)}</span></div>`}
+    <div class="sect-label">${ic('spark','sm')}What Loose Ends recorded <span class="ai-tag">Simulated interpretation</span></div>
+    <div class="readas">
+      ${t?`<div>${ic('layers','sm')}<span>Matched to <button class="link" data-a="open-task" data-id="${t.id}">${esc(t.title)}</button> (the only task of ${esc(p.first)}'s in that email).</span></div>`:''}
+      ${e.change?`<div>${ic('circle','sm')}<span>Status ${e.change.from?`${SPILL[e.change.from][2]} → `:''}<b>${SPILL[e.change.to][2]}</b></span></div>`:'<div>'+ic('info','sm')+'<span>No status change. Logged as an update.</span></div>'}
+      ${e.read?.blocker?`<div>${ic('alert','sm')}<span>Blocker: ${esc(e.read.blocker)}. Linked to ${esc(T(e.read.dependency)?.title||'')}.</span></div>`:''}
+      ${e.read?.dateRequest?`<div>${ic('cal','sm')}<span>Date request for ${fmtDue(e.read.dateRequest)}. <b>Not applied.</b> Sent to the workstream owner for a decision.</span></div>`:''}
+    </div><p class="small muted" style="margin-top:12px">The original email text is kept as the source. The interpretation never replaces it.</p>`;}
+  if(e.type==='date_request'){const r=S.requests.find(x=>x.id===e.requestId);
+    return `<h2 class="h3">Date change request</h2><p class="muted small">${r.id} · ${stamp(r.at)}</p>
+    <div class="from-to"><div class="ft"><small>Approved</small><b>${fmtDue(r.current)}</b></div><span>${ic('arrow','sm')}</span><div class="ft after"><small>Requested</small><b>${fmtDue(r.requested)}</b></div></div>
+    <dl class="rc-rows"><dt>Task</dt><dd><button class="link" data-a="open-task" data-id="${t.id}">${esc(t.title)}</button></dd><dt>Requested by</dt><dd>${esc(P(r.by).name)}</dd><dt>Approver</dt><dd>${esc(P(r.approver).name)}</dd><dt>Status</dt><dd>${r.status==='waiting'?`<span class="pill p-update">${ic('pause')}Waiting</span>`:r.status==='approved'?`<span class="pill p-ok">${ic('check')}Approved</span>`:`<span class="pill p-declined">${ic('x')}Declined</span>`}</dd></dl>
+    ${r.status==='waiting'?'<button class="btn btn-primary btn-sm" data-a="goto" data-h="decisions">Go to decision</button>':`<button class="btn btn-secondary btn-sm" data-a="open-rc" data-id="${r.receiptId}">Open receipt</button>`}`;}
+  if(e.type==='approve_batch'){const m=S.meetings.find(x=>x.id===e.meeting);const ts=S.tasks.filter(x=>x.meeting===e.meeting);
+    return `<h2 class="h3">Tasks approved from notes</h2><p class="muted small">${esc(m?.title||'')} · approved by Maya · ${stamp(e.at)}</p><ul class="tl">${ts.map(x=>`<li><span class="dt"></span><span><b>${esc(x.title)}</b><small>${x.owner?esc(P(x.owner).name):'No owner'} · ${x.due?fmtDue(x.due):'no date'}</small><span class="muted small" style="display:block">“${esc(x.quote)}”</span></span></li>`).join('')}</ul>`;}
+  if(e.type==='digest') return `<h2 class="h3">Morning emails</h2><p class="muted small">${stamp(e.at)} · from ${TEAM_ADDR}</p><p>Each person gets only their own open tasks, most urgent first.</p><ul>${e.to.map(id=>`<li>${esc(P(id).name)}: ${S.tasks.filter(x=>x.owner===id&&isOpen(x)).length} open</li>`).join('')}</ul><p class="reason update">${ic('info','sm')}Queued in the demo. Nothing was sent, and nothing is reported as delivered.</p>`;
+  return '';
+}
+function roleText(id,ws){const r=[];if(W(ws).owner===id)r.push(`${W(ws).name} owner`);if(P(id).role==='lead')r.push('team lead');return r.join(' · ')||P(id).title}
+function fullReceipt(rc){
+  const t=T(rc.taskId), src=S.events.find(e=>e.id===rc.sourceEventId), m=S.meetings.find(x=>x.id===t.meeting);
+  return `<div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><h2 class="h2">Change receipt</h2><p class="muted small" style="margin:4px 0 0">A record of what changed, who decided it and where it came from.</p></div>${rc.kind==='owner'?`<span class="pill p-ok">${ic('check')}Assigned</span>`:rc.outcome==='approved'?`<span class="pill p-ok">${ic('check')}Approved</span>`:`<span class="pill p-declined">${ic('x')}Declined</span>`}</div>
+  <dl class="rc-rows" style="margin-top:18px;padding-top:16px;border-top:1px solid var(--line-2)">
+   <dt>Receipt</dt><dd>${rc.id}${rc.requestId?` · request ${rc.requestId}`:''}</dd>
+   <dt>Task</dt><dd><button class="link" data-a="open-task" data-id="${t.id}">${esc(t.title)}</button> · ${t.id}</dd>
+   <dt>Workstream</dt><dd>${esc(W(t.ws).name)}</dd>
+   <dt>Field</dt><dd>${rc.field}</dd>
+  </dl>
+  <div class="from-to"><div class="ft"><small>Before</small><b>${rc.kind==='owner'?'No owner':fmtDueL(rc.before)}</b></div><span aria-hidden="true">${ic('arrow','sm')}</span><div class="ft after"><small>After</small><b>${rc.kind==='owner'?esc(P(rc.after).name):fmtDueL(rc.after)}</b></div></div>
+  ${rc.outcome==='declined'?'<p class="small muted" style="margin:-6px 0 12px">Declined, so no value changed.</p>':''}
+  <dl class="rc-rows"><dt>Authorised by</dt><dd>${esc(P(rc.actor).name)}<span class="muted small" style="display:block">${esc(roleText(rc.actor,T(rc.taskId).ws))}</span></dd><dt>When</dt><dd>${stamp(rc.at)} PT</dd>${rc.note?`<dt>Note</dt><dd>“${esc(rc.note)}”</dd>`:''}</dl>
+  ${src?`<div class="sect-label">${ic('mail','sm')}Original request</div><div class="quote">“${esc(src.text)}”<span class="src">${esc(P(src.from).name)} via email · ${stamp(src.at)}</span></div>`:''}
+  <div class="sect-label">${ic('doc','sm')}Original commitment</div><div class="quote">“${esc(t.quote)}”<span class="src">${esc(m?.title||'')} · ${m?fmtDue(m.date):''}</span></div>
+  ${rc.kind==='date'&&t.status==='blocked'?`<p class="reason blocked" style="margin-top:14px">${ic('alert','sm')}<span>Still blocked: ${esc(t.blocker)}. A date change doesn’t clear a blocker.</span></p>`:''}
+  <div class="notif" style="margin-top:12px"><span class="ico">${ic('send','sm')}</span><span><b>Notification to ${esc(P(rc.notify.to).name)}</b><div class="muted small">“${esc(rc.notify.text)}”</div><div style="color:var(--warn);font-weight:600;font-size:13.5px;margin-top:4px">Queued · demo, not sent</div></span></div>`;
+}
+
+/* ---------- capture ---------- */
+function vCapture(){
+  const d=S.draft;
+  const already=S.meetings.some(m=>m.id==='M-12');
+  return `<div class="content"><div class="page-head">${headThread}<h1 tabindex="-1">Turn meetings into follow-through.</h1><p class="sub">Paste notes or upload a transcript. Nothing goes out until you approve it.</p></div>
+  ${already?`<div class="demo-banner">${ic('info')}<span class="grow">Monday’s meeting is already on the board in this scenario. Loose Ends will flag anything it already tracks, so nothing is duplicated. To see the full story, restart at Monday.</span><button class="btn btn-secondary btn-sm" data-a="reset" data-scn="monday">Restart at Monday</button></div>`:''}
+  <div class="cap-grid"><form class="card cap-card" id="cap-form" novalidate>
+   <div class="meta-row">
+    <div class="field"><label for="m-title">Meeting title</label><input class="input" id="m-title" data-f="title" value="${esc(d.title)}"></div>
+    <div class="field"><label for="m-date">Meeting date</label><input class="input" type="date" id="m-date" data-f="date" value="${esc(d.date)}"><span class="small muted">Used to turn “Tuesday” into a date.</span></div>
+    <div class="field"><span class="flabel" id="att-l">Attendees</span><div class="chips" role="group" aria-labelledby="att-l">${d.attendees.map(id=>`<span class="chip">${esc(P(id).first)}<button type="button" data-a="att-rm" data-id="${id}" aria-label="Remove ${esc(P(id).first)}">${ic('x','xs')}</button></span>`).join('')}
+      ${TEAM.some(p=>!d.attendees.includes(p.id))?`<label class="sr-only" for="att-add">Add attendee</label><select id="att-add" data-a="att-add"><option value="">+ Add</option>${TEAM.filter(p=>!d.attendees.includes(p.id)).map(p=>`<option value="${p.id}">${esc(p.first)}</option>`).join('')}</select>`:''}</div></div>
+   </div>
+   <div class="notes-row">
+    <div class="field"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><label for="m-notes">Meeting notes or transcript</label><span><button type="button" class="link small" data-a="sample">Use sample notes</button> · <button type="button" class="link small" data-a="sample-seq">Load 2-meeting sequence</button> · <button type="button" class="link small" data-a="clear-notes">Clear</button></span></div>
+      <textarea class="textarea" id="m-notes" data-f="notes" aria-describedby="notes-err">${esc(d.notes)}</textarea>
+      ${d.error?`<div class="ferr" id="notes-err">${ic('alert','xs')}${esc(d.error)}</div>`:''}</div>
+    <div class="field"><span class="flabel">Or upload a transcript</span>
+      <div class="drop" id="drop">${ic('upload','lg')}<span class="h3">Drop transcripts here</span><label class="btn btn-primary btn-sm" for="file-in" style="cursor:pointer;line-height:1">Choose file</label><input type="file" id="file-in" accept=".txt,.md,text/plain" class="sr-only" multiple><span class="small muted">One or several. .txt or .md, up to 200 KB each.<br>Each file becomes its own meeting. .docx needs the backend.</span></div></div>
+   </div>
+   ${queueBlock()}
+   <div class="cap-actions"><button type="submit" class="btn btn-primary" style="min-width:200px">${ic('spark','sm')}${(()=>{const n=d.queue.length+(d.notes.trim()?1:0);return n>1?`Find tasks in ${n} meetings`:'Find tasks'})()}</button><button type="button" class="btn btn-secondary" data-a="queue-add" ${d.notes.trim()?'':'disabled'}>${ic('plus','sm')}Add another meeting</button><span class="small muted">Extraction is simulated in this prototype. No AI is connected.</span></div>
+  </form>
+  <aside class="steps-card" aria-label="How it works"><svg class="st" viewBox="0 0 30 300" preserveAspectRatio="none" fill="none" aria-hidden="true"><path d="M2 0c20 60-18 100 6 150s-14 100 8 150" stroke="#AFC85E" stroke-width="1.4"/></svg>
+   <ol><li><span class="num">1</span><span><b>Paste or upload</b><span>Add the notes from any meeting tool.</span></span></li>
+   <li><span class="num">2</span><span><b>Review what was promised</b><span>Every proposal shows the exact sentence it came from.</span></span></li>
+   <li><span class="num">3</span><span><b>Approve and notify</b><span>Only approved tasks reach the board and the morning email.</span></span></li></ol>
+  </aside></div></div>`;
+}
+
+function queueBlock(){
+  const q=S.draft.queue.slice().sort((a,b)=>a.date<b.date?-1:1);
+  if(!q.length) return '';
+  return `<div style="margin-top:22px;border-top:1px solid var(--line-2);padding-top:18px"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><span class="flabel" style="font-weight:600">Meetings in this upload · processed oldest first</span><span class="small muted">Later meetings can’t duplicate tasks from earlier ones.</span></div>
+  <ol style="list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px">${q.map((m,i)=>`<li style="display:grid;grid-template-columns:30px minmax(0,1fr) 170px auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--canvas)"><span class="prop-num" style="width:28px;height:28px;font-size:13px">${i+1}</span><span style="min-width:0"><b style="font-weight:600;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(m.title)}</b><span class="small muted">${m.notes.split(/\n/).filter(Boolean).length} lines${m.file?` · from ${esc(m.file)}`:''}</span></span><span><label class="sr-only" for="qd-${m.id}">Meeting date for ${esc(m.title)}</label><input class="input" style="height:38px" type="date" id="qd-${m.id}" data-a="q-date" data-id="${m.id}" value="${m.date}"></span><button type="button" class="btn btn-ghost btn-sm" data-a="q-rm" data-id="${m.id}" aria-label="Remove ${esc(m.title)}">${ic('trash','sm')}</button></li>`).join('')}</ol></div>`;
+}
+function detectDate(text,fallback){
+  const m=text.match(/\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\b/i);
+  if(m){const mo=MON.findIndex(x=>x.toLowerCase()===m[2].slice(0,3).toLowerCase());return isoD(new Date(2026,mo,+m[1]))}
+  const iso=text.match(/\b(20\d\d)-(\d\d)-(\d\d)\b/); if(iso) return iso[0];
+  return fallback;
+}
+let qSeq=1;
+/* simulated extraction */
+function extract(notes,dateIso,prior=[],mk=null,startN=0){
+  const base=parseD(dateIso||'2026-11-02');
+  const sentences=notes.split(/\n+/).flatMap(l=>l.split(/(?<=[.!?])\s+/)).map(s=>s.trim()).filter(Boolean);
+  const items=[];let n=startN;
+  const names=TEAM.map(p=>p.first).join('|');
+  const dayRe=/\bby (next )?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
+  const dayRe2=/\bon (monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i;
+  const resolveDay=(m,nxt)=>{const idx=DOWL.map(x=>x.toLowerCase()).indexOf(m.toLowerCase());let d=new Date(base);let diff=(idx-d.getDay()+7)%7;if(diff===0)diff=7;if(nxt&&diff<7)diff+=0;d.setDate(d.getDate()+diff);return isoD(d)};
+  for(const s of sentences){
+    if(/^(attendees|weekly|agenda)\b/i.test(s)) continue;
+    if(/\b(goal|aim|target)\b/i.test(s)){const dm=s.match(dayRe2)||s.match(dayRe);items.push({pid:'p'+(++n),kind:'target',quote:s,mk,due:dm?resolveDay(dm[dm.length-1]):null});continue;}
+    const om=s.match(new RegExp(`\\b(${names})\\b\\s+(will|to|should|needs to|is going to)\\s+(.+)`,'i'));
+    const nm=!om&&s.match(/\b(someone|somebody|we|someone else)\s+(should|needs to|must|will)\s+(.+)/i);
+    if(!om&&!nm) continue;
+    let rest=(om?om[3]:nm[3]);
+    const dm=rest.match(dayRe);
+    let action=rest.split(/\s+(by|once|before|after|so that|so)\s+/i)[0].replace(/[.!?]+$/,'').trim();
+    action=action.replace(/^(have|get)\s+(the\s+)?(.+?)\s+(ready|done|set up)$/i,(x,a,b,c,d)=>`${d==='ready'?'Prepare':d==='set up'?'Set up':'Finish'} ${c}`);
+    const parts=action.split(' ');const verb=parts.shift();let obj=parts.join(' ').replace(/^the\s+/i,'').replace(/^(up|out)\s+the\s+/i,'$1 ');
+    const title=(verb.charAt(0).toUpperCase()+verb.slice(1)+' '+obj).trim();
+    const owner=om?TEAM.find(p=>p.first.toLowerCase()===om[1].toLowerCase()).id:null;
+    const due=dm?resolveDay(dm[2],!!dm[1]):null;
+    const low=s.toLowerCase();
+    const ws=/investor|fundrais|data room/.test(low)?'fundraising':/payroll|contract|office/.test(low)?'operations':/support inbox|walkthrough|email sequence/.test(low)?'customer-onboarding':'product-launch';
+    let priority='medium';if(due){const days=daysBetween(base,parseD(due));priority=days<=2?'high':days<=4?'medium':'low'}
+    const depM=s.match(/\bonce\s+(\w+)'s\b/i);
+    items.push({pid:'p'+(++n),kind:'task',title,owner,due,priority,ws,quote:s,keep:true,mk,depName:depM?depM[1]:null});
+  }
+  items.filter(i=>i.depName).forEach(i=>{const d=items.find(x=>x.kind==='task'&&x.owner&&P(x.owner).first.toLowerCase()===i.depName.toLowerCase());if(d)i.depOn=d.pid});
+  // duplicates already tracked
+  const norm=s=>s.toLowerCase().replace(/[^a-z ]/g,'').split(' ').filter(w=>w.length>3);
+  items.filter(i=>i.kind==='task').forEach(i=>{const a=norm(i.title);const dup=S.tasks.find(t=>t.owner===i.owner&&(t.quote===i.quote||norm(t.title).filter(w=>a.includes(w)).length>=Math.max(2,Math.ceil(a.length*.6))));if(dup){i.dupOf=dup.id;i.keep=false;return}
+    const pd=prior.find(x=>x.kind==='task'&&x.owner===i.owner&&norm(x.title).filter(w=>a.includes(w)).length>=Math.max(2,Math.ceil(a.length*.6)));if(pd){i.dupItem=pd.pid;i.keep=false}});
+  return items;
+}
+const flagsOf=i=>{const f=[];if(!i.owner)f.push('no_owner');if(!i.due)f.push('no_date');return f};
+
+function vReview(){
+  const R=S.review;
+  if(!R) return `<div class="content"><div class="page-head"><h1 tabindex="-1">Review what was promised.</h1><p class="sub">Check every detail before anything goes out.</p></div><div class="card empty">${loopArt()}<p class="h3">Nothing to review yet.</p><p>Paste meeting notes first and Loose Ends will propose tasks here.</p><a class="btn btn-primary" href="#capture">Go to Capture notes</a></div></div>`;
+  if(R.status==='loading') return `<div class="content"><div class="page-head"><h1 tabindex="-1">Reading your notes…</h1><p class="sub">Finding who owes what, by when, and the exact sentence it came from.</p></div><div class="rv-grid"><div class="skel" style="height:360px"></div><div>${'<div class="card prop"><div class="skel" style="height:26px;width:50%;margin-bottom:16px"></div><div class="skel" style="height:42px;margin-bottom:12px"></div><div class="skel" style="height:40px"></div></div>'.repeat(3)}</div></div><p class="sr-only" role="status">Reading your notes</p></div>`;
+  if(R.status==='approved'){const ts=R.created.map(T).filter(Boolean);const noOwner=ts.filter(t=>!t.owner);
+    return `<div class="content"><div class="page-head">${headThread}<h1 tabindex="-1">${ts.length} task${ts.length===1?' is':'s are'} now on the board.</h1><p class="sub">Approved by Maya at ${hm(R.approvedAt)}. Named owners get them in tomorrow’s morning email.</p></div>
+    <div class="card card-pad" style="max-width:860px">${ts.map(t=>`<div style="display:flex;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-2);flex-wrap:wrap"><svg class="tcirc" viewBox="0 0 22 22" aria-hidden="true"><circle cx="11" cy="11" r="9.5"/></svg><span style="flex:1;min-width:200px"><b style="font-family:var(--serif);font-weight:400;font-size:19px">${esc(t.title)}</b><span class="muted small" style="display:block">${esc(W(t.ws).name)} · ${t.due?'due '+fmtDue(t.due):'no date'}</span></span>${t.owner?person(t.owner):`<span class="pill p-update">${ic('user')}Waiting in Decisions</span>`}</div>`).join('')}
+    <p class="reason update" style="margin-top:16px">${ic('send','sm')}<span>Morning emails queued for 08:00. Demo only: nothing is sent and nothing is reported as delivered.</span></p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px"><button class="btn btn-primary" data-a="open-ws" data-id="${ts[0]?.ws||'product-launch'}">Open ${esc(W(ts[0]?.ws||'product-launch').name)}</button>${noOwner.length?'<a class="btn btn-secondary" href="#decisions">Assign missing owners</a>':''}<button class="btn btn-ghost" data-a="new-capture">Capture another meeting</button></div>
+    ${S.scn==='monday'&&!S.requests.length?`<div class="demo-banner" style="margin-top:20px">${ic('flask')}<span class="grow"><b>Next in the story:</b> on Tuesday morning, Alex replies to his email. Open <b>Demo tools</b> and choose “Alex replies”.</span><button class="btn btn-secondary btn-sm" data-a="sim-alex">Simulate Alex’s reply</button></div>`:''}</div></div>`;}
+  const items=R.items, tasks=items.filter(i=>i.kind==='task'), targets=items.filter(i=>i.kind==='target');
+  const kept=tasks.filter(i=>i.keep), att=kept.filter(i=>flagsOf(i).length), ready=kept.length-att.length;
+  const noOwnerN=tasks.filter(i=>i.keep&&!i.owner).length, noDateN=tasks.filter(i=>i.keep&&!i.due).length;
+  const multi=R.meetings.length>1;
+  const srcHtml=R.meetings.map((m,mi)=>{let txt=esc(m.notes);items.filter(i=>i.mk===m.key).forEach(i=>{const q=esc(i.quote);txt=txt.replace(q,`<mark data-a="focus-prop" data-pid="${i.pid}" class="${S.ui.focusProp===i.pid?'hl-active':''}" tabindex="0" role="button" aria-label="Show proposal for: ${q}">${q}</mark>`)});
+    return `${multi?`<div class="label" style="margin-top:${mi?22:14}px">Meeting ${mi+1} of ${R.meetings.length} · ${fmtDue(m.date)}</div><b style="font-family:var(--serif);font-weight:400;font-size:18px">${esc(m.title)}</b>`:''}<div class="src-text">${txt}</div>`}).join('');
+  const mOf=i=>R.meetings.find(m=>m.key===i.mk);
+  const numOf=pid=>tasks.findIndex(x=>x.pid===pid)+1;
+  return `<div class="content" style="padding-bottom:30px"><div class="rv-head"><div class="page-head" style="margin:0"><h1 tabindex="-1">Review what was promised.</h1><p class="sub">Check every detail before anything goes out.</p></div>
+   <div class="rv-stats"><div class="rv-stat a"><span><span class="n">${tasks.length}</span><span class="l" style="display:block">proposed</span></span>${ic('doc')}</div><div class="rv-stat b"><span><span class="n">${noOwnerN}</span><span class="l" style="display:block">need an owner</span></span>${ic('user')}</div><div class="rv-stat b"><span><span class="n">${noDateN}</span><span class="l" style="display:block">need a date</span></span>${ic('cal')}</div></div></div>
+  <div class="rv-grid">
+   <aside class="card src-panel" aria-label="Source notes"><div style="display:flex;justify-content:space-between;align-items:center"><h2 class="h3">Source notes</h2><span class="count">${items.length}</span></div><p class="small muted" style="margin:6px 0 0">${multi?`${R.meetings.length} meetings, oldest first.`:`${esc(R.meetings[0].title)} · ${fmtDue(R.meetings[0].date)}.`} Highlighted sentences were used for the proposals. Select one to jump to it.</p>${srcHtml}</aside>
+   <section aria-labelledby="pt-h"><div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:14px;flex-wrap:wrap"><div><h2 class="h2" id="pt-h">Proposed tasks</h2><p class="muted" style="margin:4px 0 0">These are proposals, not tasks. Edit anything, then approve.</p></div><span class="ai-tag">${ic('spark','xs')}Simulated extraction</span></div>
+   ${tasks.length?'':`<div class="card empty">${loopArt()}<p class="h3">No commitments found.</p><p>We look for sentences like “Priya will send the figures by Tuesday.”</p><a class="btn btn-secondary btn-sm" href="#capture">Edit notes</a></div>`}
+   ${tasks.map((i,ix)=>{const fl=flagsOf(i);const dep=i.depOn?items.find(x=>x.pid===i.depOn):null;return `<article class="card prop ${i.keep?'':'removed'} ${S.ui.focusProp===i.pid?'focus':''}" id="prop-${i.pid}" aria-labelledby="pti-${i.pid}">
+     <div class="prop-top"><span class="prop-num" aria-hidden="true">${ix+1}</span><label class="sr-only" for="pti-${i.pid}">Task title</label><input class="title-input" id="pti-${i.pid}" data-pf="title" data-pid="${i.pid}" value="${esc(i.title)}" ${i.keep?'':'disabled'}>
+      <span class="flagline">${i.dupOf||i.dupItem?`<span class="pill p-grey">${ic('link')}${i.dupOf?'Already tracked':'Repeated'}</span>`:i.keep?`<span class="pill p-proposed">${ic('spark')}Proposed</span>`:`<span class="pill p-grey">${ic('x')}Removed</span>`}
+      ${i.keep?`<button class="btn btn-ghost btn-sm" data-a="rm-prop" data-pid="${i.pid}">${ic('trash','sm')}Remove</button>`:`<button class="btn btn-ghost btn-sm" data-a="restore-prop" data-pid="${i.pid}">${ic('undo','sm')}Restore</button>`}</span></div>
+     ${i.dupOf?`<p class="small" style="margin:8px 0 0;color:var(--ink-2)">Matches approved task ${i.dupOf} “${esc(T(i.dupOf).title)}”, so it was left out. Restore it only if this is genuinely new work.</p>`:''}
+     ${i.dupItem?`<p class="small" style="margin:8px 0 0;color:var(--ink-2)">Same commitment as #${numOf(i.dupItem)} from an earlier meeting in this upload, so it was left out.</p>`:''}
+     ${multi?`<p class="small muted" style="margin:6px 0 0">${ic('cal','xs')} From meeting ${R.meetings.indexOf(mOf(i))+1}: ${esc(mOf(i).title)} · ${fmtDue(mOf(i).date)}</p>`:''}
+     <div class="prop-fields">
+      <div><label class="label" for="po-${i.pid}">Owner</label><select class="select ${!i.owner&&i.keep?'warn':''}" id="po-${i.pid}" data-pf="owner" data-pid="${i.pid}" ${i.keep?'':'disabled'}><option value="">${i.owner?'Unassigned':'Assign owner…'}</option>${TEAM.map(p=>`<option value="${p.id}" ${i.owner===p.id?'selected':''}>${esc(p.name)}</option>`).join('')}</select>${!i.owner&&i.keep?`<div class="fwarn">${ic('alert','xs')}No owner named in the notes</div>`:''}</div>
+      <div><label class="label" for="pd-${i.pid}">Due date</label><input type="date" class="input ${!i.due&&i.keep?'warn':''}" id="pd-${i.pid}" data-pf="due" data-pid="${i.pid}" value="${i.due||''}" ${i.keep?'':'disabled'}>${!i.due&&i.keep?`<div class="fwarn">${ic('alert','xs')}No date in the notes</div>`:i.due?`<div class="small muted" style="margin-top:4px">${fmtDue(i.due)}</div>`:''}</div>
+      <div><label class="label" for="pp-${i.pid}">Priority</label><select class="select" id="pp-${i.pid}" data-pf="priority" data-pid="${i.pid}" ${i.keep?'':'disabled'}>${['high','medium','low'].map(p=>`<option value="${p}" ${i.priority===p?'selected':''}>${p[0].toUpperCase()+p.slice(1)}</option>`).join('')}</select><div class="small muted" style="margin-top:4px">Suggested</div></div>
+      <div><label class="label" for="pw-${i.pid}">Workstream</label><select class="select" id="pw-${i.pid}" data-pf="ws" data-pid="${i.pid}" ${i.keep?'':'disabled'}>${WS.map(w=>`<option value="${w.id}" ${i.ws===w.id?'selected':''}>${esc(w.name)}</option>`).join('')}</select><div class="small muted" style="margin-top:4px">Suggested</div></div>
+     </div>
+     ${dep?`<p class="dep">${ic('link','sm')}Depends on #${numOf(dep.pid)} “${esc(dep.title)}”, detected from “once…” in the notes.</p>`:''}
+     <div class="from"><span class="label">From your notes · exact words</span><div class="quote">“${esc(i.quote)}”</div></div>
+    </article>`}).join('')}
+   ${targets.map(i=>`<div class="card target-card">${ic('target')}<span><b>Target, not a task</b><div class="muted small" style="margin:2px 0 8px">Loose Ends doesn’t turn goals into tasks. ${i.due?`This matches the Product launch target (${fmtDue(W('product-launch').target)}).`:''}</div><div class="quote">“${esc(i.quote)}”</div></span></div>`).join('')}
+   </section></div></div>
+   <div class="rv-foot" role="region" aria-label="Approval summary"><span class="sum"><b>${ready} ready</b>${att.length?` · <span class="att">${att.length} need${att.length===1?'s':''} attention</span>`:''}${tasks.length-kept.length?` · <span class="muted">${tasks.length-kept.length} left out</span>`:''}</span>
+   <button class="btn btn-secondary" data-a="save-draft">Save draft</button><button class="btn btn-primary" data-a="approve-ask" ${kept.length?'':'disabled'}>${ic('check','sm')}Approve ${kept.length} task${kept.length===1?'':'s'}</button></div>`;
+}
+
+/* ---------- team ---------- */
+function vTeam(){
+  const f=S.ui.teamFilter, q=S.ui.teamQuery.toLowerCase();
+  const info=p=>{const own=WS.filter(w=>w.owner===p.id).map(w=>w.name);const open=S.tasks.filter(t=>t.owner===p.id&&isOpen(t)).length;const rs=S.events.filter(e=>e.type==='reply'&&e.from===p.id).sort((a,b)=>b.at-a.at);const lr=rs[0];const days=lr?daysBetween(lr.at,S.now):null;
+    const openOld=S.tasks.filter(t=>t.owner===p.id&&isOpen(t)).some(t=>staleDays(t)>=3);return {own,open,lr,days,stale:openOld}};
+  const rows=TEAM.filter(p=>{const i=info(p);if(q&&!(p.name+p.email+p.title+i.own.join(' ')).toLowerCase().includes(q))return false;if(f==='leads')return p.role==='lead';if(f==='stale')return i.stale;return true});
+  const staleN=TEAM.filter(p=>info(p).stale).length;
+  return `<div class="content"><div class="page-head">${headThread}<h1 tabindex="-1">Who owns what.</h1><p class="sub">Each person gets a morning email with only their own tasks.</p></div>
+  <div class="team-head"><div class="filters" role="group" aria-label="Filter team">
+    <button class="fpill" data-a="teamf" data-f="all" aria-pressed="${f==='all'}">All <span class="ct">${TEAM.length}</span></button>
+    <button class="fpill" data-a="teamf" data-f="leads" aria-pressed="${f==='leads'}">Leads <span class="ct">${TEAM.filter(p=>p.role==='lead').length}</span></button>
+    <button class="fpill" data-a="teamf" data-f="stale" aria-pressed="${f==='stale'}"><span class="dot" style="background:#E5B653"></span>No recent reply <span class="ct">${staleN}</span></button></div>
+    <div class="mini-search">${ic('search','sm')}<label class="sr-only" for="teamq">Search people</label><input id="teamq" placeholder="Search people…" value="${esc(S.ui.teamQuery)}"></div></div>
+  <div class="card table-card">${rows.length?`<table class="tt team"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Workstream owned</th><th>Open tasks</th><th>Last reply</th></tr></thead><tbody>
+  ${rows.map(p=>{const i=info(p);return `<tr><td data-l="">${person(p.id,p.title)}</td><td data-l="Email"><span class="email-t">${esc(p.email)}</span></td><td data-l="Role">${p.role==='lead'?'<span class="pill lead">Lead</span>':'<span class="pill p-grey">Member</span>'}</td><td data-l="Owns">${i.own.length?esc(i.own.join(', ')):'<span class="muted">None</span>'}</td><td data-l="Open tasks">${i.open}</td>
+  <td data-l="Last reply">${i.stale?`<span class="lr warn"><span class="dot"></span>${ic('clock','xs')}No update · ${i.lr?i.days+' days':'none yet'}</span>`:i.lr?`<span class="lr"><span class="dot"></span>${rel(i.lr.at)} · ${i.lr.via==='app'?'In app':'Email'}</span>`:`<span class="lr muted"><span class="dot" style="background:#C4C9C1"></span>No reply yet</span>`}</td></tr>`}).join('')}</tbody></table>`:`<div class="empty">${loopArt()}<p class="h3">No one matches.</p></div>`}</div>
+  <p class="foot-note">${ic('info','sm')}No reply means unknown, not on track. Team members never need to open Loose Ends. They answer the 08:00 email from ${TEAM_ADDR}.</p></div>`;
+}
+
+/* ---------- modal ---------- */
+function modal(){
+  const m=S.ui.modal; if(!m) return '';
+  if(m==='approve'){const R=S.review;const kept=R.items.filter(i=>i.kind==='task'&&i.keep);const no=kept.filter(i=>!i.owner);const nd=kept.filter(i=>!i.due);const owners=[...new Set(kept.map(i=>i.owner).filter(Boolean))];
+   return `<div class="overlay" data-a="modal-bg"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mh"><h2 class="h2" id="mh">Approve ${kept.length} task${kept.length===1?'':'s'}?</h2><p class="muted" style="margin:0">They become active tasks on the board under their workstreams.</p>
+   <ul><li>${owners.length?`${owners.map(o=>P(o).first).join(', ')} will see their tasks in tomorrow’s 08:00 email.`:'No named owners, so no one is emailed.'}</li>${no.length?`<li><b>${no.length} without an owner</b> will wait in Decisions. No one is emailed about ${no.length===1?'it':'them'}.</li>`:''}${nd.length?`<li><b>${nd.length} without a date</b> stay${nd.length===1?'s':''} flagged “No date”.</li>`:''}<li>Each task keeps its exact source sentence.</li></ul>
+   <div class="actions"><button class="btn btn-secondary" data-a="modal-close">Keep editing</button><button class="btn btn-primary" data-a="approve" id="modal-primary">${ic('check','sm')}Approve tasks</button></div></div></div>`;}
+  return '';
+}
+
+/* ---------- render ---------- */
+let firstLoad=true;
+function render(routeChanged){
+  const r=route();
+  const ae=document.activeElement; const fid=ae&&ae.id; let sel=null; try{sel=[ae.selectionStart,ae.selectionEnd]}catch(e){}
+  let view;
+  if(S.ui.loading) view=skeleton();
+  else switch(r.v){case 'overview':view=vOverview();break;case 'workstreams':view=vWorkstreams();break;case 'ws':view=vWsDetail(r.id);break;case 'decisions':view=vDecisions();break;case 'activity':view=vActivity();break;case 'capture':view=vCapture();break;case 'review':view=vReview();break;case 'team':view=vTeam();break}
+  const scrollY=window.scrollY;
+  const actBanner=S.ui.actingAs!=='maya'?`<div class="demo-banner" style="margin:16px 40px 0;border-radius:12px">${ic('flask')}<span class="grow"><b>Demo:</b> you are acting as ${esc(P(S.ui.actingAs).name)}, ${esc(roleText(S.ui.actingAs,WS.find(w=>w.owner===S.ui.actingAs)?.id||'product-launch'))}.</span><button class="btn btn-secondary btn-sm" data-a="act-as" data-id="maya">Back to Maya</button></div>`:'';
+  document.getElementById('app').innerHTML=`<a class="sr-only" href="#main" id="skip" data-a="skip">Skip to content</a><div class="app">${sidebar(r)}<main class="main" id="main">${topbar(r)}${actBanner}${view}</main></div>${modal()}`;
+  document.title=`${PAGE_NAMES[r.v]} · Loose Ends (demo data)`;
+  if(routeChanged){window.scrollTo(0,0);const h=document.querySelector('h1');if(h&&!firstLoad)h.focus({preventScroll:true});}
+  else{window.scrollTo(0,scrollY); if(fid){const el=document.getElementById(fid);if(el){el.focus({preventScroll:true});try{if(sel&&sel[0]!=null)el.setSelectionRange(sel[0],sel[1])}catch(e){}}}}
+  if(S.ui.modal){const b=document.getElementById('modal-primary');b&&b.focus()}
+  bindDrop();
+  S.ui.loopPlay=false; S.ui.animTask=null;
+  firstLoad=false;
+}
+let lastRoute=null;
+window.addEventListener('hashchange',()=>{S.ui.nav=false;S.ui.pop=null;S.ui.searchQ='';const r=route();if(r.v!=='ws'||(lastRoute&&lastRoute.id!==r.id)){if(!(r.v==='ws'&&S.ui.keepSel))S.ui.selTask=null}S.ui.keepSel=false;if(r.v!=='activity'&&!S.ui.keepEv)S.ui.selEvent=null;S.ui.keepEv=false;lastRoute=r;render(true)});
+
+/* ---------- actions ---------- */
+function openTask(id){const t=T(id);if(!t)return;S.ui.selTask=id;S.ui.wsTab='tasks';S.ui.keepSel=true;S.ui.taskFilter='all';S.ui.taskQuery='';const h='ws-'+t.ws;if(location.hash==='#'+h){S.ui.keepSel=false;render(false);const p=document.getElementById('panel-title');p&&p.setAttribute('tabindex','-1');p&&p.focus()}else location.hash=h}
+function openRc(id){const e=S.events.find(x=>x.receiptId===id);S.ui.selEvent=e?e.id:null;S.ui.actFilter='all';S.ui.keepEv=true;go('activity')}
+function addEvent(e){e.id=nextId('E');S.events.push(e);return e}
+
+function simAlex(){
+  const deck=S.tasks.find(t=>t.owner==='alex'&&/deck/i.test(t.title)); if(!deck||S.requests.some(r=>r.taskId===deck.id)) return;
+  const pricing=S.tasks.find(t=>t.owner==='priya'&&/pricing/i.test(t.title));
+  if(S.now<at(NOV,3,8,42)){
+    const leah=T('T-104'); if(leah&&leah.status!=='done'){addEvent({type:'reply',at:at(NOV,2,15,20),from:'leah',via:'email',taskId:'T-104',text:'Beta environment is up and tested, ready for partners.',change:{from:'in_progress',to:'done'}});leah.status='done'}
+    if(pricing&&pricing.status==='not_started'){addEvent({type:'reply',at:at(NOV,2,16,10),from:'priya',via:'email',taskId:pricing.id,text:"On it. Finance signs off tomorrow morning and I'll send the figures to Alex straight after.",change:{from:'not_started',to:'in_progress'}});pricing.status='in_progress'}
+    addEvent({type:'digest',at:at(NOV,3,8,0),to:[...new Set(S.tasks.filter(t=>t.owner&&isOpen(t)).map(t=>t.owner))]});
+    S.now=at(NOV,3,8,42);
+  }
+  const t0=tick(0);
+  const prev=deck.status;
+  deck.status='blocked'; deck.blocker="Waiting for Priya's pricing figures"; if(pricing)deck.dependsOn=pricing.id;
+  const rep=addEvent({type:'reply',at:new Date(t0),from:'alex',via:'email',taskId:deck.id,subject:'Re: Your 1 open task for Tuesday',text:"I'm blocked until Priya sends the figures. Can I move the deck to Friday?",change:{from:prev,to:'blocked'},read:{blocker:"Waiting for Priya's pricing figures",dependency:pricing?pricing.id:null,dateRequest:'2026-11-06'}});
+  const dr={id:nextId('DR'),taskId:deck.id,by:'alex',current:deck.due||'2026-11-04',requested:'2026-11-06',reason:'Blocked until Priya sends the pricing figures',replyEvent:rep.id,approver:W(deck.ws).owner==='alex'?'maya':W(deck.ws).owner,status:'waiting',at:new Date(t0)};
+  S.requests.push(dr);
+  addEvent({type:'date_request',at:new Date(t0),actor:'alex',taskId:deck.id,requestId:dr.id});
+  tick(3);
+  toast('Simulated email from Alex received. Blocker recorded and date request sent to Maya. The deck is still due Wednesday.');
+  S.ui.decTab='waiting'; go('decisions');
+}
+function simSamir(){
+  const inbox=T('T-103'), pay=T('T-109'); if(!inbox||!pay||S.events.some(e=>e.from==='samir'&&e.parts)) return;
+  const at0=tick(6); const req=isoD(new Date(parseD(pay.due).getTime()+3*86400000));
+  const p1={taskId:inbox.id,fragment:'The support inbox templates are done.',change:{from:inbox.status,to:'done'}};
+  const p2={taskId:pay.id,fragment:'I haven’t touched payroll yet. Can I have three more days? Waiting on the new hires’ bank details.',change:null,note:'Recorded as no progress',dateRequest:req};
+  inbox.status='done';
+  const e=addEvent({type:'reply',at:at0,from:'samir',via:'email',taskId:inbox.id,subject:'Re: Your 3 open tasks for Tuesday',text:'The support inbox templates are done. I haven’t touched payroll yet. Can I have three more days? Waiting on the new hires’ bank details.',parts:[p1,p2]});
+  const dr={id:nextId('DR'),taskId:pay.id,by:'samir',current:pay.due,requested:req,reason:'Hasn’t started. Waiting on the new hires’ bank details.',replyEvent:e.id,approver:W(pay.ws).owner==='samir'?'maya':W(pay.ws).owner,status:'waiting',at:at0,calNote:`“Three more days” read as calendar days: ${fmtDue(pay.due)} → ${fmtDue(req)}. In working days it would be ${fmtDue(isoD(addWorkdays(parseD(pay.due),3)))}. The team hasn’t picked a rule yet.`};
+  S.requests.push(dr); addEvent({type:'date_request',at:at0,actor:'samir',taskId:pay.id,requestId:dr.id});
+  S.ui.animTask=inbox.id; S.ui.selEvent=e.id; S.ui.keepEv=true; S.ui.actFilter='all';
+  toast('Simulated email from Samir about two tasks. Inbox marked done; payroll date request sent to Leah (Operations owner).');
+  go('activity');
+}
+function addWorkdays(d,n){const x=new Date(d);while(n>0){x.setDate(x.getDate()+1);if(x.getDay()%6)n--}return x}
+function simJordan(){
+  const open=S.tasks.filter(t=>t.owner==='jordan'&&isOpen(t)).map(t=>t.id); if(open.length<2){toast('Jordan has fewer than two open tasks in this scenario.','warn');return}
+  const e=addEvent({type:'reply',at:tick(3),from:'jordan',via:'email',taskId:null,subject:'Re: Your open tasks',text:'I’m working on it, should be done soon.',ambiguous:open});
+  S.clarify.push({to:'jordan',text:'Which task is this about? Reply with its number from this morning’s email.'});
+  S.ui.selEvent=e.id; S.ui.keepEv=true; S.ui.actFilter='all';
+  toast('Jordan’s reply was unclear. No task changed; a clarifying email is queued.','warn'); go('activity');
+}
+function simPriya(){
+  const p=S.tasks.find(t=>t.owner==='priya'&&/pricing/i.test(t.title)); if(!p||p.status==='done')return;
+  const at0=tick(25); const prev=p.status; p.status='done';
+  addEvent({type:'reply',at:at0,from:'priya',via:'email',taskId:p.id,text:'Figures are approved by finance and sent to Alex.',change:{from:prev,to:'done'}});
+  S.ui.animTask=p.id; S.ui.selTask=p.id;
+  toast('Simulated email from Priya: pricing figures marked done. Alex stays blocked until he confirms.');
+  openTask(p.id); S.ui.animTask=p.id;
+}
+function decide(id,o){
+  const r=S.requests.find(x=>x.id===id); if(!r) return {status:404};
+  if(r.status!=='waiting') return {status:409,r};
+  const actor=S.ui.actingAs||'maya'; if(actor!==r.approver) return {status:403,r};
+  const t=T(r.taskId), at0=tick(1), before=t.due;
+  if(o==='approved') t.due=r.requested;
+  r.status=o; r.decidedAt=at0; r.decidedBy=actor;
+  const note=(S.ui.notes&&S.ui.notes[id]||'').trim();
+  const rc={id:nextId('RC'),kind:'date',outcome:o,taskId:t.id,requestId:r.id,field:'Approved due date',before,after:o==='approved'?r.requested:before,actor,at:at0,sourceEventId:r.replyEvent,note,notify:{to:r.by,text:o==='approved'?`New date approved: ${fmtDueL(r.requested)}`:`Date change declined. ${t.title} stays due ${fmtDueL(before)}`,status:'queued'}};
+  S.receipts.push(rc); r.receiptId=rc.id;
+  addEvent({type:'decision',at:at0,actor,taskId:t.id,receiptId:rc.id});
+  return {status:200,rc};
+}
+
+document.addEventListener('click',ev=>{
+  const el=ev.target.closest('[data-a]');
+  if(S.ui.pop&&!ev.target.closest('.rel')){S.ui.pop=null;if(!el){render(false);return}}
+  if(!el) return;
+  const a=el.dataset.a, id=el.dataset.id;
+  switch(a){
+   case 'skip': ev.preventDefault(); document.querySelector('h1')?.focus(); return;
+   case 'nav-open': S.ui.nav=true; render(false); document.querySelector('.nav a')?.focus(); return;
+   case 'nav-close': S.ui.nav=false; render(false); return;
+   case 'pop': S.ui.pop=S.ui.pop===el.dataset.p?null:el.dataset.p; render(false); return;
+   case 'pop-close': S.ui.pop=null; render(false); return;
+   case 'goto': S.ui.pop=null; go(el.dataset.h); return;
+   case 'open-ws': ev.preventDefault(); S.ui.selTask=null; S.ui.searchQ=''; go('ws-'+id); return;
+   case 'open-task': ev.preventDefault(); S.ui.searchQ=''; openTask(id); return;
+   case 'open-person': S.ui.teamQuery=P(id).first; S.ui.searchQ=''; S.ui.teamFilter='all'; go('team'); return;
+   case 'sel-task': if(ev.target.closest('.link')&&el.tagName==='TR')return; ev.stopPropagation(); S.ui.selTask=id; render(false); {const p=document.getElementById('panel-title');if(p){p.setAttribute('tabindex','-1');if(window.innerWidth<=1080)p.focus()}} return;
+   case 'close-panel': {const last=S.ui.selTask;S.ui.selTask=null;render(false);document.querySelector(`button.tname[data-id="${last}"]`)?.focus();} return;
+   case 'wsf': S.ui.wsFilter=el.dataset.f; render(false); return;
+   case 'wstab': S.ui.wsTab=el.dataset.t; render(false); document.getElementById('tab-'+el.dataset.t)?.focus(); return;
+   case 'dectab': S.ui.decTab=el.dataset.t; render(false); return;
+   case 'actf': S.ui.actFilter=el.dataset.f; render(false); return;
+   case 'teamf': S.ui.teamFilter=el.dataset.f; render(false); return;
+   case 'open-ev': S.ui.selEvent=id; if(route().v!=='activity'){S.ui.keepEv=true;S.ui.actFilter='all';go('activity')}else{render(false); if(window.innerWidth<=1080)document.querySelector('.act-grid aside')?.scrollIntoView({behavior:'smooth'})} return;
+   case 'open-rc': openRc(id); return;
+   case 'ask': S.ui.confirm={id,o:el.dataset.o}; render(false); document.getElementById('confirm-btn')?.focus(); return;
+   case 'cancel-confirm': S.ui.confirm=null; render(false); return;
+   case 'decide': { S.ui.busy=id; render(false); setTimeout(()=>{const res=decide(id,el.dataset.o);S.ui.busy=null;S.ui.confirm=null;
+      if(res.status===200){S.ui.loopPlay=true;toast(res.rc.outcome==='approved'?`Approved. ${T(res.rc.taskId).title} is now due ${fmtDue(res.rc.after)}. Receipt ${res.rc.id} created.`:`Declined. ${T(res.rc.taskId).title} stays due ${fmtDue(res.rc.before)}. Receipt ${res.rc.id} created.`)}
+      else if(res.status===409){toast(`Already decided at ${hm(res.r.decidedAt)}. No change made (409).`,'warn')}
+      else if(res.status===403){toast(`Only ${P(res.r.approver).name} can decide this. No change made (403).`,'warn')}
+      render(false); document.querySelector('.rcpt h2')?.setAttribute('tabindex','-1'); document.querySelector('.rcpt h2')?.focus();},650); return; }
+   case 'assign': { const pick=S.ui.ownerPick?.[id]; if(!pick)return; const t=T(id); if(t.owner){toast('Already assigned. No change made (409).','warn');return}
+      const at0=tick(1); t.owner=pick; t.flags=(t.flags||[]).filter(f=>f!=='no_owner');
+      const rc={id:nextId('RC'),kind:'owner',outcome:'assigned',taskId:t.id,field:'Owner',before:null,after:pick,actor:'maya',at:at0,notify:{to:pick,text:`You now own “${t.title}”. It will be in tomorrow’s morning email`,status:'queued'}};
+      S.receipts.push(rc); addEvent({type:'assign',at:at0,actor:'maya',taskId:t.id,receiptId:rc.id}); S.ui.loopPlay=true;
+      toast(`${P(pick).name} now owns “${t.title}”. Receipt ${rc.id} created.`); render(false); return; }
+   case 'sim-alex': S.ui.pop=null; simAlex(); return;
+   case 'sim-samir': S.ui.pop=null; simSamir(); return;
+   case 'sim-jordan': S.ui.pop=null; simJordan(); return;
+   case 'sim-unknown': { S.ui.pop=null; const e=addEvent({type:'reply',at:tick(4),from:null,unknown:true,sender:'partner-team@example.com',via:'email',text:'Can you move our kickoff to Friday?'}); S.ui.selEvent=e.id; S.ui.keepEv=true; S.ui.actFilter='all'; toast('Reply from an unknown address logged. No task changed.','warn'); go('activity'); return; }
+   case 'act-as': S.ui.actingAs=id; S.ui.confirm=null; toast(id==='maya'?'Back to Maya’s view.':`Demo: now acting as ${P(id).name}.`); render(false); return;
+   case 'sim-priya': S.ui.pop=null; simPriya(); return;
+   case 'sim-dup': { S.ui.pop=null; const r=S.requests.filter(x=>x.status!=='waiting').pop(); const res=decide(r.id,r.status); toast(res.status===409?`Duplicate decision for ${r.id} rejected (409). Still exactly one change, one receipt, one notification.`:'Recorded.', res.status===409?'warn':''); render(false); return; }
+   case 'reset': { const scn=el.dataset.scn; S=seed(scn); S.ui.loading=false; toast(scn==='monday'?'Restarted at Mon 2 Nov, 10:30. Start on Capture notes.':'Restarted at Tue 3 Nov, 09:30. Alex’s request is waiting.'); go(scn==='monday'?'capture':'overview'); return; }
+   case 'att-rm': S.draft.attendees=S.draft.attendees.filter(x=>x!==id); render(false); return;
+   case 'sample': S.draft.notes=SAMPLE_NOTES; S.draft.error=''; render(false); return;
+   case 'queue-add': { const d=S.draft; if(!d.notes.trim())return; d.queue.push({id:'q'+(qSeq++),title:d.title||'Untitled meeting',date:d.date||isoD(S.now),notes:d.notes}); d.notes=''; d.title=''; render(false); toast('Added to this upload. Paste or drop the next meeting.'); document.getElementById('m-notes')?.focus(); return; }
+   case 'q-rm': S.draft.queue=S.draft.queue.filter(m=>m.id!==id); render(false); return;
+   case 'sample-seq': S.draft.queue=[{id:'q'+(qSeq++),title:'Ops stand-up',date:'2026-10-30',notes:SAMPLE_NOTES_2}]; S.draft.title='Weekly launch meeting'; S.draft.date='2026-11-02'; S.draft.notes=SAMPLE_NOTES; S.draft.error=''; render(false); toast('Loaded two meetings: Fri 30 Oct and Mon 2 Nov.'); return;
+   case 'clear-notes': S.draft.notes=''; render(false); document.getElementById('m-notes')?.focus(); return;
+   case 'focus-prop': S.ui.focusProp=el.dataset.pid; render(false); document.getElementById('pti-'+el.dataset.pid)?.closest('.prop')?.scrollIntoView({behavior:'smooth',block:'center'}); document.getElementById('pti-'+el.dataset.pid)?.focus({preventScroll:true}); return;
+   case 'rm-prop': { const i=S.review.items.find(x=>x.pid===el.dataset.pid); i.keep=false; render(false); document.querySelector(`[data-a="restore-prop"][data-pid="${i.pid}"]`)?.focus(); return; }
+   case 'restore-prop': { const i=S.review.items.find(x=>x.pid===el.dataset.pid); i.keep=true; render(false); document.querySelector(`[data-a="rm-prop"][data-pid="${i.pid}"]`)?.focus(); return; }
+   case 'save-draft': toast('Draft kept in this session. Nothing approved, nothing sent.'); return;
+   case 'approve-ask': S.ui.modal='approve'; render(false); return;
+   case 'modal-close': S.ui.modal=null; render(false); document.querySelector('[data-a="approve-ask"]')?.focus(); return;
+   case 'modal-bg': if(ev.target===el){S.ui.modal=null;render(false)} return;
+   case 'approve': approveReview(); return;
+   case 'new-capture': S.review=null; S.draft={title:'',date:isoD(S.now),attendees:['maya'],notes:'',error:'',queue:[]}; go('capture'); return;
+  }
+});
+function approveReview(){
+  const R=S.review; const at0=tick(2); const map={}; const created=[]; const mids={};
+  R.meetings.forEach(m=>{const id=m.mid||nextId('M');mids[m.key]=id;S.meetings.push({id,title:m.title,date:m.date,notes:m.notes})});
+  R.items.filter(i=>i.kind==='task'&&i.keep).forEach(i=>{const id='T-'+(S.seq.T++);map[i.pid]=id;created.push({i,id})});
+  created.forEach(({i,id})=>{S.tasks.push({id,ws:i.ws,title:i.title.trim()||'Untitled task',owner:i.owner||null,due:i.due||null,priority:i.priority,status:'not_started',meeting:mids[i.mk],quote:i.quote,approvedAt:at0,dependsOn:i.depOn&&map[i.depOn]?map[i.depOn]:undefined,flags:flagsOf(i)})});
+  R.meetings.forEach(m=>{const c=created.filter(x=>x.i.mk===m.key).length;if(c)addEvent({type:'approve_batch',at:at0,actor:'maya',meeting:mids[m.key],count:c})});
+  S.draft.queue=[]; S.draft.notes=''; S.draft.title='';
+  R.status='approved'; R.created=created.map(c=>c.id); R.approvedAt=at0; S.ui.modal=null;
+  toast(`${created.length} task${created.length===1?'':'s'} approved and added to the board.`);
+  render(true);
+}
+document.addEventListener('submit',ev=>{
+  if(ev.target.id!=='cap-form')return; ev.preventDefault();
+  const d=S.draft;
+  if(!d.notes.trim()&&!d.queue.length){d.error='Paste some notes or upload a transcript first.';render(false);document.getElementById('m-notes')?.focus();return}
+  if(!d.date){d.error='Add the meeting date so relative days like “Tuesday” can be worked out.';render(false);return}
+  d.error='';
+  const ms=d.queue.map(m=>({...m}));
+  if(d.notes.trim()) ms.push({id:'q'+(qSeq++),title:d.title||'Untitled meeting',date:d.date,notes:d.notes});
+  if(!ms.length){d.error='Paste some notes or upload a transcript first.';render(false);return}
+  ms.sort((a,b)=>a.date<b.date?-1:1);
+  ms.forEach(m=>{m.key=m.id;m.mid=(m.notes===SAMPLE_NOTES&&!S.meetings.some(x=>x.id==='M-12'))?'M-12':null});
+  S.review={status:'loading',meetings:ms,meeting:ms[ms.length-1]};
+  go('review');
+  setTimeout(()=>{if(!S.review||S.review.status!=='loading')return;let all=[];ms.forEach(m=>{all=all.concat(extract(m.notes,m.date,all,m.key,all.length))});S.review.items=all;S.review.status='ready';S.ui.focusProp=null;render(false);document.querySelector('h1')?.focus()},1200);
+});
+document.addEventListener('input',ev=>{
+  const el=ev.target;
+  if(el.id==='gsearch'){S.ui.searchQ=el.value;render(false);return}
+  if(el.id==='tq'){S.ui.taskQuery=el.value;render(false);return}
+  if(el.id==='teamq'){S.ui.teamQuery=el.value;render(false);return}
+  if(el.dataset.f&&S.draft){S.draft[el.dataset.f]=el.value;return}
+  if(el.dataset.a==='note'){S.ui.notes=S.ui.notes||{};S.ui.notes[el.dataset.id]=el.value;return}
+  if(el.dataset.pf==='title'){S.review.items.find(x=>x.pid===el.dataset.pid).title=el.value;return}
+});
+document.addEventListener('change',ev=>{
+  const el=ev.target;
+  if(el.id==='tf'){S.ui.taskFilter=el.value;render(false);return}
+  if(el.dataset.a==='q-date'){const m=S.draft.queue.find(x=>x.id===el.dataset.id);if(m&&el.value)m.date=el.value;render(false);return}
+  if(el.dataset.a==='att-add'&&el.value){S.draft.attendees.push(el.value);render(false);document.getElementById('att-add')?.focus();return}
+  if(el.dataset.a==='owner-pick'){S.ui.ownerPick=S.ui.ownerPick||{};S.ui.ownerPick[el.dataset.id]=el.value;render(false);return}
+  if(el.dataset.pf&&el.dataset.pf!=='title'){const i=S.review.items.find(x=>x.pid===el.dataset.pid);i[el.dataset.pf]=el.value||null;render(false);return}
+  if(el.id==='file-in'&&el.files.length) [...el.files].forEach(f=>readFile(f,el.files.length>1));
+});
+document.addEventListener('keydown',ev=>{
+  if(ev.key==='Escape'){
+    if(S.ui.modal){S.ui.modal=null;render(false);return}
+    if(S.ui.pop||S.ui.searchQ){S.ui.pop=null;S.ui.searchQ='';render(false);return}
+    if(S.ui.nav){S.ui.nav=false;render(false);document.querySelector('.menu-btn')?.focus();return}
+    if(S.ui.selTask){const last=S.ui.selTask;S.ui.selTask=null;render(false);document.querySelector(`button.tname[data-id="${last}"]`)?.focus();return}
+    if(S.ui.confirm){S.ui.confirm=null;render(false);return}
+  }
+  const el=ev.target;
+  if((ev.key==='Enter'||ev.key===' ')&&el.tagName==='MARK'&&el.dataset.a){ev.preventDefault();el.click();return}
+  if(el.getAttribute&&el.getAttribute('role')==='tab'&&(ev.key==='ArrowRight'||ev.key==='ArrowLeft')){
+    const tabs=[...el.parentElement.querySelectorAll('[role=tab]')];const i=tabs.indexOf(el);const n=tabs[(i+(ev.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length];n.click();setTimeout(()=>{document.querySelector('[role=tab][aria-selected=true]')?.focus()},0);ev.preventDefault();
+  }
+  if(S.ui.modal&&ev.key==='Tab'){const f=[...document.querySelectorAll('.modal button')];if(!f.length)return;const first=f[0],last=f[f.length-1];if(ev.shiftKey&&document.activeElement===first){ev.preventDefault();last.focus()}else if(!ev.shiftKey&&document.activeElement===last){ev.preventDefault();first.focus()}}
+});
+function readFile(file,multi){
+  if(!/\.(txt|md)$/i.test(file.name)&&file.type!=='text/plain'){S.draft.error=`“${file.name}” isn’t supported here. Use .txt or .md. .docx needs the backend.`;render(false);return}
+  if(file.size>200*1024){S.draft.error='That file is over 200 KB. Trim it or paste the relevant part.';render(false);return}
+  const fr=new FileReader();fr.onload=()=>{const text=String(fr.result);const d=S.draft;
+    if(multi||d.notes.trim()||d.queue.length){d.queue.push({id:'q'+(qSeq++),title:file.name.replace(/\.\w+$/,''),date:detectDate(text,d.date||isoD(S.now)),notes:text,file:file.name});d.error='';render(false);toast(`Added “${file.name}” as a meeting. Check its date.`)}
+    else{d.notes=text;d.error='';d.date=detectDate(text,d.date);if(!d.title)d.title=file.name.replace(/\.\w+$/,'');render(false);toast(`Loaded “${file.name}”. Review the text, then Find tasks.`)}};fr.readAsText(file);
+}
+function bindDrop(){const d=document.getElementById('drop');if(!d)return;
+  d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('over')});d.addEventListener('dragleave',()=>d.classList.remove('over'));
+  d.addEventListener('drop',e=>{e.preventDefault();d.classList.remove('over');const fs=[...e.dataTransfer.files];fs.forEach(f=>readFile(f,fs.length>1))});}
+
+/* ---------- boot ---------- */
+lastRoute=route();
+render(true);
+setTimeout(()=>{S.ui.loading=false;render(false)},550);
+</script>
+</body>
+</html>

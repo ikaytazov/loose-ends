@@ -1,0 +1,419 @@
+Loose Ends | use case, jobs to be done and test scenarios
+
+Source: AIAP-G52 Hackathon Team Meeting transcription, 31 October 2026, 54 minutes. Timestamps below refer to the meeting recording. This brief distinguishes confirmed statements from proposed product and testing interpretations. The transcript contains speech-recognition errors and interruptions; paraphrases preserve the intended meaning without pretending uncertain words are exact quotations.
+
+1. Use case exactly as described in the meeting
+
+A fictional firm has roughly 8–10 people: a CEO responsible for the overall plan, workstream owners responsible for parts of it, and team members who execute tasks. David will prepare 3–5 sequential weekly team-call transcripts and a corresponding team/workstream structure. A user uploads the transcripts through a simple landing page. The team is not expected to hold actual meetings for the demonstration. The uploaded records establish the tasks and their evolution over time. [06:36–08:34; 21:10–23:57]
+
+The CEO uses the web interface to see how projects/workstreams and tasks are progressing. Each task member receives a morning email digest listing their own tasks and priorities, and replies naturally with progress, no progress, or a request for more time. The application checks its shared Gmail inbox approximately every minute, processes replies, and tries to update tasks. The stated send time is 8:00 a.m., but the transcript does not establish the relevant timezone or verify that the schedule is deployed. [04:55–06:36; 48:42–51:41]
+
+If a member asks for an extension, the request goes to the workstream owner, who approves or declines it in the interface. The date must not be treated as approved simply because the member asked. The interface also enables the manager to see progress. Valerie described detecting someone running late or waiting on a dependency as the coordination problem to solve; Iliyan agreed with the need for a decision interface but explicitly centred the workstream owner's approval. [14:09–15:56; 48:42–49:56]
+
+Critical path stated by Iliyan: Valerie's transcript upload page and David's test data must be running before meaningful end-to-end testing. The rest of the visual interface can then be refined. Valerie and Abir are to get the front end into the repository and hosted on Vercel; Abir can check the setup. Jerry is to design and perform end-to-end tests. Iliyan will work on the email-processing prompt. [30:41–31:39; 35:49–38:53; 43:28–45:44]
+
+Scope and naming: the shared materials were to be changed to Loose Ends. Issue #17, a leader view of individual task effectiveness, was described as optional. The meeting did not approve a page-by-page visual review. Issue #16 was called a decision notice email to the workstream owner and described as “Valerie's task basically”, but the exact implementation owner/dependency was not resolved on the call. [17:49–20:34]
+
+2. Jobs to be done
+
+Actor
+
+Job statement
+
+Trigger
+
+Successful outcome
+
+CEO
+
+When the team is working across several streams, I need to see recorded progress, blockers and decisions, so I can direct attention without chasing each person.
+
+Morning or before a leadership check-in
+
+A truthful overview backed by approved tasks and processed replies.
+
+Workstream owner
+
+When a member requests more time, I need the original task, approved date, requested change and reason together, so I can approve or decline with context.
+
+Extension request in an email reply
+
+One authorised decision, recorded result and appropriate notice.
+
+Team member
+
+When I receive my morning tasks, I need to reply in ordinary language, so I can report progress or ask for help without opening a task manager.
+
+8 a.m. digest
+
+The intended tasks receive accurate updates; uncertainty prompts clarification.
+
+Meeting uploader
+
+When a transcript is ready, I need to provide it quickly, so the team can review the resulting tasks and begin the workflow.
+
+Sequential weekly test call/transcript
+
+Accepted transcript, clear processing state and reviewable proposals.
+
+Tester
+
+When the first page and fixture data are available, I need repeatable paths and observable results, so I can find failures before the demonstration.
+
+Vercel preview and seeded dataset
+
+End-to-end evidence from upload through email, decision and dashboard.
+
+These are product formulations of the meeting, rather than verbatim statements by participants.
+
+3. Core scenarios for the demonstration
+
+ID
+
+Scenario
+
+Steps
+
+Observable result
+
+Status
+
+S1
+
+Sequential weekly calls
+
+Upload transcript 1, then 2 and 3 in their stated order. Review proposed tasks from each.
+
+Workstream state evolves; repeated commitments are not blindly duplicated.
+
+First part confirmed; exact deduplication rule proposed.
+
+S2
+
+Morning digest
+
+At configured 8 a.m. in a stated timezone, generate each member's task and priority email.
+
+Recipient sees only their tasks, with reply path.
+
+Digest confirmed; timezone and delivery proof open.
+
+S3
+
+Natural progress reply
+
+Member replies, “I finished the figures; I made progress on the launch note.”
+
+Correct tasks update and original reply remains available.
+
+Reply pattern confirmed; exact parser behaviour proposed.
+
+S4
+
+No progress and extension
+
+Member replies, “I haven't touched the deck. Can I have three more days?”
+
+No-progress update and pending request go to the correct workstream owner; approved due date remains unchanged.
+
+Core request/approval confirmed.
+
+S5
+
+Owner decision
+
+Workstream owner opens request, reads current and proposed dates and original reply, then approves or declines.
+
+Record changes only on approval; outcome and actor are visible.
+
+Approval confirmed; receipt and notification detail proposed.
+
+S6
+
+CEO overview
+
+CEO opens the hosted app after replies are processed.
+
+Workstreams show current recorded progress and needs attention.
+
+Confirmed.
+
+S7
+
+Blocker/dependency
+
+Member says a task is late because another task is pending.
+
+Show the blocker and dependency for owner action without assuming a new deadline.
+
+Coordination intent expressed; exact automated routing proposed.
+
+4. Additional use cases worth testing (proposed, not agreed on the call)
+
+Mixed reply: one email says task A is complete, task B is untouched, and task C needs an extension. Update each only when a reliable task match exists; queue the extension separately.
+
+Unknown update: a member says “I'm working on it” without naming a task while they have three tasks. Ask which one; leave statuses unchanged.
+
+Owner availability: the workstream owner is also the requester, absent, or not present in the fixture. Escalate to the CEO or an explicitly configured delegate; do not self-approve by default.
+
+Changing dependency: Priya completes the figures after Alex reports a blocker. Show the new evidence; do not automatically mark Alex's deck complete.
+
+Successive weekly calls: a later transcript revises or contradicts an earlier task. Preserve the original agreement and ask for review rather than overwrite silently.
+
+Manual upload fallback: paste text if file conversion fails. Retain meeting title/date and show an error that allows retry without creating duplicate records.
+
+Leadership review: CEO filters workstreams with decisions, blockers or no recent updates. “No update” means unknown, not on track.
+
+5. Edge cases and expected safeguards (proposed)
+
+Input or failure
+
+Expected handling
+
+Same transcript uploaded twice
+
+Detect duplicate or offer explicit confirmation; never silently create duplicate tasks.
+
+Empty, unsupported, oversized or unreadable file
+
+Explain the problem and accepted formats; preserve entered metadata and notes.
+
+Transcript without speaker, owner or date
+
+Flag missing fields for review; do not invent an owner or deadline.
+
+Multiple people make the same commitment
+
+Present separate proposals or ask for a named accountable owner.
+
+Task text appears in several meetings
+
+Link to existing task or seek review of a new version.
+
+Reply refers to several tasks with ambiguous pronouns
+
+Ask for clarification before mutating the ambiguous one.
+
+Reply comes from unknown address or wrong person
+
+No task mutation; record safe diagnostic/audit information.
+
+Gmail poll sees the same message twice
+
+Process once using message ID/idempotency key.
+
+Reply arrives before digest/task import completes
+
+Hold or reject safely, then retry or seek manual match; never attach arbitrarily.
+
+“Three more days” crosses a weekend or has no baseline date
+
+Clarify calendar-days versus working-days policy; keep approved date until decision.
+
+Two owners act on one request
+
+One decision succeeds; later attempt sees already-decided state.
+
+Owner approves after task completed or superseded
+
+Recheck current version and ask for confirmation if stale.
+
+Email delivery fails or lands in spam
+
+Show queued/sent/failed honestly; support retry without duplicate mail.
+
+8 a.m. schedule and daylight-saving change
+
+Use configured timezone, store UTC event times, test the boundary.
+
+Sensitive or real team email addresses in fixtures
+
+Use only addresses approved by those teammates; avoid publishing them in screenshots or repo fixtures.
+
+AI misreads a blocker as completed work
+
+Preserve original reply and allow correction; uncertain classifications require review.
+
+6. Minimum end-to-end acceptance path for Jerry
+
+Seed David's team structure and first weekly transcript; confirm workstream owner and executor roles.
+
+Open Vercel capture page, upload a supported transcript, see an explicit processing response and review proposals.
+
+Approve valid proposals and verify the task board/CEO view reflects persisted records.
+
+Trigger or observe the 8 a.m. digest in a test-safe way; verify recipient, task scope and priority.
+
+Reply with a clear progress update and a separate request for three more days. Check that the inbox poll processes the message once.
+
+Verify the extension appears for the correct workstream owner while the approved due date stays put.
+
+Approve; verify date, notification state, audit event and CEO view. Repeat with Decline and with a duplicate decision.
+
+Upload the next chronological transcript and verify the continuing story, then try ambiguous and malformed inputs.
+
+Record for each step: source message/transcript ID, task ID, expected state, observed state, timestamp and screenshot or API response. The meeting asks Jerry to devise broader cases; this is a proposed starting set, not a claim that the app already passes it. [35:49–38:53; 43:28–44:53]
+
+7. Open questions requiring a team decision
+
+What exact timezone controls the 8 a.m. digest, and what is the approved test trigger?
+
+What is the canonical schema for a workstream owner, a task executor and the CEO; who may act if an owner is unavailable?
+
+How does a member's reply identify multiple tasks: quoted digest IDs, subject threading, or model matching?
+
+Does the decision screen only approve date changes, or also owner assignment and blockers in this build?
+
+Is issue #16's email implemented by Valerie, or by the email owner after Valerie exposes the decision event/API?
+
+Which upload formats and maximum file size are actually supported by the current route?
+
+What is the rule for an ambiguous or incomplete task at approval time?
+
+What is the precise hackathon deadline according to the organiser's countdown? The participants discussed differing interpretations. [08:34–10:54]
+
+8. Paste-ready addition to the product brief
+
+Primary use case: Loose Ends supports a small company with a CEO, workstream owners and task executors. A lead uploads sequential weekly meeting transcripts and reviews the extracted tasks. Each morning, team members receive an email showing their own tasks and priorities. They reply naturally with progress, no progress or requests for more time. The application processes those replies and updates only confidently matched tasks. A request for more time is presented to the relevant workstream owner for approval or decline; the approved due date remains in force until that decision. The CEO sees workstream progress and outstanding attention items in the web interface. For the hackathon, simulated transcripts and an upload page establish the workflow, while automated meeting capture remains a later enhancement.
+
+9. User stories and acceptance criteria
+
+Reading key: P0 = essential to demonstrate the stated flow; P1 = useful if time allows. “Confirmed” means the underlying need appears in the meeting, while the specific acceptance criteria are implementation proposals. These stories should be checked against the current repository issues before being assigned.
+
+ID
+
+Priority
+
+User story
+
+Acceptance criteria
+
+Basis
+
+US-01
+
+P0
+
+As the meeting uploader, I want to upload a weekly team-call transcript, so the team can turn the conversation into trackable work.
+
+Valid file or supported pasted text is accepted; meeting identity and date are retained; processing result is visible; failure permits retry without duplication.
+
+Confirmed need [06:36–08:34; 45:28–45:44].
+
+US-02
+
+P0
+
+As the meeting uploader, I want to review proposed tasks and their source words, so I can correct mistakes before they become commitments.
+
+Proposed title, owner, date, priority and source sentence are visible; missing facts are flagged; edits and removal are possible; nothing is sent before approval.
+
+Review is in current team task scope; detailed controls are proposed.
+
+US-03
+
+P0
+
+As a team member, I want one morning email listing my own tasks and priorities, so I know what to work on without visiting the app.
+
+At the configured 8 a.m. schedule, the email contains only that recipient's tasks and priorities; send outcome is observable; timezone is explicit.
+
+Confirmed [04:55–06:36; 50:29–51:41].
+
+US-04
+
+P0
+
+As a team member, I want to reply in normal language about several tasks, so reporting takes only one email.
+
+A clear reply can express progress, no progress and an extension separately; each confidently identified task changes appropriately; original reply is retained; ambiguous portions do not change a task.
+
+Confirmed pattern [05:20–06:36; 50:29–51:25]; ambiguity safeguard proposed.
+
+US-05
+
+P0
+
+As a team member, I want to ask for three more days, so the owner can decide on a realistic deadline.
+
+Request records current date, proposed date, requester, reason and original reply; approved date stays unchanged until authorised action.
+
+Confirmed [14:25–15:56; 50:42–51:25].
+
+US-06
+
+P0
+
+As the workstream owner, I want to approve or decline an extension with its context, so the team has one authoritative date.
+
+Only that workstream's authorised owner can act; Approve updates once; Decline retains current date; duplicate or stale action returns an intelligible state; outcome is recorded.
+
+Approval role confirmed [14:25–15:56; 48:42–49:56]; safeguards proposed.
+
+US-07
+
+P0
+
+As CEO, I want an overview of workstream progress and pending requests, so I know where to intervene.
+
+Overview reflects persisted tasks and processed replies; shows blockers and decisions; missing replies are labelled unknown/no update.
+
+Management view confirmed [04:55–06:36; 48:42–49:56]; wording safeguard proposed.
+
+US-08
+
+P0
+
+As a tester, I want 3–5 chronological transcripts and a realistic firm structure, so I can test changes over successive weeks.
+
+Fixtures include CEO, workstream owners and task executors; dates are sequential; identities match seeded records; test recipients use approved addresses.
+
+Confirmed [21:10–23:57].
+
+US-09
+
+P1
+
+As a workstream owner, I want a blocker linked to the task it depends on, so I know who or what may unblock it.
+
+Original message, blocked task and dependency are visible; inferred links can be corrected; completing the dependency does not mark the blocked task done.
+
+Valerie's coordination scenario [15:11–15:46]; detailed behaviour proposed.
+
+US-10
+
+P1
+
+As CEO, I want to inspect the evidence for a change, so I can trust the dashboard.
+
+Receipt shows before/after, actor, source, time and notification result; unresolved requests are not presented as completed changes.
+
+Proposed elaboration of management and approval flow.
+
+US-11
+
+P1
+
+As a team member, I want a clarification request when my reply could refer to more than one task, so the wrong record is not changed.
+
+Ambiguous reply produces no guessed mutation; reply identifies the choices or asks for task reference; later clarification applies once.
+
+Proposed edge-case safeguard.
+
+US-12
+
+P1
+
+As an operator, I want to see whether digest and decision emails were sent, so I can recover from provider failures.
+
+Queued, sent and failed states are distinct; retry does not duplicate a successful notification.
+
+Proposed operational safeguard; issue #16 ownership remains open.
+
+Example story walkthrough: extension request
+
+Given Alex has an approved task due Wednesday and Priya is its workstream owner, when Alex replies to the digest, “I have not finished the deck; can I have three more days because I am waiting on pricing?”, then Loose Ends records the blocker/no-progress information and creates a pending date request for Priya. The approved Wednesday date remains visible. When Priya approves, the new due date is calculated under the agreed calendar rule, saved once and reflected in the CEO view. When Priya declines, Wednesday remains. The named people, date and dependency here are an illustrative scenario; David's actual fixture and the repository's due-date logic govern the demo.
+
+Recommended immediate implementation order
+
+US-08 fixture and US-01 capture unlock testing. Then connect US-02 review, US-03 digest, US-04 reply processing, US-05/06 decisions and US-07 overview as one vertical slice. Add P1 stories only after that path works. This ordering follows Iliyan's critical-path statement [43:28–45:44].

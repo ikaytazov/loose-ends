@@ -1,0 +1,179 @@
+Loose Ends | Product requirements document
+
+Version: Hackathon MVP, 31 October 2026
+Source: 54-minute team meeting transcript and previously discussed screen scope. Confirm repository details against current GitHub issues and docs/team-tasks.md before implementation.
+Product owner for this document: T. Valerie Onu, front-end design and implementation.
+
+1. Product summary
+
+Loose Ends turns sequential meeting transcripts into reviewable work, sends each member an email with their own tasks, interprets replies, and brings requests for more time to the responsible workstream owner. The CEO sees the resulting workstream state in a web interface. The member's primary interface is email.
+
+The problem
+
+A promise made in a meeting can become separated from the owner, due date and later email update. A CEO then has to chase progress manually, while a workstream owner may not see a request to change a deadline. Loose Ends connects the original statement, approved task, member update and owner decision.
+
+Outcome for the demonstration
+
+A judge can upload a fictional weekly transcript, review and approve proposed tasks, see a task digest, submit a natural-language reply with progress and a request for more time, approve or decline that request as the workstream owner, and observe the resulting state and source evidence in the CEO view.
+
+2. Users and jobs
+
+User
+
+Main job
+
+Interface
+
+CEO/overall plan owner
+
+See recorded progress, blockers, missing updates and pending decisions across workstreams
+
+Overview and workstream pages
+
+Workstream owner
+
+Decide whether an executor's requested date change is acceptable
+
+Decision page and notice email, if implemented
+
+Task executor
+
+Know their tasks and report progress or a problem quickly
+
+Morning email and ordinary email reply
+
+Meeting uploader
+
+Introduce chronological weekly call transcripts and review proposed work
+
+Capture and Review pages
+
+Tester
+
+Trace an upload through email, reply, decision and dashboard
+
+Vercel preview, test inbox and seeded data
+
+3. MVP boundaries
+
+Must have
+
+Capture: meeting title, date, attendees and pasted notes or supported file upload; POST /api/notes.
+
+Review: proposals with editable title, owner, date, priority, workstream and exact source sentence; no_owner/no_date flags; remove via keep: false; approve via POST /api/meetings/[id]/approve.
+
+Team structure: CEO, workstream owners and task executors from David's sequential fixture data; Team page reads team_members.
+
+Digest and reply: each member's tasks and priorities in an 8 a.m. email; shared Gmail inbox polled about once a minute; interpret clear progress, no progress and date requests. Timezone and live behaviour require verification.
+
+Decision: a requested extension is presented to its workstream owner; show current and proposed dates, reason, requester and original reply. Approve/Decline through POST /api/date-requests/[id]/decide; duplicate decision returns 409. Owner assignment, where applicable, uses POST /api/tasks/[id]/assign.
+
+Management view: Overview and Workstream detail show persisted task progress, blockers, decisions and missing updates. Activity/receipt makes changes inspectable.
+
+Hosted demo: UI on Vercel, seeded chronological transcripts, and an end-to-end test path.
+
+Conditional / later
+
+Automated meeting capture, Fireflies/Tactiq hooks, MCP ingestion, autonomous agent management, Slack, performance ranking and issue #17 follow-through effectiveness view. Issue #16 decision notice email was mentioned as Valerie-related but ownership is unresolved. Only show active controls for features that are implemented.
+
+4. Product rules
+
+A transcript-derived proposal is not an approved task. Nothing is emailed before approval.
+
+A member's requested date does not replace the approved date until the authorised workstream owner approves.
+
+A decline preserves the approved date. An already decided request cannot be applied again.
+
+A reply that cannot be confidently matched to a task requires clarification or review. Preserve the original words.
+
+Missing reply means unknown/no update, not done, on track or failure.
+
+Completion counts mean completed recorded approved tasks divided by all recorded approved tasks in that workstream.
+
+Distinguish queued, sent and failed mail; never claim delivery from an attempted send.
+
+The repository's current demo story and fixture dates override the generated image text. Product name and UI copy are Loose Ends; use Decline, not Reject.
+
+5. User stories and priorities
+
+The full set of 12 stories and edge cases is in Loose-Ends-Use-Case-and-JTBD.md. The vertical slice is US-08 team fixture, US-01 upload, US-02 review, US-03 digest, US-04 reply, US-05 request, US-06 workstream owner decision and US-07 CEO overview. Stories US-09–12 improve dependency explanation, receipts, clarification and delivery recovery if time allows.
+
+6. Screen requirements
+
+Screen
+
+Essential content
+
+Primary action
+
+States
+
+Capture notes
+
+Meeting metadata, paste area, supported file selection, selected file details
+
+Find tasks
+
+Empty, invalid file, uploading, processing, error
+
+Review & approve
+
+Editable proposal list, source quotes, missing owner/date, kept count
+
+Approve valid proposals
+
+Loading, draft, incomplete, approval success/error
+
+Overview
+
+Workstream progress from approved records, blockers, decisions, last update
+
+Open workstream or decision
+
+Empty, loading, stale/no update, error
+
+Workstream detail
+
+Target, task board, owner, due, status, dependency, evidence panel
+
+Inspect task/decision
+
+Blocked, pending decision, no update
+
+Decisions
+
+Current/proposed date, reason, requester, original reply and authorised owner
+
+Approve or Decline; assign owner if supported
+
+Waiting, resolved, conflict 409, error
+
+Activity
+
+Events with source and change receipt
+
+Inspect event
+
+No events, queued/sent/failed notice
+
+Team
+
+Name, email, role, workstream ownership, task count and last reply
+
+Filter/search
+
+Empty, no recent reply
+
+The seven design images in Loose-Ends-Screen-Designs.zip define layout and style only. Do not render image text as production data. The frontend must be responsive and keyboard accessible.
+
+7. Demo data and acceptance
+
+David prepares 3–5 weekly team-call transcripts in chronological order and a roughly ten-person firm with a CEO, workstream owners and task executors. Use approved team inboxes for live email tests; keep addresses out of public screenshots. A successful demonstration proves the path: transcript → approved task → digest → reply → pending extension → workstream owner decision → updated CEO view. Test an ambiguous reply, duplicate message, duplicate decision and missing update. Jerry owns end-to-end case design and testing; Abir assists with front-end setup/testing; Iliyan owns the email interpretation prompt, according to the meeting.
+
+8. Success and known limits
+
+For the hackathon: one coherent, reproducible end-to-end path and truthful states matter more than screen count. Show which steps are live, simulated or stubbed. The meeting said the AI extraction route currently had a fixed eight-task stub in an earlier team summary; Claude must verify the current repository before describing it as live AI. No measured time saving or moat claim is supported by this demonstration.
+
+9. Open decisions
+
+Digest timezone; precise upload formats and size; task matching and ambiguity threshold; policy for “three more days” across weekends; workstream owner delegation; approval of proposals with missing owner/date; issue #16 implementation owner; whether a direct Team add flow exists; authoritative demo transcript and names; deadline as displayed by the organiser's countdown.

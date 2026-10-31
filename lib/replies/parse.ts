@@ -27,20 +27,40 @@ Rules:
 - One reply can update several tasks. Return one change per task mentioned. Ignore tasks that are not mentioned.
 - new_status: "done" for done, finished, live, shipped, sent, submitted. "in_progress" for started, working on it, halfway. "blocked" when waiting on someone or something, or stuck. Otherwise "unchanged".
 - blocker: what they are waiting on, in a few words ("numbers from finance"). Null if nothing blocks the task.
-- requested_due_date: only when they ask for more time or name a new date. Convert it to a calendar date using the calendar provided. "next <weekday>" means that weekday in the following week. "by <weekday>" or a bare weekday means the next such day after the reply date. Null otherwise.
+- requested_due_date: only when they ask for more time or name a new date. Convert it to a calendar date by looking up their exact words in the calendar provided: each date lists the phrases that mean it (for example "next Wednesday"). Use that date; do not work it out yourself. Null otherwise.
 - quote: the exact words from the reply that support the change.
 - confidence: "sure" when the meaning and the task are clear; "unsure" when you are guessing which task is meant or what they mean.
 - question: if anything is unsure, one short, friendly question that would settle it. Otherwise null.
 - Never invent tasks, dates or blockers that the reply does not state.`;
 
-function calendar(fromDate: string, days = 21): string {
+/**
+ * A calendar from the reply date, with the meaning of day words worked out here (not by the AI):
+ *   "Wednesday" / "this Wednesday" / "by Wednesday" = the first Wednesday after the reply date
+ *   "next Wednesday" = the Wednesday of the following week (weeks run Monday–Sunday)
+ * Example: reply on Fri 30 Oct → "next Wednesday" = 4 Nov. Reply on Tue 3 Nov → "next Wednesday" = 11 Nov.
+ */
+export function calendar(fromDate: string, days = 21): string {
+  const DAY = 86400000;
   const start = new Date(fromDate + "T12:00:00Z");
+  const weekday = (d: Date) => d.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
+  const mondayIndex = (d: Date) => (d.getUTCDay() + 6) % 7; // Monday = 0
+  const nextWeekStart = new Date(start.getTime() + (7 - mondayIndex(start)) * DAY);
+  const nextWeekEnd = new Date(nextWeekStart.getTime() + 6 * DAY);
+  const seen = new Set<string>();
   const lines: string[] = [];
   for (let i = 0; i < days; i++) {
-    const d = new Date(start.getTime() + i * 86400000);
-    const iso = d.toISOString().slice(0, 10);
-    const wd = d.toLocaleDateString("en-US", { weekday: "long", timeZone: "UTC" });
-    lines.push(`${iso} ${wd}${i === 0 ? " (reply date)" : ""}`);
+    const d = new Date(start.getTime() + i * DAY);
+    const wd = weekday(d);
+    const labels: string[] = [];
+    if (i === 0) labels.push("reply date, today");
+    if (i === 1) labels.push("tomorrow");
+    if (i > 0 && !seen.has(wd)) {
+      seen.add(wd);
+      labels.push(`"${wd}", "this ${wd}", "by ${wd}"`);
+    }
+    if (d >= nextWeekStart && d <= nextWeekEnd) labels.push(`"next ${wd}"`);
+    if (d.getTime() === nextWeekStart.getTime()) labels.push(`"next week"`);
+    lines.push(`${d.toISOString().slice(0, 10)} ${wd}${labels.length ? "  = " + labels.join(", ") : ""}`);
   }
   return lines.join("\n");
 }

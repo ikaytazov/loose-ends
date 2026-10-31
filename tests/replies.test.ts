@@ -6,7 +6,7 @@ import type { DateRequest, Task, TeamMember, Workstream } from "@/lib/contracts/
 import { ReplyParse } from "@/lib/contracts/ai";
 import { handleInbound } from "@/lib/replies/handle";
 import type { ReplyParser } from "@/lib/replies/parse";
-import { buildUserMessage, readStructured } from "@/lib/replies/parse";
+import { buildUserMessage, calendar, readStructured } from "@/lib/replies/parse";
 import type { NewActivity, ReplyRepo } from "@/lib/replies/repo";
 import { pickApprover } from "@/lib/replies/approver";
 import { findReplyCode, replyAddress, stripQuoted, bareAddress } from "@/lib/email/address";
@@ -165,6 +165,19 @@ test("the AI sees only the new text and a calendar", () => {
   const msg = buildUserMessage({ replyText: stripQuoted(priyaReply.text), receivedDate: "2026-11-03", tasks: [{ n: 1, title: "A", status: "in_progress", due_date: null, priority: "high" }] });
   assert.ok(msg.includes("2026-11-11 Wednesday"));
   assert.ok(!msg.includes("Good morning Priya"));
+});
+
+test("calendar labels: 'next Wednesday' depends on the reply day", () => {
+  const line = (cal: string, phrase: string) => cal.split("\n").find((l) => l.includes(phrase))!.slice(0, 10);
+  const friday = calendar("2026-10-30"); // Fri
+  assert.equal(line(friday, '"next Wednesday"'), "2026-11-04");
+  assert.equal(line(friday, '"Wednesday"'), "2026-11-04");
+  assert.equal(line(friday, '"by Monday"'), "2026-11-02");
+  const tuesday = calendar("2026-11-03"); // Tue
+  assert.equal(line(tuesday, '"next Wednesday"'), "2026-11-11");
+  assert.equal(line(tuesday, '"this Wednesday"'), "2026-11-04");
+  assert.equal(line(tuesday, '"by Friday"'), "2026-11-06");
+  assert.equal(line(tuesday, '"next week"'), "2026-11-09");
 });
 
 test("helpers", () => {

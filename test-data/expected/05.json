@@ -1,0 +1,63 @@
+{
+  "tasks": [
+    {
+      "title": "Fix the annual discount at checkout",
+      "owner_name": "Priya Shah",
+      "due_date": "2026-11-09",
+      "priority": "high",
+      "workstream_name": "Product launch",
+      "source_sentence": "one problem: the annual discount isn't applying at checkout, Priya is fixing that today.",
+      "flags": []
+    },
+    {
+      "title": "Send the launch recap to investors",
+      "owner_name": "Maya Chen",
+      "due_date": "2026-11-10",
+      "priority": "medium",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Maya to send the launch recap to investors tomorrow.",
+      "flags": []
+    },
+    {
+      "title": "Follow up with the interviewees",
+      "owner_name": "Jordan Lee",
+      "due_date": "2026-11-13",
+      "priority": "low",
+      "workstream_name": "Product launch",
+      "source_sentence": "Jordan follows up with the interviewees by end of week to thank them and offer the discount.",
+      "flags": []
+    },
+    {
+      "title": "Post the help center design contractor job",
+      "owner_name": null,
+      "due_date": "2026-11-11",
+      "priority": "medium",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "we need a contractor for the help center design, so someone should post the job by Wednesday.",
+      "flags": [
+        "no_owner"
+      ]
+    },
+    {
+      "title": "Draft the board meeting agenda",
+      "owner_name": "Maya Chen",
+      "due_date": "2026-11-16",
+      "priority": "medium",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Maya will put together the board agenda, draft by next Monday.",
+      "flags": []
+    },
+    {
+      "title": "Move the support inbox to the new tool",
+      "owner_name": "Alex Romero",
+      "due_date": null,
+      "priority": "low",
+      "workstream_name": "Operations",
+      "source_sentence": "Alex mentioned maybe moving the support inbox over to the new tool, if he has time.",
+      "flags": [
+        "no_date",
+        "unclear"
+      ]
+    }
+  ]
+}

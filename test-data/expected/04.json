@@ -1,0 +1,55 @@
+{
+  "tasks": [
+    {
+      "title": "Fix the confirmation email landing in spam",
+      "owner_name": "Jordan Lee",
+      "due_date": "2026-11-05",
+      "priority": "high",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "Jordan said he'd look at the signup bug where the confirmation email lands in spam, hopefully by tomorrow.",
+      "flags": []
+    },
+    {
+      "title": "Record the two-minute walkthrough video",
+      "owner_name": "Sam Okafor",
+      "due_date": "2026-11-10",
+      "priority": "medium",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "Sam offered to record the two-minute walkthrough video next Tuesday, once the product screens are final.",
+      "flags": []
+    },
+    {
+      "title": "Tweak the pricing page copy",
+      "owner_name": "Priya Shah",
+      "due_date": "2026-11-06",
+      "priority": "high",
+      "workstream_name": "Product launch",
+      "source_sentence": "I'll tweak the pricing page copy after the interviews, in time for the launch on Friday.",
+      "flags": []
+    },
+    {
+      "title": "Write up the interview notes for the team",
+      "owner_name": null,
+      "due_date": null,
+      "priority": "medium",
+      "workstream_name": "Product launch",
+      "source_sentence": "someone should write up the interview notes somewhere the whole team can see them.",
+      "flags": [
+        "no_owner",
+        "no_date"
+      ]
+    },
+    {
+      "title": "Review the churned users list",
+      "owner_name": null,
+      "due_date": null,
+      "priority": "low",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "Jordan and I both said we'd look at the churned users list but honestly we didn't agree who actually does it, so that one is a bit fuzzy.",
+      "flags": [
+        "no_date",
+        "unclear"
+      ]
+    }
+  ]
+}

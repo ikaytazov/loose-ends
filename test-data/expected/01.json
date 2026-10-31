@@ -1,0 +1,80 @@
+{
+  "tasks": [
+    {
+      "title": "Launch the new pricing page",
+      "owner_name": "Priya Shah",
+      "due_date": "2026-11-05",
+      "priority": "high",
+      "workstream_name": "Product launch",
+      "source_sentence": "Priya will get the new pricing page live by Thursday.",
+      "flags": []
+    },
+    {
+      "title": "Finish the partner deck",
+      "owner_name": "Priya Shah",
+      "due_date": "2026-11-05",
+      "priority": "high",
+      "workstream_name": "Product launch",
+      "source_sentence": "Priya also owns the partner deck, same deadline.",
+      "flags": []
+    },
+    {
+      "title": "Own the launch checklist",
+      "owner_name": null,
+      "due_date": "2026-11-06",
+      "priority": "medium",
+      "workstream_name": "Product launch",
+      "source_sentence": "Someone needs to own the launch checklist before Friday's launch.",
+      "flags": [
+        "no_owner"
+      ]
+    },
+    {
+      "title": "Run five customer interviews",
+      "owner_name": "Jordan Lee",
+      "due_date": "2026-11-06",
+      "priority": "medium",
+      "workstream_name": "Product launch",
+      "source_sentence": "Jordan to run five customer interviews by end of week, ideally people from the waitlist.",
+      "flags": []
+    },
+    {
+      "title": "Write the onboarding email sequence",
+      "owner_name": "Jordan Lee",
+      "due_date": "2026-11-04",
+      "priority": "high",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "Jordan drafts the onboarding email sequence, first version by Wednesday, high priority because this is the leak.",
+      "flags": []
+    },
+    {
+      "title": "Draft the help center FAQ",
+      "owner_name": "Priya Shah",
+      "due_date": "2026-11-09",
+      "priority": "medium",
+      "workstream_name": "Customer onboarding",
+      "source_sentence": "Priya can draft the help center FAQ once pricing is final, say next Monday.",
+      "flags": []
+    },
+    {
+      "title": "Refresh the data room",
+      "owner_name": "Maya Chen",
+      "due_date": "2026-11-06",
+      "priority": "high",
+      "workstream_name": "Fundraising",
+      "source_sentence": "Maya refreshes the data room by Friday, with the new pricing in it.",
+      "flags": []
+    },
+    {
+      "title": "Renew the vendor contract",
+      "owner_name": null,
+      "due_date": "2026-11-13",
+      "priority": "medium",
+      "workstream_name": "Operations",
+      "source_sentence": "somebody should chase the vendor contract renewal by Friday the 13th so we don't get stuck on the higher rate.",
+      "flags": [
+        "no_owner"
+      ]
+    }
+  ]
+}

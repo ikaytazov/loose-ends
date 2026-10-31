@@ -1,4 +1,4 @@
-// Every screen under this group shares the sidebar and top bar. app/page.tsx (Overview) is outside the group until it is built.
+// Every screen under this group shares the sidebar and top bar, including the Overview at "/".
 import { Suspense, type ReactNode } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 

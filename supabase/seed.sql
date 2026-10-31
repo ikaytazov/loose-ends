@@ -8,7 +8,7 @@
 -- Starting health on the overview, one of each:
 --   Product launch      on_track         (Sam's graphics updated a few hours ago)
 --   Fundraising         decision_needed  (financial model has no owner)
---   Operations          blocked          (laptops out of stock)
+--   Operations          blocked          (Maya is waiting on laptops coming back in stock)
 --   Customer onboarding update_needed    (welcome call script: no update for 4 days)
 -- Priya has no open tasks here, so after the demo paste her morning email lists exactly 3.
 --
@@ -178,7 +178,7 @@ from (values
   -- Ops standup (transcripts/03.md)
   ('Set up payroll for the two new hires', 'Operations',          'Ops standup',      'Alex Romero', -3,   'high',   'done',        null, 'alex - payroll for 2 new hires by fri', '{}'),
   ('Audit and cancel unused tool subscriptions','Operations',     'Ops standup',      'Jordan Lee',  -2,   'low',    'done',        null, 'jordan to audit the tool subscriptions and cancel the ones nobody uses, end of month', '{}'),
-  ('Order laptops for the new hires',      'Operations',          'Ops standup',      'Maya Chen',    1,   'high',   'blocked',     'supplier out of stock until next week', 'maya to order laptops for the new hires asap', '{}'),
+  ('Order laptops for the new hires',      'Operations',          'Ops standup',      'Maya Chen',    1,   'high',   'blocked',     'laptops coming back in stock', 'maya to order laptops for the new hires asap', '{}'),
   ('Look into the double Stripe charges',  'Operations',          'Ops standup',      'Jordan Lee',   2,   'high',   'in_progress', null, 'the stripe thing - jordan? or alex? TBD who looks into it', '{}'),
   ('Script the welcome call',              'Customer onboarding', 'Ops standup',      'Jordan Lee',   6,   'low',    'not_started', null, 'jordan will script the welcome call next wk', '{}')
 ) as t(title, ws, meeting, owner, due, priority, status, blocker, src, flags)
@@ -191,7 +191,10 @@ left join public.team_members m on m.name = t.owner;
 -- "Script the welcome call" has none on purpose (Customer onboarding: Update needed).
 -- ---------------------------------------------------------------------------
 insert into public.activity_log (task_id, actor_id, source, field, old_value, new_value, quote, created_at)
-select t.id, coalesce(m.id, t.owner_id), a.source, a.field, a.old_v, a.new_v, a.quote, now() - (a.hours || ' hours')::interval
+-- An owner change logs the new owner's id, as POST /api/tasks/[id]/assign does ('owner_id' stands for it here).
+select t.id, coalesce(m.id, t.owner_id), a.source, a.field, a.old_v,
+       case when a.field = 'owner' and a.new_v = 'owner_id' then t.owner_id::text else a.new_v end,
+       a.quote, now() - (a.hours || ' hours')::interval
 from (values
   ('Write the launch announcement post',   null,        'email', 'status',  'in_progress', 'done',        'Announcement post is done, scheduled for launch morning.', 30),
   ('Set up signup tracking on the website',null,        'app',   'status',  'in_progress', 'done',        null, 70),
@@ -203,8 +206,8 @@ from (values
   ('Set up payroll for the two new hires', null,        'app',   'status',  'in_progress', 'done',        null, 50),
   ('Audit and cancel unused tool subscriptions', null,  'email', 'status',  'in_progress', 'done',        'Cancelled the old CRM and the design tool, kept the analytics one.', 26),
   ('Order laptops for the new hires',      null,        'email', 'status',  'in_progress', 'blocked',     'Laptops are out of stock until next week, I''ll order the moment they''re back.', 16),
-  ('Order laptops for the new hires',      null,        'email', 'blocker', null,          'supplier out of stock until next week', 'Laptops are out of stock until next week, I''ll order the moment they''re back.', 16),
-  ('Look into the double Stripe charges',  'Maya Chen', 'app',   'owner',   null,          'Jordan Lee',  null, 90),
+  ('Order laptops for the new hires',      null,        'email', 'blocker', null,          'laptops coming back in stock', 'Laptops are out of stock until next week, I''ll order the moment they''re back.', 16),
+  ('Look into the double Stripe charges',  'Maya Chen', 'app',   'owner',   null,          'owner_id',    null, 90),
   ('Look into the double Stripe charges',  null,        'app',   'status',  'not_started', 'in_progress', null, 10)
 ) as a(title, actor, source, field, old_v, new_v, quote, hours)
 join public.tasks t on t.title = a.title

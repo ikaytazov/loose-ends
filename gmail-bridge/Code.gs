@@ -13,6 +13,11 @@
 
 var DONE_LABEL = 'le-processed';
 
+// Only emails that belong to Loose Ends are touched; the rest of the inbox is left alone.
+// Morning emails are titled "Your N open tasks for <day>", so replies contain "open tasks".
+// For a manual test, send an email whose subject contains "Loose Ends".
+var SEARCH = 'in:inbox is:unread newer_than:3d (subject:"open tasks" OR subject:"Loose Ends")';
+
 function props_() {
   return PropertiesService.getScriptProperties();
 }
@@ -54,7 +59,7 @@ function checkInbox() {
   if (!appUrl || !secret) throw new Error('Set APP_URL and BRIDGE_SECRET in Script properties');
   var me = Session.getActiveUser().getEmail().toLowerCase();
 
-  var threads = GmailApp.search('in:inbox is:unread newer_than:3d', 0, 30);
+  var threads = GmailApp.search(SEARCH, 0, 30);
   for (var i = 0; i < threads.length; i++) {
     var messages = threads[i].getMessages();
     for (var j = 0; j < messages.length; j++) {

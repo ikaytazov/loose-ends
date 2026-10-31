@@ -40,4 +40,6 @@ so the URL stays the same.
 - Replies arrive in the app within about a minute (the script checks every minute).
 - Emails the app has handled are marked read and labelled `le-processed`. Leave them alone.
 - Gmail lets a script send to about 100 people a day — plenty for the demo.
-- Any unread email in the inbox gets passed to the app. Emails from people not in the team list are recorded and ignored.
+- Only unread emails whose subject contains "open tasks" (replies to morning emails) or "Loose Ends" (manual tests)
+  are passed to the app. The rest of the inbox is never touched. Emails from people not in the team list are recorded and ignored.
+- The morning email subject must keep the words "open tasks" (agreement C) or replies will not be picked up.

@@ -55,7 +55,7 @@ Code: `lib/contracts/ai.ts`. Both steps return this exact shape (checked by the 
 ```
 From:    Loose Ends <signalridgeco@gmail.com>
 Reply-To: signalridgeco+le-<code>@gmail.com      (same inbox; the code says which email is being answered)
-Subject: Your 3 open tasks for Tuesday
+Subject: Your 3 open tasks for Tuesday      (must contain "open tasks": the Gmail bridge only picks up replies with these words)
 
 Good morning Priya. You have 3 open tasks, most urgent first.
 

@@ -266,3 +266,65 @@ test("follow-up wording helpers", () => {
   assert.ok(isAutoReply("Out of Office: Re: Your 3 open tasks"));
   assert.ok(!isAutoReply("Re: Your 3 open tasks for Tuesday"));
 });
+
+// ---------- Approver notice (issue #16) ----------
+import { approverBody, approverSubject, decisionsUrl, type ApproverNotice } from "@/lib/email/approver-notice";
+
+function captureNotices() {
+  const sent: ApproverNotice[] = [];
+  return { sent, notifyApprover: async (n: ApproverNotice) => { sent.push(n); } };
+}
+
+const change = (task_number: number, requested_due_date: string, reason: string | null) => ({
+  task_number, new_status: "unchanged" as const, blocker: null, requested_due_date, reason, quote: "need more time", confidence: "sure" as const,
+});
+
+test("the demo reply emails Maya about the partner deck, once", async () => {
+  const w = makeWorld();
+  const box = captureNotices();
+  await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notifyApprover: box.notifyApprover });
+  assert.equal(box.sent.length, 1);
+  const n = box.sent[0];
+  assert.equal(n.to, "maya@x.com", "Priya owns Product launch herself, so the lead decides");
+  assert.equal(n.requesterName, "Priya");
+  assert.deepEqual(n.requests.map((r) => [r.title, r.currentDueDate, r.requestedDueDate]), [["Finish the partner deck", "2026-11-05", "2026-11-11"]]);
+});
+
+test("a request on another person's workstream goes to that owner; two requests to one approver make one email", async () => {
+  const w = makeWorld();
+  const box = captureNotices();
+  // 1 = pricing page and 2 = partner deck (Product launch: Maya decides), 3 = FAQ (Customer onboarding: Jordan decides).
+  await handleInbound(w.repo, fakeAI({ changes: [change(1, "2026-11-06", null), change(2, "2026-11-11", "numbers from finance"), change(3, "2026-11-12", "waiting on pricing")], question: null }), priyaReply, {
+    today: "2026-11-03",
+    notifyApprover: box.notifyApprover,
+  });
+  const byTo = Object.fromEntries(box.sent.map((n) => [n.to, n.requests.map((r) => r.title)]));
+  assert.deepEqual(byTo, { "maya@x.com": ["Launch the new pricing page", "Finish the partner deck"], "jordan@x.com": ["Draft FAQ for support"] });
+});
+
+test("no approver email without a date request, and a failed send never undoes the request", async () => {
+  const w = makeWorld();
+  const box = captureNotices();
+  await handleInbound(w.repo, fakeAI({ changes: [{ ...change(1, "2026-11-05", null), requested_due_date: null, new_status: "done" }], question: null }), priyaReply, { today: "2026-11-03", notifyApprover: box.notifyApprover });
+  assert.equal(box.sent.length, 0);
+
+  const w2 = makeWorld();
+  const res = await handleInbound(w2.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notifyApprover: async () => { throw new Error("Gmail down"); } });
+  assert.equal(res.status, "applied");
+  assert.equal(w2.dateRequests.length, 1);
+});
+
+test("approver email wording: links to Decisions, never looks like a reply the bridge would read", () => {
+  const notice = { approverName: "Maya Chen", requesterName: "Priya Shah", requests: [{ task_id: "t", title: "Finish the partner deck", currentDueDate: "2026-11-05", requestedDueDate: "2026-11-11", reason: "numbers from finance" }] };
+  const subject = approverSubject(notice.requesterName, 1);
+  assert.equal(subject, "Decision needed: Priya asked for more time");
+  assert.ok(!/open tasks|loose ends/i.test(subject), "the Gmail bridge must not pick up replies to this email");
+  assert.equal(approverSubject("Priya Shah", 2), "Decision needed: Priya asked for more time on 2 tasks");
+  const body = approverBody(notice, "https://le.example/decisions");
+  assert.ok(body.startsWith("Hi Maya.\n\nPriya asked to move \"Finish the partner deck\" from Thu 5 Nov to Wed 11 Nov.\nReason: numbers from finance.\nThe date stays Thu 5 Nov until you decide."));
+  assert.ok(body.includes("Approve or decline here: https://le.example/decisions"));
+  assert.ok(approverBody(notice, null).includes("on the Decisions page in Loose Ends"));
+  assert.equal(decisionsUrl({ APP_URL: "https://le.example/" }), "https://le.example/decisions");
+  assert.equal(decisionsUrl({ VERCEL_PROJECT_PRODUCTION_URL: "loose-ends.vercel.app" }), "https://loose-ends.vercel.app/decisions");
+  assert.equal(decisionsUrl({}), null);
+});

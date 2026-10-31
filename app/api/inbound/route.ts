@@ -1,6 +1,7 @@
 // POST /api/inbound — the Gmail bridge (gmail-bridge/Code.gs) sends every new email here.
 // Protected by BRIDGE_SECRET so nobody else can post fake replies.
 import { InboundEmail } from "@/lib/contracts/api";
+import { gmailApproverNotifier } from "@/lib/email/approver-notice";
 import { gmailNotifier } from "@/lib/email/follow-up";
 import { todayIn } from "@/lib/email/ordering";
 import { handleInbound } from "@/lib/replies/handle";
@@ -20,6 +21,7 @@ export const POST = route(async (req: Request) => {
   const result = await handleInbound(supabaseReplyRepo(sb), claudeReplyParser, email, {
     today: todayIn(env.timezone()),
     notify: gmailNotifier(sb),
+    notifyApprover: gmailApproverNotifier(sb),
   });
   return Response.json(result, { status: result.ok ? 200 : 500 });
 });

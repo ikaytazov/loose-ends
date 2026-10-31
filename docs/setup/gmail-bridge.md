@@ -36,6 +36,12 @@ You need: to be signed in to **signalridgeco@gmail.com** in your browser, and th
 If you later change the script, use **Deploy → Manage deployments → edit (pencil) → Version: New version → Deploy**
 so the URL stays the same.
 
+## Check it works
+- Open `<app address>/api/health`. `gmail_bridge` should say **"ok"**. If it says the bridge answered with a web page,
+  the deployment's "Who has access" is not "Anyone", or `GMAIL_BRIDGE_URL` is not the `/exec` address.
+- To send a real test email (to a team member or the team address), call `POST /api/dev/test-email` with header
+  `x-bridge-secret: <BRIDGE_SECRET>` and body `{"to": "someone@on-the-team"}`. Ask Iliyan or Claude to run it.
+
 ## Good to know
 - Replies arrive in the app within about a minute (the script checks every minute).
 - Emails the app has handled are marked read and labelled `le-processed`. Leave them alone.

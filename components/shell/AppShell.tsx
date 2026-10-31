@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { SendMorningButton } from "@/components/shell/SendMorningButton";
 import { useTeam } from "@/components/use-team";
 import { browserSupabase } from "@/lib/supabase/browser";
 
@@ -133,7 +134,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             </span>
           </button>
           <p className="text-[15px] font-semibold">{current}</p>
-          <span className="ml-auto rounded-full border border-line bg-paper px-3 py-1 text-[13px] text-muted" title="Seed data is loaded until real transcripts arrive">
+          <span className="ml-auto">
+            <SendMorningButton />
+          </span>
+          <span className="rounded-full border border-line bg-paper px-3 py-1 text-[13px] text-muted" title="Seed data is loaded until real transcripts arrive">
             Demo data
           </span>
         </header>

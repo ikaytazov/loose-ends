@@ -50,7 +50,7 @@ screen before moving on). Times are a guide for the edit.
   (due Thursday 11/5) and the help center FAQ (due Monday 11/9).
 
 ### Scene 3: Tuesday, 8 am. The morning email (1:10–1:35)
-- **Do:** Send the morning emails (see "Gaps to close": no button yet). Cut to Priya's phone. Open
+- **Do:** Press **Send morning emails now** in the top bar, then **Send**. Cut to Priya's phone. Open
   **"Your 3 open tasks for …"**.
 - **Say:** "Every morning, each owner gets one email with their open tasks, most urgent first. No app to open, no
   login."
@@ -81,8 +81,8 @@ screen before moving on). Times are a guide for the edit.
   11/11, with Priya's reason. Press **Approve** and confirm.
 - **Say:** "Dates only move when the workstream owner says so. Maya approves, the date moves, and Priya gets a
   one-line confirmation."
-- **Check:** the due date is now 11/11 and the card moves to *Resolved*. If the confirmation to Priya is built,
-  flash it on her phone.
+- **Check:** the due date is now 11/11 and the card moves to *Resolved*. Flash Priya's phone: "Loose Ends: new date
+  approved".
 
 ### Scene 7: Friday. Follow-through (2:50–3:05)
 - **If #17 (follow-through view) is built:** Maya opens it and shows who replies quickly and who delivers
@@ -103,13 +103,11 @@ screen before moving on). Times are a guide for the edit.
 
 ## Gaps to close by Sunday midday (control point 3)
 
-1. **"Send morning emails now" button.** The route `POST /api/emails/send-morning` works, but no screen has the
-   button yet. Ask Jerry to add it to the Overview, or, for the recording only, send with
-   `curl -X POST https://<live app>/api/emails/send-morning -H 'content-type: application/json' -d '{}'`
-   off camera.
+1. ~~"Send morning emails now" button~~ **Fixed:** it's in the top bar of every screen, with a confirm step.
+   Scene 3: press it, then **Send**.
 2. **Real notes reader (#10, Iliyan).** Scene 2 needs it, so the tasks match transcript 01 and Priya gets exactly 3.
-3. **Confirmation to Priya after approval.** The Decisions screen receipt says "No notice sent". Check with Iliyan
-   whether approving should email her (spec step 6). If not, drop that line from the voice-over.
+3. ~~Confirmation to Priya after approval~~ **Fixed:** approving or declining now emails the person who asked
+   ("Maya approved your new date: … is now due Wed 11 Nov"). Scene 6: flash it on Priya's phone.
 4. **Follow-through view (#17).** Unassigned. Scene 7 falls back to the Team screen.
 5. **Screens merged and live.** Merge #23 → #24 → #25 → #26, plus Jerry's Overview and Workstream pages, then do one
    full dry run with this script. That dry run is also the end-to-end test (#13).

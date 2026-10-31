@@ -296,7 +296,7 @@ export function DecisionsScreen() {
                 <p className="text-muted">
                   {latest.decidedBy ? `Decided by ${latest.decidedBy}` : "Decided by the workstream owner"} · {formatWhen(latest.at)}
                 </p>
-                <p className="rounded-[10px] bg-warn-bg px-3 py-2 text-[14px] text-warn">No notice sent</p>
+                <p className="rounded-[10px] bg-canvas px-3 py-2 text-[14px] text-muted">The person who asked is told by email.</p>
               </div>
             ) : (
               <p className="mt-3 text-muted">The most recent change will appear here once a decision is made.</p>

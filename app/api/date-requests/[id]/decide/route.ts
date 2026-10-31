@@ -2,6 +2,7 @@
 // Approved: the task's due date moves. Declined: it stays. Either way the decision is logged.
 import { DecideDateRequest, type DecideDateResponse } from "@/lib/contracts/api";
 import type { DateRequest, Task } from "@/lib/contracts/domain";
+import { sendDecisionNotice } from "@/lib/email/decision";
 import { HttpError, readJson, route, throwIf } from "@/lib/server/http";
 import { db } from "@/lib/server/supabase";
 
@@ -44,6 +45,30 @@ export const POST = route(async (req: Request, ctx: { params: Promise<{ id: stri
     old_value: request.current_due_date,
     new_value: body.decision === "approved" ? request.requested_due_date : null,
   });
+
+  // Tell the person who asked (spec step 6). The decision is already saved, so a failed send must not undo it.
+  if (request.requested_by) {
+    try {
+      const { data: people } = await sb.from("team_members").select("id, name, email").in("id", [request.requested_by, body.decided_by]);
+      const requester = people?.find((p) => p.id === request.requested_by);
+      const decider = people?.find((p) => p.id === body.decided_by);
+      if (requester?.email) {
+        await sendDecisionNotice(sb, {
+          to: requester.email,
+          member_id: requester.id,
+          task_id: task.id,
+          requesterName: requester.name,
+          deciderName: decider?.name ?? null,
+          title: task.title,
+          decision: body.decision,
+          currentDueDate: request.current_due_date,
+          requestedDueDate: request.requested_due_date,
+        });
+      }
+    } catch (e) {
+      console.error("decision notice not sent", e);
+    }
+  }
 
   const res: DecideDateResponse = { date_request: updated as DateRequest, task };
   return Response.json(res);

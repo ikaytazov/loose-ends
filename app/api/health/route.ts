@@ -1,5 +1,7 @@
-// GET /api/health — open this in a browser to check the app can reach the database and has its settings.
+// GET /api/health — open this in a browser to check the app has its settings, can reach the database,
+// and can reach the Gmail bridge.
 import { connection } from "next/server";
+import { checkBridge } from "@/lib/email/gmail";
 import { db } from "@/lib/server/supabase";
 
 const SETTINGS = [
@@ -10,6 +12,7 @@ const SETTINGS = [
   "TEAM_EMAIL",
   "GMAIL_BRIDGE_URL",
   "BRIDGE_SECRET",
+  "CRON_SECRET",
 ];
 
 export async function GET() {
@@ -22,5 +25,7 @@ export async function GET() {
   } catch (e) {
     database = `error: ${e instanceof Error ? e.message : String(e)}`;
   }
-  return Response.json({ settings, database });
+  // Sends no email: only checks the Apps Script bridge answers (docs/setup/gmail-bridge.md).
+  const gmail_bridge = process.env.GMAIL_BRIDGE_URL ? await checkBridge() : "not set";
+  return Response.json({ settings, database, gmail_bridge });
 }

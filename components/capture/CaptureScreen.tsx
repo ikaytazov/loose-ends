@@ -7,7 +7,7 @@ import { errorText, postJson } from "@/components/api";
 import { dateFromText, firstLine, uploadProblem } from "@/components/capture/parse";
 import { formatDay } from "@/components/format";
 import { useTeam } from "@/components/use-team";
-import { Button, Card, Eyebrow, Field, inputClass, Notice, PageHead, Pill } from "@/components/ui";
+import { Button, Card, Chip, Eyebrow, Field, inputClass, Notice, PageHead, Pill } from "@/components/ui";
 import type { PasteNotesResponse } from "@/lib/contracts/api";
 import { browserSupabase } from "@/lib/supabase/browser";
 
@@ -201,7 +201,7 @@ export function CaptureScreen() {
               }}
               onDragLeave={() => setDragging(false)}
               onDrop={onDrop}
-              className={`flex flex-wrap items-center justify-between gap-4 rounded-[12px] border border-dashed p-5 ${
+              className={`flex flex-wrap items-center justify-between gap-4 rounded-card border border-dashed p-5 ${
                 dragging ? "border-forest-2 bg-lime-wash" : "border-line bg-canvas"
               }`}
             >
@@ -291,15 +291,9 @@ export function CaptureScreen() {
                 {team?.map((m) => {
                   const on = active.attendees.includes(m.name);
                   return (
-                    <button
-                      key={m.id}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => toggleAttendee(m.name)}
-                      className={`min-h-11 rounded-full border px-4 text-[14.5px] ${on ? "border-forest bg-forest text-canvas" : "border-line bg-paper"}`}
-                    >
+                    <Chip key={m.id} active={on} onClick={() => toggleAttendee(m.name)}>
                       {m.name}
-                    </button>
+                    </Chip>
                   );
                 })}
               </div>

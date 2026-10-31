@@ -11,7 +11,7 @@
 import { connection } from "next/server";
 import { SendMorningRequest, type SendMorningResponse } from "@/lib/contracts/api";
 import type { Task, TeamMember, Workstream } from "@/lib/contracts/domain";
-import { newReplyCode, replyAddress } from "@/lib/email/address";
+import { newReplyCode, replyAddress, replyPageUrl } from "@/lib/email/address";
 import { sendEmail } from "@/lib/email/gmail";
 import { morningBody, morningSubject } from "@/lib/email/morning";
 import { orderForEmail, todayIn } from "@/lib/email/ordering";
@@ -36,6 +36,7 @@ async function sendMorning(memberId?: string): Promise<Result> {
   const wsNames = new Map(((workstreams ?? []) as Pick<Workstream, "id" | "name">[]).map((w) => [w.id, w.name]));
   const today = todayIn(env.timezone());
   const teamEmail = env.teamEmail();
+  const appUrl = env.appUrl();
 
   const result: Result = { sent: 0, recipients: [], failed: [] };
   for (const m of (members ?? []) as TeamMember[]) {
@@ -44,7 +45,7 @@ async function sendMorning(memberId?: string): Promise<Result> {
 
     const code = newReplyCode();
     const subject = morningSubject(mine.length, today);
-    const text = morningBody(m.name, mine, wsNames, today);
+    const text = morningBody(m.name, mine, wsNames, today, appUrl && replyPageUrl(appUrl, code));
     const { data: saved, error: e4 } = await sb
       .from("emails")
       .insert({

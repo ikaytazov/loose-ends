@@ -64,8 +64,11 @@ Good morning Priya. You have 3 open tasks, most urgent first.
 3. Medium – Draft FAQ for support – Customer onboarding – due next Monday
 
 Just reply in your own words, for example "1 is done" or "2 needs until Friday, waiting on finance".
+
+Or type your update here: https://<app>/reply/<code>
 ```
 
 - **Order:** overdue first, then priority, then due date — always via `orderForEmail()` in `lib/email/ordering.ts`.
 - **Saved:** each sent morning email is stored in `emails` with `kind = 'morning'`, `reply_code`, and `task_refs = [{ "n": 1, "task_id": "..." }, ...]`. This is how "2 is done" finds the right task.
+- **Reply link:** the last line links to the "reply here" page, and is left out when the app address is not set (`APP_URL`).
 - **Timing:** 8 am (team time zone) by a scheduled job, plus a "Send morning emails now" button for the demo.

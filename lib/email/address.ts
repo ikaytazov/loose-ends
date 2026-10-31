@@ -13,6 +13,11 @@ export function replyAddress(teamEmail: string, code: string): string {
   return `${local}+${CODE_PREFIX}${code}@${domain}`;
 }
 
+/** The "reply here" page for one morning email. */
+export function replyPageUrl(appUrl: string, code: string): string {
+  return `${appUrl.replace(/\/+$/, "")}/reply/${code}`;
+}
+
 /** Find our code in a To/Cc header such as `"Loose Ends" <signalridgeco+le-k3x9p2@gmail.com>`. */
 export function findReplyCode(toHeader: string): string | null {
   const m = toHeader.match(/\+le-([a-z0-9]+)@/i);

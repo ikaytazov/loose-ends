@@ -15,5 +15,7 @@ export const env = {
   teamEmail: () => need("TEAM_EMAIL"), // e.g. signalridgeco@gmail.com
   gmailBridgeUrl: () => need("GMAIL_BRIDGE_URL"), // Apps Script web app URL (docs/setup/gmail-bridge.md)
   bridgeSecret: () => need("BRIDGE_SECRET"), // shared secret between the app and the Apps Script
+  // Public address of the app, for the "reply here" link. Vercel fills in the fallback; with neither, emails have no link.
+  appUrl: () => process.env.APP_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null),
   timezone: () => process.env.TEAM_TIMEZONE || "America/Los_Angeles",
 };

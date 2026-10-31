@@ -45,3 +45,10 @@ test("body matches agreement C", () => {
     ].join("\n"),
   );
 });
+
+test("the reply-here link is the last line, and only when there is an app address", () => {
+  const tasks = [{ title: "Partner deck", priority: "high" as const, due_date: null, workstream_id: null }];
+  const body = morningBody("Priya", tasks, new Map(), TUESDAY, "https://app.test/reply/abc123");
+  assert.ok(body.endsWith("\n\nOr type your update here: https://app.test/reply/abc123"));
+  assert.ok(!morningBody("Priya", tasks, new Map(), TUESDAY, null).includes("type your update"));
+});

@@ -51,6 +51,7 @@ export function morningBody(
   tasks: Pick<Task, "title" | "priority" | "due_date" | "workstream_id">[],
   workstreamNames: Map<string, string>,
   today: string,
+  replyUrl?: string | null,
 ): string {
   const first = name.trim().split(/\s+/)[0] || name;
   const count = tasks.length === 1 ? "1 open task" : `${tasks.length} open tasks, most urgent first`;
@@ -64,5 +65,6 @@ export function morningBody(
     ...lines,
     "",
     `Just reply in your own words, for example "1 is done" or "2 needs until Friday, waiting on finance".`,
+    ...(replyUrl ? ["", `Or type your update here: ${replyUrl}`] : []),
   ].join("\n");
 }

@@ -5,7 +5,7 @@ Types for every request and response: `lib/contracts/api.ts`. Every error comes 
 
 | Route | What it does | State |
 |---|---|---|
-| `POST /api/notes` | Paste notes → proposed tasks | **Stub AI** (always the same 8 tasks), real saving |
+| `POST /api/notes` | Paste notes → proposed tasks | Real (Claude reads the notes; can take 10–40 seconds) |
 | `POST /api/meetings/[id]/approve` | Lead approves the reviewed list | Real |
 | `POST /api/tasks/[id]/assign` | Give a task an owner | Real |
 | `POST /api/date-requests/[id]/decide` | Approve or decline a new date | Real |

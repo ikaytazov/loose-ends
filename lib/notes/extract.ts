@@ -26,7 +26,7 @@ export const SYSTEM = `You read the notes or transcript of a startup team meetin
 
 What counts as a task
 - Include every commitment, including vague ones ("someone should…", "we should probably sort that out at some point", "maybe … if he has time").
-- Leave out: anything the notes say is "not a task", "not now", "not this week", parked, for the roadmap, "not happening" or a later-quarter conversation; things already done or already sorted; decisions, opinions, debates and questions that were answered in the meeting; routine things with nothing to do; chit-chat; meeting logistics ("X will assign it after the meeting", "X will bring it up Monday", "next meeting same time").
+- Leave out: anything the notes say is "not a task", "not now", "not this week", parked, for the roadmap, "not happening" or a later-quarter conversation; things already done or already sorted; decisions, opinions, debates and questions that were answered in the meeting; routine things with nothing to do; chit-chat; meeting logistics ("X will assign it after the meeting", "X will bring it up Monday", "next meeting same time"); small hand-offs that are only an input to someone else's task ("I can send you that number today").
 - If the same commitment is mentioned twice, or two things are said to be one thing, list it once.
 
 Owner
@@ -39,18 +39,18 @@ Due date
 - "today" and "tomorrow" are relative to the meeting date. A date with a day number ("Friday the 13th", "by nov 13") is that calendar date. "Same deadline" means the same date as the task it refers to.
 - No date (null) when the timing is vague: "next week" without a day, "asap", "soon", "at some point", "once X is done" without a date, "if he has time".
 
-Priority
-- high: said to be high priority or urgent, blocks the launch or a deadline this week, fixes something hurting customers or revenue, investor or fundraising deadlines, "asap", things due today or tomorrow.
-- low: nice to have, "at some point", "maybe", "if time", "no rush", small clean-ups, thank-you notes and follow-ups.
-- medium: everything else.
+Priority (the lead can change it at review, so be consistent rather than generous with "high")
+- high: a named owner has work that is said to be high priority or urgent ("asap"), is needed for this week's launch or this week's fundraising deadline, or must happen today or tomorrow; also anything fixing a problem that is hurting customers or revenue right now (e.g. customers charged twice, a signup bug), whoever owns it.
+- low: nice to have, "at some point", "maybe", "if he has time", "no rush"; anything flagged unclear (unless it is hurting customers); internal clean-ups and process improvements (audits, cancelling tools, writing a call script); thank-you notes and follow-ups.
+- medium: everything else, including tasks with no owner yet (unless they are hurting customers) and courtesy updates such as a recap to investors.
 
 Workstream
-- Choose the best match from the workstream list by topic (section headings in the notes help). Null if none fits.
+- Choose the best match from the workstream list by topic (section headings in the notes help). If nothing fits clearly, use the workstream of the meeting's main topic (e.g. a fundraising meeting → Fundraising). Null only if no workstream relates at all.
 
 Other fields
 - title: short, starts with a verb, no person's name (e.g. "Launch the new pricing page").
 - source_sentence: copy the sentence or line from the notes that contains the commitment, word for word, without the leading "- ".
-- flags: "unclear" when the owner was not settled, the commitment is conditional ("maybe", "if he has time"), or it is too vague to know what is meant ("the thing with the lawyer"). Also "no_owner" when owner is null and "no_date" when due date is null.`;
+- flags: "unclear" when the owner was not settled, the owner hedged about doing it at all ("maybe … if he has time"), or it is too vague to know what is meant ("the thing with the lawyer"). A polite "maybe you can…?" that the person agrees to ("I can try") is not unclear. Also "no_owner" when owner is null and "no_date" when due date is null.`;
 
 export function buildUserMessage(input: ExtractInput): string {
   return [

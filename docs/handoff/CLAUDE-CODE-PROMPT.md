@@ -28,7 +28,7 @@ You are building the front-end screens for **Loose Ends** in the repo `ikaytazov
 1. Inspect the repo first, including any shell or components Jerry has already merged, and **reuse them**. If no shell exists, build it as part of the first PR (sidebar, top bar, tokens).
 2. Write a short plan for the assigned issue, then build in the order in BUILD-SPEC §1.
 3. For every screen, implement loading, empty, error and long-text states. Test keyboard use, visible focus, and widths down to 320px.
-4. Test against the real routes and seed data (`supabase/seed-dev.sql`, then David's test data when it lands). Where data isn't seeded yet, use a typed fixture in one isolated file and say so in the PR.
+4. Test against the real routes and seed data (`supabase/seed.sql`, built from David's `test-data/`). Where data isn't seeded yet, use a typed fixture in one isolated file and say so in the PR.
 5. One small PR per screen, on branch `fe-valerie` or `fe-valerie/<screen>`. Include what a user can now do, screenshots at desktop and 375px, the Vercel preview URL, test results, and any dependency on Iliyan's routes. Don't merge it yourself.
 
 ## My assigned issue

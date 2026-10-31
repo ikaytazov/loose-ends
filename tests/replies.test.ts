@@ -3,10 +3,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { DateRequest, Task, TeamMember, Workstream } from "@/lib/contracts/domain";
-import type { ReplyParse } from "@/lib/contracts/ai";
+import { ReplyParse } from "@/lib/contracts/ai";
 import { handleInbound } from "@/lib/replies/handle";
 import type { ReplyParser } from "@/lib/replies/parse";
-import { buildUserMessage } from "@/lib/replies/parse";
+import { buildUserMessage, readStructured } from "@/lib/replies/parse";
 import type { NewActivity, ReplyRepo } from "@/lib/replies/repo";
 import { pickApprover } from "@/lib/replies/approver";
 import { findReplyCode, replyAddress, stripQuoted, bareAddress } from "@/lib/email/address";
@@ -49,10 +49,11 @@ function makeWorld() {
     async getOpenTasksForOwner(id) { return tasks.filter((t) => t.owner_id === id && !["done", "proposed"].includes(t.status)); },
     async getWorkstream(id) { return workstreams.find((w) => w.id === id) ?? null; },
     async insertInboundEmail(row) {
-      if (emails.some((e) => e.gmail_message_id === row.gmail_message_id)) return "duplicate";
+      const prev = emails.find((e) => e.gmail_message_id === row.gmail_message_id);
+      if (prev) return { id: prev.id, alreadyProcessed: prev.processed === true };
       const id = "e-in-" + emails.length;
       emails.push({ id, gmail_message_id: row.gmail_message_id, member_id: row.member_id, task_refs: null, kind: "reply" });
-      return { id };
+      return { id, alreadyProcessed: false };
     },
     async updateTask(id, patch) { Object.assign(tasks.find((t) => t.id === id)!, patch); },
     async upsertWaitingDateRequest(row) {
@@ -112,6 +113,24 @@ test("the same email delivered twice is only applied once", async () => {
   const again = await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03" });
   assert.equal(again.status, "duplicate");
   assert.equal(w.dateRequests.length, 1);
+});
+
+test("an email that failed is tried again on the next delivery", async () => {
+  const w = makeWorld();
+  const broken: ReplyParser = async () => { throw new Error("AI unavailable"); };
+  const first = await handleInbound(w.repo, broken, priyaReply, { today: "2026-11-03" });
+  assert.equal(first.status, "error");
+  assert.equal(w.tasks.find((t) => t.id === "t-pricing")!.status, "in_progress");
+  const second = await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03" });
+  assert.equal(second.status, "applied");
+  assert.equal(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
+});
+
+test("AI answer is read from a tool call or from plain JSON text", () => {
+  const viaTool = readStructured([{ type: "tool_use", id: "x", name: "record_updates", input: demoParse } as never], ReplyParse);
+  assert.equal(viaTool.changes.length, 2);
+  const viaText = readStructured([{ type: "text", text: "Here you go:\n" + JSON.stringify(demoParse) } as never], ReplyParse);
+  assert.equal(viaText.changes[1].requested_due_date, "2026-11-11");
 });
 
 test("date request for someone else's workstream goes to that workstream's owner", async () => {

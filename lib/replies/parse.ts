@@ -52,18 +52,27 @@ export function buildUserMessage(input: ParseInput): string {
   return `Calendar:\n${calendar(input.receivedDate)}\n\nTasks in the email they are answering:\n${taskLines}\n\nTheir reply:\n"""\n${input.replyText}\n"""`;
 }
 
+/** Take the answer from a tool call if there is one, otherwise from JSON in the text. */
+export function readStructured<T>(content: Anthropic.ContentBlock[], schema: z.ZodType<T>): T {
+  const tool = content.find((b) => b.type === "tool_use");
+  if (tool && tool.type === "tool_use") return schema.parse(tool.input);
+  const text = content.flatMap((b) => (b.type === "text" ? [b.text] : [])).join("\n");
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start < 0 || end <= start) throw new Error("AI did not return updates");
+  return schema.parse(JSON.parse(text.slice(start, end + 1)));
+}
+
 export const claudeReplyParser: ReplyParser = async (input) => {
   const client = new Anthropic({ apiKey: env.anthropicKey() });
   const schema = z.toJSONSchema(ReplyParse) as Anthropic.Tool.InputSchema;
+  // Not every model accepts a *forced* tool call, so we ask for it and also accept plain JSON.
   const res = await client.messages.create({
     model: env.anthropicModel(),
-    max_tokens: 1500,
-    system: SYSTEM,
+    max_tokens: 4000,
+    system: SYSTEM + "\n\nAlways answer by calling the record_updates tool exactly once. If you cannot call it, reply with only the same JSON object.",
     tools: [{ name: "record_updates", description: "Record the task updates found in the reply", input_schema: schema }],
-    tool_choice: { type: "tool", name: "record_updates" },
     messages: [{ role: "user", content: buildUserMessage(input) }],
   });
-  const block = res.content.find((b) => b.type === "tool_use");
-  if (!block || block.type !== "tool_use") throw new Error("AI did not return updates");
-  return ReplyParse.parse(block.input);
+  return readStructured(res.content, ReplyParse);
 };

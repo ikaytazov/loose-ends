@@ -17,7 +17,11 @@ export interface ReplyRepo {
   getTasks(ids: string[]): Promise<Task[]>;
   getOpenTasksForOwner(memberId: string): Promise<Task[]>;
   getWorkstream(id: string): Promise<Workstream | null>;
-  /** Returns "duplicate" when this Gmail message was already received. */
+  /**
+   * Saves the incoming email, or finds it if this Gmail message was received before.
+   * alreadyProcessed = true means it was handled successfully earlier: skip it.
+   * A message that failed before comes back with alreadyProcessed = false, so it is tried again.
+   */
   insertInboundEmail(row: {
     gmail_message_id: string;
     member_id: string | null;
@@ -26,7 +30,7 @@ export interface ReplyRepo {
     subject: string;
     body: string;
     in_reply_to_email_id: string | null;
-  }): Promise<{ id: string } | "duplicate">;
+  }): Promise<{ id: string; alreadyProcessed: boolean }>;
   updateTask(id: string, patch: Partial<Pick<Task, "status" | "blocker">>): Promise<void>;
   /** One waiting request per task: replaces the requested date if one is already waiting. */
   upsertWaitingDateRequest(row: Omit<DateRequest, "id" | "status" | "decided_at" | "created_at">): Promise<void>;

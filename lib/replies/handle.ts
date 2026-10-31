@@ -37,7 +37,7 @@ export async function handleInbound(
     body: replyText,
     in_reply_to_email_id: morning?.id ?? null,
   });
-  if (inserted === "duplicate") return { ok: true, status: "duplicate", ...empty };
+  if (inserted.alreadyProcessed) return { ok: true, status: "duplicate", ...empty };
   const emailId = inserted.id;
 
   if (!member) {

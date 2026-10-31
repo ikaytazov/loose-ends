@@ -56,9 +56,19 @@ export function supabaseReplyRepo(sb: SupabaseClient): ReplyRepo {
         .insert({ ...row, direction: "in", kind: "reply" })
         .select("id")
         .single();
-      if (error?.code === "23505") return "duplicate"; // unique gmail_message_id
+      if (error?.code === "23505") {
+        // Seen this Gmail message before: skip it if it was handled, retry it if it failed.
+        const { data: prev, error: e2 } = await sb
+          .from("emails")
+          .select("id, processed")
+          .eq("gmail_message_id", row.gmail_message_id)
+          .single();
+        throwIf(e2, "find earlier copy of email");
+        const p = prev as { id: string; processed: boolean };
+        return { id: p.id, alreadyProcessed: p.processed };
+      }
       throwIf(error, "save incoming email");
-      return { id: (data as { id: string }).id };
+      return { id: (data as { id: string }).id, alreadyProcessed: false };
     },
     async updateTask(id, patch) {
       const { error } = await sb.from("tasks").update(patch).eq("id", id);

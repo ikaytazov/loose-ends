@@ -66,3 +66,16 @@ one reply covering two tasks, a reply naming the task instead of the number, typ
   }
 ]
 ```
+
+## What's here now
+
+- `team.json`: 5 people (Maya is lead) with the team's real inboxes, and the 4 workstreams.
+- `transcripts/01–05.md` with answer keys `expected/01–05.json`. `01.md` is the Monday demo meeting.
+- `transcripts/06.md`, a **follow-up meeting** that repeats, revises and gives status on tasks from `05.md`.
+  `expected/06.json` lists only the genuinely new tasks under `tasks`. Its extra lists (`repeated`, `revisions`,
+  `status_mentions`, `not_tasks`) are for reviewers and say what must **not** become a new task.
+- `replies.json`: 19 replies. Some include `_case` (what the reply tests) and `_policy_note` (a rule the team still
+  has to decide, such as calendar vs working days).
+
+Thanks to Valerie for the follow-up meeting idea and the out-of-office, unknown sender, "it's done" and
+"three more days" cases.

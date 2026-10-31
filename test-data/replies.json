@@ -379,5 +379,111 @@
       }
     ],
     "should_be_unsure": false
+  },
+  {
+    "from": "abiralameddine@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Refresh the data room",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "high"
+      }
+    ],
+    "reply": "I'm travelling until Thursday with limited access to email. For anything urgent, contact Priya.",
+    "expected": [],
+    "should_be_unsure": true,
+    "_case": "Out-of-office auto-reply. Nothing should change, and no question should be sent back."
+  },
+  {
+    "from": "partner-team@example.org",
+    "received_date": "2026-11-04",
+    "email_tasks": [],
+    "reply": "Hi, can you move our kickoff call to Friday? Thanks!",
+    "expected": [],
+    "should_be_unsure": true,
+    "_case": "Unknown sender (not on the team list). Should be ignored and logged, never applied to anyone's tasks."
+  },
+  {
+    "from": "ikaytazov@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Finish the partner deck",
+        "status": "blocked",
+        "due_date": "2026-11-11",
+        "priority": "high"
+      },
+      {
+        "n": 2,
+        "title": "Draft the help center FAQ",
+        "status": "not_started",
+        "due_date": "2026-11-09",
+        "priority": "medium"
+      }
+    ],
+    "reply": "it's done",
+    "expected": [],
+    "should_be_unsure": true,
+    "_case": "'it's done' with two open tasks and no number or name. Must ask which one, not guess (the retro problem in transcripts/06.md)."
+  },
+  {
+    "from": "tellyonu@gmail.com",
+    "received_date": "2026-11-04",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Run five customer interviews",
+        "status": "in_progress",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Script the welcome call",
+        "status": "not_started",
+        "due_date": "2026-11-10",
+        "priority": "low"
+      }
+    ],
+    "reply": "I'm working on it, should be done soon.",
+    "expected": [],
+    "should_be_unsure": true,
+    "_case": "Vague progress with two tasks: unclear which one, and no real status change."
+  },
+  {
+    "from": "jerry.yeoh1270@gmail.com",
+    "received_date": "2026-11-03",
+    "email_tasks": [
+      {
+        "n": 1,
+        "title": "Own the launch checklist",
+        "status": "not_started",
+        "due_date": "2026-11-06",
+        "priority": "medium"
+      },
+      {
+        "n": 2,
+        "title": "Renew the vendor contract",
+        "status": "not_started",
+        "due_date": "2026-11-13",
+        "priority": "medium"
+      }
+    ],
+    "reply": "Haven't started the checklist yet, can I have three more days on it?",
+    "expected": [
+      {
+        "task_number": 1,
+        "new_status": "unchanged",
+        "blocker": null,
+        "requested_due_date": "2026-11-09"
+      }
+    ],
+    "should_be_unsure": false,
+    "_case": "'Three more days' from the current due date (Fri 11/6).",
+    "_policy_note": "Calendar days gives 2026-11-09 (Monday). Working days would give 2026-11-11. The team needs to decide; this key assumes calendar days."
   }
 ]

@@ -288,6 +288,20 @@ function EventCard({ ev, data, names }: { ev: ActivityEvent; data: Loaded; names
 
   const e = ev.entry;
   const actor = who(e.actor_id);
+  // Part A writes new_value as the new person's name and quote as the meeting title, when there is one.
+  if (e.field === "team_member_added") {
+    return (
+      <Card className="p-5">
+        <p className="font-semibold">
+          {actor ?? "Someone"} added {e.new_value ?? "someone"} to the team
+        </p>
+        {e.quote && <p className="mt-0.5 text-[14.5px]">from {e.quote}</p>}
+        <Meta>
+          {SOURCE_LABEL[e.source]} · {timeOfDay(e.created_at)}
+        </Meta>
+      </Card>
+    );
+  }
   return (
     <Card className="p-5">
       <p className="font-semibold">{activityHeadline(e, names)}</p>

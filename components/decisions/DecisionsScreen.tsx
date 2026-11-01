@@ -7,6 +7,7 @@ import { ApiError, errorText, postJson } from "@/components/api";
 import { formatDay, formatWhen } from "@/components/format";
 import { canDecide, daysBetween, leavesNoBuffer } from "@/components/decisions/logic";
 import { useTeam } from "@/components/use-team";
+import { Thread } from "@/components/Thread";
 import { Button, Card, Eyebrow, Notice, PageHead, Pill, Quote, inputClass } from "@/components/ui";
 import type { AssignOwnerResponse, DecideDateResponse } from "@/lib/contracts/api";
 import type { DateRequest, DecisionNeededRow, Task, TeamMember } from "@/lib/contracts/domain";
@@ -185,6 +186,7 @@ export function DecisionsScreen() {
         eyebrow="Decisions"
         title={tab === "waiting" && data && !loadError && waitingCount === 0 ? "Nothing waiting for you." : "A few decisions. Work moving again."}
         subtitle="Date changes and unowned tasks wait here. Nothing moves until the workstream owner decides."
+        thread="short"
       />
 
       <div className="grid gap-8 min-[1080px]:grid-cols-[minmax(0,1fr)_360px]">
@@ -303,22 +305,10 @@ export function DecisionsScreen() {
             )}
           </Card>
 
-          <Card className="bg-lime-soft p-5" aria-live="polite">
-            <svg viewBox="0 0 240 60" className="h-14 w-full" aria-hidden>
-              <path
-                d="M4 30 C 60 4, 90 56, 130 30 S 200 4, 236 30"
-                fill="none"
-                stroke="#215846"
-                strokeWidth="2"
-                strokeLinecap="round"
-                pathLength={100}
-                strokeDasharray={100}
-                strokeDashoffset={justDecided ? 0 : 100}
-                className="transition-[stroke-dashoffset] duration-[1200ms] ease-out"
-              />
-            </svg>
-            <p className="font-serif text-[20px]">One less loose end.</p>
-            <p className="text-[14px] text-ink-2">The thread closes once a decision is made here.</p>
+          <Card className="relative h-[168px] overflow-hidden border-[#DCE9A8] bg-lime-soft p-5" aria-live="polite">
+            <Thread variant="loop" draw={justDecided} className="absolute inset-0" />
+            <p className="relative mt-[72px] font-serif text-[20px]">One less loose end.</p>
+            <p className="relative text-[14px] text-ink-2">The thread closes once a decision is made here.</p>
           </Card>
         </aside>
       </div>

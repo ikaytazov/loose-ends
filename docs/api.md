@@ -48,6 +48,16 @@ Send back every proposed task from the review screen, edited by the lead. `keep:
 { "task": { "id": "uuid", "owner_id": "uuid", "...": "..." } }
 ```
 
+### POST /api/team-members
+Adds a teammate (Team page "Add teammate", Review "Add Sarah"). Never sends an email: the new person gets the normal morning email.
+```json
+// request  (assign_task_ids = proposed tasks to give them; added_by = who clicked, optional)
+{ "name": "Sarah Kim", "email": "sarah@example.com", "role": "member", "assign_task_ids": ["uuid"], "added_by": "uuid" }
+// response  (existing = the email was already on the team; no duplicate is created)
+{ "member": { "id": "uuid", "name": "Sarah Kim", "email": "sarah@example.com", "...": "..." }, "assigned": 1, "existing": false }
+```
+Only tasks still `proposed` are assigned. 400 for a bad name or email, 429 after 10 new teammates in 24 hours.
+
 ### POST /api/date-requests/[id]/decide
 `id` is `decision_id` from the `decisions_needed` view (or `pending_date_request_id` from `task_board`).
 ```json

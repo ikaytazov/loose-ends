@@ -1,4 +1,4 @@
-// Every screen under this group shares the sidebar and top bar, including the Overview at "/".
+// Every screen under this group shares the sidebar and top bar, including the Overview at "/overview".
 import { Suspense, type ReactNode } from "react";
 import { AppShell } from "@/components/shell/AppShell";
 

@@ -85,7 +85,7 @@ export function DemoResetScreen() {
             <Notice tone="ok" title={`Reset at ${done.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`}>
               {done.result.members} people, {done.result.workstreams} workstreams, {done.result.meetings} meetings, {done.result.tasks} tasks and{" "}
               {done.result.activity} updates loaded.{" "}
-              <Link href="/" className="font-semibold underline underline-offset-4">
+              <Link href="/overview" className="font-semibold underline underline-offset-4">
                 Open the Overview
               </Link>{" "}
               to check it: Product launch on track, Fundraising decision needed, Operations blocked, Customer onboarding update needed.

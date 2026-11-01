@@ -2,17 +2,10 @@
 
 // One workstream on the Overview and the Workstreams list (mockup docs/mockups/01-overview.png).
 import Link from "next/link";
-import { Avatar, HealthPill, Icon, ProgressBar, timeAgo } from "@/components/board/pieces";
+import { Avatar, HealthCallout, HealthPill, Icon, ProgressBar, timeAgo } from "@/components/board/pieces";
 import { daysSince, doers, isOpen, reasonLine } from "@/components/board/logic";
 import { formatDay } from "@/components/format";
 import type { DecisionNeededRow, TaskBoardRow, WorkstreamOverviewRow } from "@/lib/contracts/domain";
-
-const REASON_TONE = {
-  blocked: "bg-danger-bg text-danger",
-  decision_needed: "bg-lime-wash text-forest",
-  update_needed: "bg-warn-bg text-warn",
-  on_track: "",
-} as const;
 
 export function WorkstreamCard({
   stream,
@@ -34,7 +27,7 @@ export function WorkstreamCard({
   const quiet = quietDays !== null && quietDays >= 3 && tasks.some((t) => isOpen(t.status));
 
   return (
-    <article className="rounded-[14px] border border-line bg-paper p-5 shadow-card min-[640px]:p-6">
+    <article className="rounded-card border border-line bg-paper p-5 shadow-card min-[640px]:p-6">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="font-serif text-[26px] leading-tight text-ink">
@@ -60,10 +53,9 @@ export function WorkstreamCard({
       </div>
 
       {reason && (
-        <p className={`mt-4 flex items-start gap-2 rounded-[10px] px-3.5 py-2.5 text-[14.5px] ${REASON_TONE[stream.health]}`}>
-          <Icon name={stream.health === "update_needed" ? "clock" : stream.health === "blocked" ? "triangle" : "doc"} className="mt-0.5 size-4 shrink-0" />
-          <span>{reason}</span>
-        </p>
+        <HealthCallout health={stream.health} className="mt-4">
+          {reason}
+        </HealthCallout>
       )}
 
       <dl className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 text-[14px]">

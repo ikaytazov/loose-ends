@@ -12,6 +12,7 @@ import { activityHeadline, daysSince, filterTasks, isOpen, reasonLine, rowsShowi
 import {
   Avatar,
   firstName,
+  HealthCallout,
   HealthPill,
   Icon,
   NeedsOwnerPill,
@@ -25,7 +26,7 @@ import {
 } from "@/components/board/pieces";
 import { formatDay, formatWhen } from "@/components/format";
 import { useTeam } from "@/components/use-team";
-import { Button, Card, Notice, inputClass } from "@/components/ui";
+import { Button, Card, Notice, PageHead, SectionTitle, Stat, inputClass } from "@/components/ui";
 import type { ActivityLogEntry, DecisionNeededRow, TaskBoardRow } from "@/lib/contracts/domain";
 
 type Tab = "tasks" | "updates";
@@ -127,16 +128,20 @@ export function WorkstreamScreen({ id }: { id: string }) {
   return (
     <div className={selected ? "min-[1080px]:grid min-[1080px]:grid-cols-[minmax(0,1fr)_400px] min-[1080px]:items-start min-[1080px]:gap-6" : ""}>
       <div className="min-w-0">
-        <Link href="/workstreams" className="inline-flex items-center gap-1.5 text-[14.5px] text-ink-2 hover:underline">
+        <Link href="/workstreams" className="mb-3 inline-flex items-center gap-1.5 text-[14.5px] text-ink-2 hover:underline">
           <Icon name="arrow-left" /> Back to workstreams
         </Link>
-        <h1 className="mt-2 font-serif text-[clamp(36px,4vw,56px)] leading-[1.05] tracking-[-0.02em] text-ink">{stream.name}</h1>
-        <p className="mt-2 text-[19px] text-muted">
-          {stream.goal ?? "No goal set"}
-          {stream.target_date && <> · target {formatDay(stream.target_date)}</>}
-        </p>
+        <PageHead
+          title={stream.name}
+          subtitle={
+            <>
+              {stream.goal ?? "No goal set"}
+              {stream.target_date && <> · target {formatDay(stream.target_date)}</>}
+            </>
+          }
+        />
 
-        <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <div className="flex items-center gap-2.5">
             <Avatar name={stream.owner_name} />
             <div>
@@ -153,24 +158,17 @@ export function WorkstreamScreen({ id }: { id: string }) {
         </div>
 
         {reason && (
-          <p
-            className={`mt-5 flex items-start gap-2 rounded-[10px] px-4 py-3 text-[15px] ${
-              stream.health === "blocked" ? "bg-danger-bg text-danger" : stream.health === "update_needed" ? "bg-warn-bg text-warn" : "bg-lime-wash text-forest"
-            }`}
-          >
-            <Icon name={stream.health === "blocked" ? "triangle" : stream.health === "update_needed" ? "clock" : "doc"} className="mt-0.5 size-4 shrink-0" />
-            <span>
-              <b>{stream.health === "blocked" ? "Why blocked: " : stream.health === "update_needed" ? "Gone quiet: " : "Waiting on a decision: "}</b>
-              {reason}
-            </span>
-          </p>
+          <HealthCallout health={stream.health} className="mt-5">
+            <b>{stream.health === "blocked" ? "Why blocked: " : stream.health === "update_needed" ? "Gone quiet: " : "Waiting on a decision: "}</b>
+            {reason}
+          </HealthCallout>
         )}
 
         <div className="mt-5 grid grid-cols-2 gap-3 min-[720px]:grid-cols-4">
-          <Tile value={tasks.length} label="approved tasks" />
-          <Tile value={counts.done} label="done" />
-          <Tile value={counts.blocked} label="blocked" />
-          <Tile value={board.decisions.length} label={board.decisions.length === 1 ? "decision needed" : "decisions needed"} />
+          <Stat value={tasks.length} label="approved tasks" />
+          <Stat value={counts.done} label="done" />
+          <Stat value={counts.blocked} label="blocked" />
+          <Stat value={board.decisions.length} label={board.decisions.length === 1 ? "decision needed" : "decisions needed"} />
         </div>
 
         <Card className="mt-4 p-5">
@@ -193,7 +191,7 @@ export function WorkstreamScreen({ id }: { id: string }) {
         {tab === "tasks" ? (
           <Card className="mt-4">
             <div className="flex flex-wrap items-center gap-3 border-b border-line-2 p-4">
-              <h2 className="mr-auto font-serif text-[22px]">Tasks</h2>
+              <SectionTitle className="mr-auto">Tasks</SectionTitle>
               <label className="w-full min-[560px]:w-56">
                 <span className="sr-only">Search tasks</span>
                 <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search tasks…" className={`${inputClass} mt-0`} />
@@ -244,7 +242,7 @@ export function WorkstreamScreen({ id }: { id: string }) {
           </Card>
         ) : (
           <Card className="mt-4 p-5">
-            <h2 className="font-serif text-[22px]">Updates</h2>
+            <SectionTitle>Updates</SectionTitle>
             <Timeline entries={board.activity} tasks={tasks} names={names} now={now} showTask />
           </Card>
         )}
@@ -269,15 +267,6 @@ export function WorkstreamScreen({ id }: { id: string }) {
           </button>
         </Notice>
       )}
-    </div>
-  );
-}
-
-function Tile({ value, label }: { value: number; label: string }) {
-  return (
-    <div className="rounded-[14px] border border-line bg-paper p-4 shadow-card">
-      <p className="font-serif text-[34px] leading-none text-ink">{value}</p>
-      <p className="mt-1 text-[14px] text-muted">{label}</p>
     </div>
   );
 }
@@ -427,7 +416,7 @@ function TaskPanel({
       <div className="fixed inset-0 z-40 bg-ink/40 min-[1080px]:hidden" onClick={onClose} aria-hidden />
       <aside
         aria-labelledby="task-panel-title"
-        className="fixed inset-y-0 right-0 z-50 w-full max-w-[420px] overflow-y-auto bg-paper p-5 shadow-xl min-[1080px]:sticky min-[1080px]:top-24 min-[1080px]:z-auto min-[1080px]:max-h-[calc(100vh-7rem)] min-[1080px]:max-w-none min-[1080px]:rounded-[14px] min-[1080px]:border min-[1080px]:border-line min-[1080px]:shadow-card"
+        className="fixed inset-y-0 right-0 z-50 w-full max-w-[420px] overflow-y-auto bg-paper p-5 shadow-xl min-[1080px]:sticky min-[1080px]:top-24 min-[1080px]:z-auto min-[1080px]:max-h-[calc(100vh-7rem)] min-[1080px]:max-w-none min-[1080px]:rounded-card min-[1080px]:border min-[1080px]:border-line min-[1080px]:shadow-card"
       >
         <div className="flex items-start gap-3">
           <div className="min-w-0 flex-1">
@@ -436,7 +425,7 @@ function TaskPanel({
             </h2>
             <p className="mt-1 text-[13.5px] text-muted">In {workstreamName}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close task panel" className="grid size-10 place-items-center rounded-[10px] hover:bg-canvas">
+          <button type="button" onClick={onClose} aria-label="Close task panel" className="grid size-10 place-items-center rounded-control hover:bg-canvas">
             <Icon name="close" className="size-5" />
           </button>
         </div>
@@ -494,11 +483,11 @@ function TaskPanel({
         </dl>
 
         {t.pending_date_request_id && (
-          <div className="mt-2 flex flex-wrap items-center gap-3 rounded-[10px] border border-line bg-canvas p-3">
+          <div className="mt-2 flex flex-wrap items-center gap-3 rounded-control border border-line bg-canvas p-3">
             <span className="text-[14.5px]">
               Request for more time · <b className="text-warn">Pending</b>
             </span>
-            <Link href="/decisions" className="ml-auto inline-flex min-h-10 items-center rounded-[10px] bg-forest px-4 text-[14.5px] font-semibold text-canvas hover:bg-forest-2">
+            <Link href="/decisions" className="ml-auto inline-flex min-h-10 items-center rounded-control bg-forest px-4 text-[14.5px] font-semibold text-canvas hover:bg-forest-2">
               Review date request
             </Link>
           </div>

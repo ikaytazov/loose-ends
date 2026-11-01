@@ -4,10 +4,12 @@
 //   3. Apply: status and blocker change straight away; a new date becomes a date request for the approver.
 //   4. Log every change with the words that caused it.
 //   5. Email the sender back: a one-line confirmation, or the AI's question (lib/replies/follow-up.ts).
+//   6. Tell each approver about new date requests (issue #16, lib/email/approver-notice.ts).
 import type { InboundEmail, InboundResponse } from "@/lib/contracts/api";
 import type { ReplyChange } from "@/lib/contracts/ai";
 import type { ActivitySource, Task, TeamMember } from "@/lib/contracts/domain";
 import { bareAddress, findReplyCode, stripQuoted } from "@/lib/email/address";
+import type { ApproverNotice, ApproverNotifier } from "@/lib/email/approver-notice";
 import { orderForEmail } from "@/lib/email/ordering";
 import { pickApprover } from "./approver";
 import { buildFollowUp, isAutoReply, type FollowUpItem, type Notifier } from "./follow-up";
@@ -18,7 +20,7 @@ export async function handleInbound(
   repo: ReplyRepo,
   parse: ReplyParser,
   email: InboundEmail,
-  opts: { today: string; notify?: Notifier; source?: ActivitySource },
+  opts: { today: string; notify?: Notifier; notifyApprover?: ApproverNotifier; source?: ActivitySource },
 ): Promise<InboundResponse> {
   const empty = { applied: [], question: null };
   const fromAddr = bareAddress(email.from);
@@ -73,6 +75,7 @@ export async function handleInbound(
     const applied: InboundResponse["applied"] = [];
     const items: FollowUpItem[] = [];
     const logs: NewActivity[] = [];
+    const notices = new Map<string, ApproverNotice>(); // one email per approver
     const base = { actor_id: member.id, source: opts.source ?? "email", email_id: emailId };
 
     for (const change of parsed.changes) {
@@ -84,7 +87,7 @@ export async function handleInbound(
         logs.push({ ...base, task_id: task.id, field: "unclear", old_value: null, new_value: null, quote: change.quote });
         continue;
       }
-      await applyChange(repo, task, change, { member: member.id, lead, emailId, base, logs, applied, items });
+      await applyChange(repo, task, change, { member, lead, emailId, base, logs, applied, items, notices });
     }
 
     if (logs.length) await repo.log(logs);
@@ -108,6 +111,17 @@ export async function handleInbound(
       }
     }
 
+    // Each approver hears about new date requests. Like the follow-up, a failed send never undoes the request.
+    if (opts.notifyApprover) {
+      for (const notice of notices.values()) {
+        try {
+          await opts.notifyApprover(notice);
+        } catch (e) {
+          console.error("Could not send the approver notice:", e);
+        }
+      }
+    }
+
     return { ok: true, status: "applied", applied, question: parsed.question };
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
@@ -121,13 +135,14 @@ async function applyChange(
   task: Task,
   change: ReplyChange,
   ctx: {
-    member: string;
+    member: TeamMember;
     lead: TeamMember | null;
     emailId: string;
     base: Pick<NewActivity, "actor_id" | "source" | "email_id">;
     logs: NewActivity[];
     applied: InboundResponse["applied"];
     items: FollowUpItem[];
+    notices: Map<string, ApproverNotice>;
   },
 ) {
   const patch: Partial<Pick<Task, "status" | "blocker">> = {};
@@ -155,10 +170,10 @@ async function applyChange(
   // Due dates never change from a reply: they become a request for the approver.
   if (change.requested_due_date && change.requested_due_date !== task.due_date) {
     const ws = task.workstream_id ? await repo.getWorkstream(task.workstream_id) : null;
-    const approver = pickApprover({ requesterId: ctx.member, workstreamOwnerId: ws?.owner_id ?? null, leadId: ctx.lead?.id ?? null });
+    const approver = pickApprover({ requesterId: ctx.member.id, workstreamOwnerId: ws?.owner_id ?? null, leadId: ctx.lead?.id ?? null });
     await repo.upsertWaitingDateRequest({
       task_id: task.id,
-      requested_by: ctx.member,
+      requested_by: ctx.member.id,
       current_due_date: task.due_date,
       requested_due_date: change.requested_due_date,
       reason: change.reason ?? change.blocker,
@@ -169,5 +184,24 @@ async function applyChange(
     applied.push({ task_id: task.id, field: "date_request", new_value: change.requested_due_date });
     const approverMember = !approver ? null : approver === ctx.lead?.id ? ctx.lead : await repo.getMember(approver);
     items.push({ type: "date_request", title: task.title, date: change.requested_due_date, approverName: approverMember?.name ?? null });
+
+    // Queue the approver's email (never to the person asking: they already get the confirmation).
+    if (approverMember?.email && approverMember.id !== ctx.member.id) {
+      const notice = ctx.notices.get(approverMember.id) ?? {
+        to: approverMember.email,
+        member_id: approverMember.id,
+        approverName: approverMember.name,
+        requesterName: ctx.member.name,
+        requests: [],
+      };
+      notice.requests.push({
+        task_id: task.id,
+        title: task.title,
+        currentDueDate: task.due_date,
+        requestedDueDate: change.requested_due_date,
+        reason: change.reason ?? change.blocker,
+      });
+      ctx.notices.set(approverMember.id, notice);
+    }
   }
 }

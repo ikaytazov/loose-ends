@@ -7,7 +7,7 @@ import { ApiError, errorText, postJson } from "@/components/api";
 import { formatDay, formatWhen } from "@/components/format";
 import { canDecide, daysBetween, leavesNoBuffer } from "@/components/decisions/logic";
 import { useTeam } from "@/components/use-team";
-import { Button, Card, Eyebrow, Notice, PageHead, Pill, inputClass } from "@/components/ui";
+import { Button, Card, Eyebrow, Notice, PageHead, Pill, Quote, inputClass } from "@/components/ui";
 import type { AssignOwnerResponse, DecideDateResponse } from "@/lib/contracts/api";
 import type { DateRequest, DecisionNeededRow, Task, TeamMember } from "@/lib/contracts/domain";
 import { browserSupabase } from "@/lib/supabase/browser";
@@ -190,7 +190,7 @@ export function DecisionsScreen() {
       <div className="grid gap-8 min-[1080px]:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div role="tablist" aria-label="Decisions" onKeyDown={onTabKey} className="inline-flex rounded-[10px] border border-line bg-paper p-1">
+            <div role="tablist" aria-label="Decisions" onKeyDown={onTabKey} className="inline-flex rounded-control border border-line bg-paper p-1">
               {(["waiting", "resolved"] as Tab[]).map((t) => (
                 <button
                   key={t}
@@ -283,12 +283,12 @@ export function DecisionsScreen() {
               <div className="mt-4 space-y-3 text-[15px]">
                 <p className="font-serif text-[20px] leading-snug">{latest.task}</p>
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-                  <div className="rounded-[10px] bg-canvas p-3">
+                  <div className="rounded-control bg-canvas p-3">
                     <p className="text-[12.5px] text-muted">Before</p>
                     <p className="font-semibold">{latest.before ? formatDay(latest.before) : "No date"}</p>
                   </div>
                   <span aria-hidden className="text-muted">→</span>
-                  <div className="rounded-[10px] bg-lime-wash p-3">
+                  <div className="rounded-control bg-lime-wash p-3">
                     <p className="text-[12.5px] text-muted">After</p>
                     <p className="font-semibold">{latest.after ? formatDay(latest.after) : "No date"}</p>
                   </div>
@@ -296,7 +296,7 @@ export function DecisionsScreen() {
                 <p className="text-muted">
                   {latest.decidedBy ? `Decided by ${latest.decidedBy}` : "Decided by the workstream owner"} · {formatWhen(latest.at)}
                 </p>
-                <p className="rounded-[10px] bg-canvas px-3 py-2 text-[14px] text-muted">The person who asked is told by email.</p>
+                <p className="rounded-control bg-canvas px-3 py-2 text-[14px] text-muted">The person who asked is told by email.</p>
               </div>
             ) : (
               <p className="mt-3 text-muted">The most recent change will appear here once a decision is made.</p>
@@ -385,10 +385,7 @@ function DecisionCard({
         </div>
         <p className="font-serif text-[20px]">{row.task_title}</p>
         {(info?.source_sentence || quote) && (
-          <blockquote className="rounded-[10px] border-l-[3px] border-lime bg-canvas px-4 py-3">
-            <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">From your notes · exact words</p>
-            <p className="mt-1">&ldquo;{info?.source_sentence ?? quote}&rdquo;</p>
-          </blockquote>
+          <Quote label="From your notes · exact words">{info?.source_sentence ?? quote}</Quote>
         )}
         {mayDecide ? (
           <div className="flex flex-wrap items-end gap-3">
@@ -434,12 +431,12 @@ function DecisionCard({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-[10px] border border-line bg-canvas p-4">
+        <div className="rounded-control border border-line bg-canvas p-4">
           <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">Current · approved</p>
           <p className="mt-1 font-serif text-[22px]">{formatDay(current)}</p>
           <p className="text-[13.5px] text-muted">Applies until you decide</p>
         </div>
-        <div className="rounded-[10px] border border-line bg-lime-wash p-4">
+        <div className="rounded-control border border-line bg-lime-wash p-4">
           <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">Requested · not approved</p>
           <p className="mt-1 font-serif text-[22px]">{formatDay(requested)}</p>
           {moved !== null && <p className="text-[13.5px] text-muted">{moved > 0 ? `Moves ${moved} days later` : moved < 0 ? `Moves ${-moved} days earlier` : "Same day"}</p>}
@@ -447,29 +444,25 @@ function DecisionCard({
       </div>
 
       {leavesNoBuffer(requested, target) && (
-        <p className="rounded-[10px] border border-dashed border-warn-line px-3 py-2 text-[14px] text-warn">
+        <p className="rounded-control border border-dashed border-warn-line px-3 py-2 text-[14px] text-warn">
           <span className="font-semibold">Inference:</span> approving leaves no buffer before the workstream target.
         </p>
       )}
 
       {row.reason && (
-        <blockquote className="rounded-[10px] border-l-[3px] border-lime bg-canvas px-4 py-3">
-          <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">Reason given</p>
-          <p className="mt-1">{row.reason}</p>
-        </blockquote>
+        <Quote label="Reason given" quoted={false}>
+          {row.reason}
+        </Quote>
       )}
       {info?.blocker && <p className="text-[15px]"><span className="font-semibold">Linked blocker:</span> {info.blocker}</p>}
       {quote && (
-        <blockquote className="rounded-[10px] border-l-[3px] border-lime bg-canvas px-4 py-3">
-          <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">Original reply</p>
-          <p className="mt-1">&ldquo;{quote}&rdquo;</p>
-        </blockquote>
+        <Quote label="Original reply">{quote}</Quote>
       )}
 
       {!mayDecide ? (
         <p className="text-muted">Only {approverName} can decide this.</p>
       ) : pending ? (
-        <div className="rounded-[10px] bg-lime-wash p-4">
+        <div className="rounded-control bg-lime-wash p-4">
           <p className="font-semibold">
             {pending === "approved"
               ? `Move the due date to ${formatDay(requested)}? It will show that date from now on.`

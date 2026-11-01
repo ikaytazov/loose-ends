@@ -47,6 +47,10 @@ body {
   border-radius: 6px;
 }
 
+/* On the dark green sidebar the green focus ring disappears, so it turns lime there. */
+.on-forest :focus-visible {
+  outline-color: var(--color-lime);
+}
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -3,7 +3,7 @@
 // Team (/team): who owns what, and when each person last replied.
 import { useEffect, useMemo, useState } from "react";
 import { daysSince, formatWhen } from "@/components/format";
-import { Card, Eyebrow, Notice, PageHead, Pill, inputClass } from "@/components/ui";
+import { Card, Chip, Eyebrow, Notice, PageHead, Pill, inputClass } from "@/components/ui";
 import { errorText } from "@/components/api";
 import { useTeam } from "@/components/use-team";
 import type { TeamMember, Workstream } from "@/lib/contracts/domain";
@@ -94,15 +94,9 @@ export function TeamScreen() {
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <div role="group" aria-label="Filter team" className="flex flex-wrap gap-2">
           {filters.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              aria-pressed={filter === f.id}
-              onClick={() => setFilter(f.id)}
-              className={`min-h-11 rounded-full border px-4 text-[14.5px] ${filter === f.id ? "border-forest bg-forest text-canvas" : "border-line bg-paper"}`}
-            >
+            <Chip key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>
               {f.label}
-            </button>
+            </Chip>
           ))}
         </div>
         <label className="ml-auto w-full sm:w-72">

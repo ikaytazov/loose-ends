@@ -3,14 +3,31 @@
 // Shared pieces for the Overview and Workstream screens: status and health pills (always icon + text, never colour
 // alone), initials avatars, the progress bar, small icons, and the live-reload hook that keeps the board current.
 import { useEffect, useState, type ReactNode } from "react";
-import { Pill, type Tone } from "@/components/ui";
+import { Callout, Pill, type Tone } from "@/components/ui";
 import type { ActivitySource, Health, TaskStatus } from "@/lib/contracts/domain";
 import { browserSupabase } from "@/lib/supabase/browser";
 
 // ---------------------------------------------------------------------------
 // Icons (decorative: the text next to them always says the same thing)
 // ---------------------------------------------------------------------------
-type IconName = "check" | "triangle" | "doc" | "clock" | "dot" | "spark" | "person" | "calendar" | "mail" | "arrow-left" | "close" | "flag";
+export type IconName =
+  | "check"
+  | "triangle"
+  | "doc"
+  | "clock"
+  | "dot"
+  | "spark"
+  | "person"
+  | "calendar"
+  | "mail"
+  | "arrow-left"
+  | "close"
+  | "flag"
+  | "home"
+  | "layers"
+  | "activity"
+  | "pen"
+  | "users";
 
 const PATHS: Record<IconName, ReactNode> = {
   check: <path d="M4 10.5l3.5 3.5L16 6" />,
@@ -55,6 +72,28 @@ const PATHS: Record<IconName, ReactNode> = {
   "arrow-left": <path d="M16 10H4.5M9 5l-5 5 5 5" />,
   close: <path d="M5 5l10 10M15 5L5 15" />,
   flag: <path d="M5 17V3.5M5 4h9l-2 3 2 3H5" />,
+  // Sidebar icons (same 20px grid and 1.6 stroke as the rest).
+  home: <path d="M3.5 9.2L10 3.5l6.5 5.7V16a.8.8 0 01-.8.8H4.3a.8.8 0 01-.8-.8z M8 16.8v-5h4v5" />,
+  layers: (
+    <>
+      <path d="M10 3.2l7 3.6-7 3.6-7-3.6z" />
+      <path d="M3 10.2l7 3.6 7-3.6M3 13.6l7 3.6 7-3.6" />
+    </>
+  ),
+  activity: <path d="M2.5 10.5h3.2L8 4.5l4 11 2.3-5h3.2" />,
+  pen: (
+    <>
+      <path d="M13.2 3.8l3 3L7.5 15.5l-4 1 1-4z" />
+      <path d="M11.7 5.3l3 3" />
+    </>
+  ),
+  users: (
+    <>
+      <circle cx="7.5" cy="7" r="2.8" />
+      <path d="M2.5 16c.6-2.9 2.6-4.3 5-4.3s4.4 1.4 5 4.3" />
+      <path d="M12.6 4.4a2.8 2.8 0 010 5.2M14.6 11.9c1.5.5 2.6 1.9 2.9 4.1" />
+    </>
+  ),
 };
 
 export function Icon({ name, className = "size-4" }: { name: IconName; className?: string }) {
@@ -118,6 +157,24 @@ export function HealthPill({ health }: { health: Health }) {
   );
 }
 
+// The tinted "why" line under a workstream (blocked, quiet, waiting on a decision). On track has nothing to explain.
+const CALLOUT_STYLE: Record<Health, { tone: "danger" | "warn" | "wash"; icon: IconName } | null> = {
+  on_track: null,
+  blocked: { tone: "danger", icon: "triangle" },
+  decision_needed: { tone: "wash", icon: "doc" },
+  update_needed: { tone: "warn", icon: "clock" },
+};
+
+export function HealthCallout({ health, className, children }: { health: Health; className?: string; children: ReactNode }) {
+  const s = CALLOUT_STYLE[health];
+  if (!s) return null;
+  return (
+    <Callout tone={s.tone} icon={<Icon name={s.icon} />} className={className}>
+      {children}
+    </Callout>
+  );
+}
+
 export function NeedsOwnerPill() {
   return (
     <Pill tone="warn">
@@ -171,15 +228,8 @@ export function ProgressBar({ done, total, label }: { done: number; total: numbe
   );
 }
 
-// A source sentence or an email reply: ivory block with a lime rule (DESIGN-SYSTEM "Quote block").
-export function Quote({ children, by }: { children: ReactNode; by?: ReactNode }) {
-  return (
-    <figure className="rounded-[10px] border-l-[3px] border-lime bg-canvas px-4 py-3">
-      <blockquote className="text-[15px] leading-relaxed text-ink">&ldquo;{children}&rdquo;</blockquote>
-      {by && <figcaption className="mt-1.5 text-[13px] text-muted">{by}</figcaption>}
-    </figure>
-  );
-}
+// The quote block now lives with the other shared pieces in components/ui.tsx; this keeps old imports working.
+export { Quote } from "@/components/ui";
 
 // ---------------------------------------------------------------------------
 // Time words

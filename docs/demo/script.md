@@ -7,11 +7,16 @@ Aim for **about 3½ minutes**. Everything the demo types or pastes already exist
 
 | Character | Role in the story | Email (from `test-data/team.json`) | Who holds the inbox on recording day |
 |---|---|---|---|
-| **Maya Chen** | Founder, team lead. Pastes notes, approves dates | ikaytazov@gmail.com | Abir (drives the app on screen) |
-| **Priya Shah** | Owns Product launch. Gets the morning email and replies | abiralameddine@gmail.com | Abir too: she replies from her own Gmail in a browser tab |
-| Jordan Lee | Owns Customer onboarding | tellyonu@gmail.com | Valerie (not on camera) |
-| Alex Romero | Owns Operations | jerry.yeoh1270@gmail.com | Jerry (not on camera) |
-| Sam Okafor | Team member | htvaught@gmail.com | H.T. (not on camera) |
+| **Maya Chen** | Founder, team lead. Pastes notes, approves dates | abiralameddine+maya@gmail.com | Abir (drives the app on screen) |
+| **Priya Shah** | Owns Product launch. Gets the morning email and replies | abiralameddine@gmail.com | Abir: replies from her own Gmail in a browser tab |
+| Jordan Lee | Owns Customer onboarding | abiralameddine+jordan@gmail.com | Abir (not on camera) |
+| Alex Romero | Owns Operations | abiralameddine+alex@gmail.com | Abir (not on camera) |
+| Sam Okafor | Team member | abiralameddine+sam@gmail.com | Abir (not on camera) |
+
+Every character's email arrives in Abir's Gmail (Gmail ignores the "+name" part), so she can run the whole demo
+alone. Priya keeps the plain address because Gmail sends replies from it, and that's how the app knows a reply is
+Priya's. When "Send morning emails now" runs, several emails arrive at once: open the one that starts
+**"Good morning Priya"** (subject "Your 3 open tasks for …").
 
 Only **Maya's screen** and **Priya's phone** appear on camera. Screen-record the laptop, and screen-record
 (or film) Iliyan's phone for the reply.

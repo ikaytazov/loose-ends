@@ -22,11 +22,11 @@ truncate public.activity_log, public.date_requests, public.emails, public.tasks,
 -- Team (roles and emails from test-data/team.json)
 -- ---------------------------------------------------------------------------
 insert into public.team_members (name, email, role) values
-  ('Maya Chen', 'ikaytazov@gmail.com', 'lead'),
+  ('Maya Chen', 'abiralameddine+maya@gmail.com', 'lead'),
   ('Priya Shah', 'abiralameddine@gmail.com', 'member'),
-  ('Jordan Lee', 'tellyonu@gmail.com', 'member'),
-  ('Alex Romero', 'jerry.yeoh1270@gmail.com', 'member'),
-  ('Sam Okafor', 'htvaught@gmail.com', 'member');
+  ('Jordan Lee', 'abiralameddine+jordan@gmail.com', 'member'),
+  ('Alex Romero', 'abiralameddine+alex@gmail.com', 'member'),
+  ('Sam Okafor', 'abiralameddine+sam@gmail.com', 'member');
 
 -- ---------------------------------------------------------------------------
 -- Workstreams, one owner each. Target dates are days from today.

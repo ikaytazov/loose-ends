@@ -33,7 +33,7 @@ export function WorkstreamsScreen() {
 
   return (
     <>
-      <PageHead title="Every workstream, one owner each." subtitle="Open one to see its tasks, who is doing them, and the latest reply on each." />
+      <PageHead thread="short" title="Every workstream, one owner each." subtitle="Open one to see its tasks, who is doing them, and the latest reply on each." />
       {error && (
         <div className="space-y-4">
           <Notice tone="danger" title="Couldn’t load the workstreams">

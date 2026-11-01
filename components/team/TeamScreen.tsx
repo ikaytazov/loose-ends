@@ -98,7 +98,7 @@ export function TeamScreen() {
 
   return (
     <>
-      <PageHead eyebrow="Team" title="Who owns what." subtitle="Everyone with a task, and when each person last replied to a follow-up email." />
+      <PageHead thread="header" eyebrow="Team" title="Who owns what." subtitle="Everyone with a task, and when each person last replied to a follow-up email." />
 
       {teamError && <Notice tone="danger" title="Could not load the team">{teamError}</Notice>}
       {statsError && <Notice tone="danger" title="Could not load tasks and replies">{statsError}</Notice>}

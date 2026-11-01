@@ -80,7 +80,7 @@ export function OverviewScreen() {
   return (
     <>
       {/* The greeting depends on the viewer's clock, so it only appears once the page runs in the browser. */}
-      <PageHead
+      <PageHead thread="header"
         title={`${board ? greeting(new Date(now)) : "Welcome back"}${lead ? `, ${firstName(lead.name)}` : ""}.`}
         subtitle="Here is what moved, what is blocked and where you are needed."
       />

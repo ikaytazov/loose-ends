@@ -26,7 +26,7 @@ insert into public.team_members (name, email, role) values
   ('Priya Shah', 'ikaytazov@gmail.com', 'member'),
   ('Jordan Lee', 'tellyonu@gmail.com', 'member'),
   ('Alex Romero', 'jerry.yeoh1270@gmail.com', 'member'),
-  ('Sam Okafor', 'david.kigundu@gmail.com', 'member');
+  ('Sam Okafor', 'htvaught@gmail.com', 'member');
 
 -- ---------------------------------------------------------------------------
 -- Workstreams, one owner each. Target dates are days from today.

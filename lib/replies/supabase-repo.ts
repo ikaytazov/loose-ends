@@ -5,18 +5,28 @@ import { mailboxKey } from "@/lib/email/address";
 import { throwIf } from "@/lib/server/http";
 import type { MorningEmailRef, ReplyRepo } from "./repo";
 
+/**
+ * Who sent this, from the address alone (used when the reply has no code we know, e.g. an answer to an email
+ * sent before a demo reset). Exact address first; otherwise the members whose address reaches the same mailbox
+ * (Gmail ignores dots and +tags). If several share it, the one whose address IS the plain mailbox wins: in the
+ * demo every character uses one Gmail inbox and Priya keeps the plain address, so such replies are Priya's.
+ * Still several and none plain: we can't tell who it is, so null.
+ */
+export function matchMember(all: TeamMember[], email: string): TeamMember | null {
+  const exact = all.find((m) => m.email.toLowerCase() === email.toLowerCase());
+  if (exact) return exact;
+  const key = mailboxKey(email);
+  const same = all.filter((m) => mailboxKey(m.email) === key);
+  if (same.length === 1) return same[0];
+  return same.find((m) => m.email.toLowerCase() === key) ?? null;
+}
+
 export function supabaseReplyRepo(sb: SupabaseClient): ReplyRepo {
   return {
     async findMemberByEmail(email) {
-      // Exact address first; otherwise the one member whose address reaches the same mailbox
-      // (Gmail ignores dots and +tags). If several members share that mailbox, we can't tell who it is: null.
       const { data, error } = await sb.from("team_members").select("*");
       throwIf(error, "find member");
-      const all = (data ?? []) as TeamMember[];
-      const exact = all.find((m) => m.email.toLowerCase() === email.toLowerCase());
-      if (exact) return exact;
-      const same = all.filter((m) => mailboxKey(m.email) === mailboxKey(email));
-      return same.length === 1 ? same[0] : null;
+      return matchMember((data ?? []) as TeamMember[], email);
     },
     async findLead() {
       const { data, error } = await sb.from("team_members").select("*").eq("role", "lead").order("created_at").limit(1).maybeSingle();

@@ -42,7 +42,7 @@ export function WorkstreamsScreen() {
           <Button onClick={() => setRetry((r) => r + 1)}>Retry</Button>
         </div>
       )}
-      {!board && !error && <div className="h-56 animate-pulse rounded-[14px] border border-line bg-paper" />}
+      {!board && !error && <div className="h-56 animate-pulse rounded-card border border-line bg-paper" />}
       {board && board.streams.length === 0 && (
         <Card className="p-6">
           <p className="font-semibold">No workstreams yet.</p>

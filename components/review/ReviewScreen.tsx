@@ -8,7 +8,7 @@ import { errorText, postJson } from "@/components/api";
 import { formatDay } from "@/components/format";
 import { findDuplicate, highlight, type Tracked } from "@/components/review/logic";
 import { useTeam } from "@/components/use-team";
-import { Button, Card, Eyebrow, Field, inputClass, Notice, PageHead, Pill } from "@/components/ui";
+import { Button, Card, Eyebrow, Field, inputClass, Notice, PageHead, Pill, Quote } from "@/components/ui";
 import type { ApproveMeetingResponse } from "@/lib/contracts/api";
 import type { Meeting, Priority, Task, TaskFlag, Workstream } from "@/lib/contracts/domain";
 import { browserSupabase } from "@/lib/supabase/browser";
@@ -255,11 +255,11 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
               </Button>
             )}
             {counts.noOwner > 0 && (
-              <Link href="/decisions" className="inline-flex min-h-11 items-center rounded-[10px] border border-line bg-paper px-4 font-semibold">
+              <Link href="/decisions" className="inline-flex min-h-11 items-center rounded-control border border-line bg-paper px-4 font-semibold">
                 Open Decisions
               </Link>
             )}
-            <Link href="/capture" className="inline-flex min-h-11 items-center rounded-[10px] px-4 font-semibold text-forest-2 underline">
+            <Link href="/capture" className="inline-flex min-h-11 items-center rounded-control px-4 font-semibold text-forest-2 underline">
               Capture another meeting
             </Link>
           </div>
@@ -308,7 +308,7 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
           <div className="grid gap-8 min-[1080px]:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <Card className="h-fit p-6 min-[1080px]:sticky min-[1080px]:top-24">
               <Eyebrow>From your notes</Eyebrow>
-              <div className="mt-3 max-h-[70vh] overflow-auto whitespace-pre-wrap rounded-[10px] bg-canvas p-4 text-[15px] leading-relaxed">
+              <div className="mt-3 max-h-[70vh] overflow-auto whitespace-pre-wrap rounded-control bg-canvas p-4 text-[15px] leading-relaxed">
                 {segments.map((s, i) =>
                   s.proposalId ? (
                     <mark
@@ -372,7 +372,7 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
         </div>
       )}
 
-      <dialog ref={dialog} aria-labelledby="approve-title" className="w-[min(92vw,480px)] rounded-[14px] border border-line bg-paper p-6 text-ink backdrop:bg-ink/40">
+      <dialog ref={dialog} aria-labelledby="approve-title" className="w-[min(92vw,480px)] rounded-card border border-line bg-paper p-6 text-ink backdrop:bg-ink/40">
         <h2 id="approve-title" className="font-serif text-[24px]">
           Approve {kept.length} {kept.length === 1 ? "task" : "tasks"}?
         </h2>
@@ -478,10 +478,7 @@ function ProposalCard({
         </div>
 
         {row.source_sentence && (
-          <blockquote className="rounded-[10px] border-l-[3px] border-lime bg-canvas px-4 py-3">
-            <p className="text-[12.5px] font-semibold uppercase tracking-[0.07em] text-muted">From your notes · exact words</p>
-            <p className="mt-1 text-[15px]">&ldquo;{row.source_sentence}&rdquo;</p>
-          </blockquote>
+          <Quote label="From your notes · exact words">{row.source_sentence}</Quote>
         )}
 
         <div className="flex justify-end">

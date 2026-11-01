@@ -18,8 +18,10 @@ Only **Maya's screen** and **Priya's phone** appear on camera. Screen-record the
 
 ## Before every take (5 minutes)
 
-1. **Reset the data.** Paste `supabase/seed.sql` into the Supabase SQL editor and press Run. This also clears old
-   emails, so **reply only to the newest morning email**. Older ones no longer match anything.
+1. **Reset the data.** Open `<live app>/demo`, enter the team password (the `BRIDGE_SECRET`, ask Iliyan) and press
+   **Reset demo data**. It loads the same data as `supabase/seed.sql`, which still works in the Supabase SQL editor
+   as a fallback. This also clears old emails, so **reply only to the newest morning email**. Older ones no longer
+   match anything.
 2. **Check the starting overview.** The four workstreams should read: Product launch *On track*,
    Fundraising *Decision needed*, Operations *Blocked*, Customer onboarding *Update needed*.
    Priya should have **no open tasks**.

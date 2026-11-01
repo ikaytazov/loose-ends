@@ -1,6 +1,6 @@
 [
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {
@@ -43,7 +43,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "tellyonu@gmail.com",
+    "from": "abiralameddine+jordan@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {
@@ -73,7 +73,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "jerry.yeoh1270@gmail.com",
+    "from": "abiralameddine+alex@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {
@@ -109,7 +109,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "abiralameddine+maya@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {
@@ -132,7 +132,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "tellyonu@gmail.com",
+    "from": "abiralameddine+jordan@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -168,7 +168,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -198,7 +198,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "jerry.yeoh1270@gmail.com",
+    "from": "abiralameddine+alex@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -228,7 +228,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "abiralameddine+maya@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -244,7 +244,7 @@
     "should_be_unsure": true
   },
   {
-    "from": "tellyonu@gmail.com",
+    "from": "abiralameddine+jordan@gmail.com",
     "received_date": "2026-11-05",
     "email_tasks": [
       {
@@ -280,7 +280,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-05",
     "email_tasks": [
       {
@@ -296,7 +296,7 @@
     "should_be_unsure": true
   },
   {
-    "from": "jerry.yeoh1270@gmail.com",
+    "from": "abiralameddine+alex@gmail.com",
     "received_date": "2026-11-05",
     "email_tasks": [
       {
@@ -319,7 +319,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "abiralameddine+maya@gmail.com",
     "received_date": "2026-11-05",
     "email_tasks": [
       {
@@ -335,7 +335,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "tellyonu@gmail.com",
+    "from": "abiralameddine+jordan@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -358,7 +358,7 @@
     "should_be_unsure": true
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-06",
     "email_tasks": [
       {
@@ -381,7 +381,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "abiralameddine+maya@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -407,7 +407,7 @@
     "_case": "Unknown sender (not on the team list). Should be ignored and logged, never applied to anyone's tasks."
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -431,7 +431,7 @@
     "_case": "'it's done' with two open tasks and no number or name. Must ask which one, not guess (the retro problem in transcripts/06.md)."
   },
   {
-    "from": "tellyonu@gmail.com",
+    "from": "abiralameddine+jordan@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -455,7 +455,7 @@
     "_case": "Vague progress with two tasks: unclear which one, and no real status change."
   },
   {
-    "from": "jerry.yeoh1270@gmail.com",
+    "from": "abiralameddine+alex@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {

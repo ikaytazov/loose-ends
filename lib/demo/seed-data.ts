@@ -3,11 +3,11 @@
 // Dates are relative to the day of the reset (days from today), like seed.sql.
 
 export const MEMBERS = [
-  { name: "Maya Chen", email: "abiralameddine@gmail.com", role: "lead" as const },
-  { name: "Priya Shah", email: "ikaytazov@gmail.com", role: "member" as const },
-  { name: "Jordan Lee", email: "tellyonu@gmail.com", role: "member" as const },
-  { name: "Alex Romero", email: "jerry.yeoh1270@gmail.com", role: "member" as const },
-  { name: "Sam Okafor", email: "htvaught@gmail.com", role: "member" as const }
+  { name: "Maya Chen", email: "abiralameddine+maya@gmail.com", role: "lead" as const },
+  { name: "Priya Shah", email: "abiralameddine@gmail.com", role: "member" as const },
+  { name: "Jordan Lee", email: "abiralameddine+jordan@gmail.com", role: "member" as const },
+  { name: "Alex Romero", email: "abiralameddine+alex@gmail.com", role: "member" as const },
+  { name: "Sam Okafor", email: "abiralameddine+sam@gmail.com", role: "member" as const }
 ];
 
 export const WORKSTREAMS = [

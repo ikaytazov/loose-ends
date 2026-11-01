@@ -287,12 +287,12 @@ export function DecisionsScreen() {
                 <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
                   <div className="rounded-control bg-canvas p-3">
                     <p className="text-[12.5px] text-muted">Before</p>
-                    <p className="font-semibold">{latest.before ? formatDay(latest.before) : "No date"}</p>
+                    <p className="font-semibold">{receiptValue(latest, latest.before)}</p>
                   </div>
                   <span aria-hidden className="text-muted">→</span>
                   <div className="rounded-control bg-lime-wash p-3">
                     <p className="text-[12.5px] text-muted">After</p>
-                    <p className="font-semibold">{latest.after ? formatDay(latest.after) : "No date"}</p>
+                    <p className="font-semibold">{receiptValue(latest, latest.after)}</p>
                   </div>
                 </div>
                 <p className="text-muted">
@@ -314,6 +314,12 @@ export function DecisionsScreen() {
       </div>
     </>
   );
+}
+
+// Due dates are ISO days and show as "Mon 9 Nov". Owner changes carry a name or "No owner" and show as typed.
+function receiptValue(r: Receipt, value: string | null) {
+  if (r.field === "Owner") return value || "No owner";
+  return value ? formatDay(value) : "No date";
 }
 
 function receiptFromResolved(r: ResolvedRow, names: Record<string, string>): Receipt {

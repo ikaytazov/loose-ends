@@ -1,7 +1,7 @@
 {
   "members": [
-    { "name": "Maya Chen", "email": "abiralameddine@gmail.com", "role": "lead" },
-    { "name": "Priya Shah", "email": "ikaytazov@gmail.com", "role": "member" },
+    { "name": "Maya Chen", "email": "ikaytazov@gmail.com", "role": "lead" },
+    { "name": "Priya Shah", "email": "abiralameddine@gmail.com", "role": "member" },
     { "name": "Jordan Lee", "email": "tellyonu@gmail.com", "role": "member" },
     { "name": "Alex Romero", "email": "jerry.yeoh1270@gmail.com", "role": "member" },
     { "name": "Sam Okafor", "email": "htvaught@gmail.com", "role": "member" }

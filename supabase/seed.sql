@@ -22,8 +22,8 @@ truncate public.activity_log, public.date_requests, public.emails, public.tasks,
 -- Team (roles and emails from test-data/team.json)
 -- ---------------------------------------------------------------------------
 insert into public.team_members (name, email, role) values
-  ('Maya Chen', 'abiralameddine@gmail.com', 'lead'),
-  ('Priya Shah', 'ikaytazov@gmail.com', 'member'),
+  ('Maya Chen', 'ikaytazov@gmail.com', 'lead'),
+  ('Priya Shah', 'abiralameddine@gmail.com', 'member'),
   ('Jordan Lee', 'tellyonu@gmail.com', 'member'),
   ('Alex Romero', 'jerry.yeoh1270@gmail.com', 'member'),
   ('Sam Okafor', 'htvaught@gmail.com', 'member');

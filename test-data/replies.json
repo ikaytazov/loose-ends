@@ -1,6 +1,6 @@
 [
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {
@@ -109,7 +109,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "ikaytazov@gmail.com",
     "received_date": "2026-11-03",
     "email_tasks": [
       {
@@ -168,7 +168,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -228,7 +228,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "ikaytazov@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -280,7 +280,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-05",
     "email_tasks": [
       {
@@ -319,7 +319,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "ikaytazov@gmail.com",
     "received_date": "2026-11-05",
     "email_tasks": [
       {
@@ -358,7 +358,7 @@
     "should_be_unsure": true
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-06",
     "email_tasks": [
       {
@@ -381,7 +381,7 @@
     "should_be_unsure": false
   },
   {
-    "from": "abiralameddine@gmail.com",
+    "from": "ikaytazov@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {
@@ -407,7 +407,7 @@
     "_case": "Unknown sender (not on the team list). Should be ignored and logged, never applied to anyone's tasks."
   },
   {
-    "from": "ikaytazov@gmail.com",
+    "from": "abiralameddine@gmail.com",
     "received_date": "2026-11-04",
     "email_tasks": [
       {

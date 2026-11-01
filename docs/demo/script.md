@@ -7,8 +7,8 @@ Aim for **about 3½ minutes**. Everything the demo types or pastes already exist
 
 | Character | Role in the story | Email (from `test-data/team.json`) | Who holds the inbox on recording day |
 |---|---|---|---|
-| **Maya Chen** | Founder, team lead. Pastes notes, approves dates | abiralameddine@gmail.com | Abir (drives the app on screen) |
-| **Priya Shah** | Owns Product launch. Gets the morning email, replies from her phone | ikaytazov@gmail.com | Iliyan (his phone is "Priya's phone") |
+| **Maya Chen** | Founder, team lead. Pastes notes, approves dates | ikaytazov@gmail.com | Abir (drives the app on screen) |
+| **Priya Shah** | Owns Product launch. Gets the morning email and replies | abiralameddine@gmail.com | Abir too: she replies from her own Gmail in a browser tab |
 | Jordan Lee | Owns Customer onboarding | tellyonu@gmail.com | Valerie (not on camera) |
 | Alex Romero | Owns Operations | jerry.yeoh1270@gmail.com | Jerry (not on camera) |
 | Sam Okafor | Team member | htvaught@gmail.com | H.T. (not on camera) |

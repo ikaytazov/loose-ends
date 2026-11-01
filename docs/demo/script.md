@@ -98,19 +98,22 @@ screen before moving on). Times are a guide for the edit.
 | Reply doesn't show after 2 minutes | Check the reply kept "open tasks" in its subject and went to the newest email. Look in the team Gmail: if the email is still unread, the bridge didn't pick it up. Re-run its `setup` once. |
 | The date request goes to the wrong person, or the date moves without approval | Stop and re-seed. Report it in the group chat: it breaks the core promise. |
 | Review shows a task as **Already tracked** and leaves it out | The board already has that task. Re-run `seed.sql`; the seed doesn't contain any of the Monday tasks. |
-| Notes reader returns 8 *different* tasks (venue, investor update, …) | The real notes reader (#10) isn't live yet, so this is the stub. Its investor update clashes with a seeded task. Record anyway, or wait for #10. |
+| Notes reader returns fewer or different tasks than 8 | Check the meeting date reads 2026-11-02 and the whole of `transcripts/01.md` was pasted. Retake; the AI can vary slightly between runs. |
 | Anything else | Re-seed and retake. A take costs about 4 minutes. |
 
-## Gaps to close by Sunday midday (control point 3)
+## Status before Sunday midday (control point 3)
 
-1. ~~"Send morning emails now" button~~ **Fixed:** it's in the top bar of every screen, with a confirm step.
-   Scene 3: press it, then **Send**.
-2. **Real notes reader (#10, Iliyan).** Scene 2 needs it, so the tasks match transcript 01 and Priya gets exactly 3.
-3. ~~Confirmation to Priya after approval~~ **Fixed:** approving or declining now emails the person who asked
-   ("Maya approved your new date: … is now due Wed 11 Nov"). Scene 6: flash it on Priya's phone.
-4. **Follow-through view (#17).** Unassigned. Scene 7 falls back to the Team screen.
-5. **Screens merged and live.** Merge #23 → #24 → #25 → #26, plus Jerry's Overview and Workstream pages, then do one
-   full dry run with this script. That dry run is also the end-to-end test (#13).
+Everything the script needs is merged:
+- **Send morning emails now** button in the top bar (scene 3).
+- **Real notes reader** (#10), so scene 2 shows the 8 tasks from transcript 01.
+- **Overview, Workstreams and the task panel** (#2, #3), so scenes 1, 5 and 6 have their screens.
+- **Confirmation to Priya** after Maya decides (scene 6), and **a notice to Maya** when Priya asks for more time
+  (#16): optionally flash Maya's inbox in scene 5, subject "Decision needed: Priya asked for more time".
+
+Still to do:
+1. **Load `supabase/seed.sql` into the live database** (Iliyan), then one **full dry run** with this script on the
+   live app. That dry run is also the end-to-end test (#13).
+2. **Follow-through view (#17)** is optional and unassigned. Scene 7 falls back to the Team screen.
 
 ## Video plan (Sunday afternoon)
 

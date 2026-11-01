@@ -1,7 +1,7 @@
 // Request and response shapes for every route in app/api. Documented in docs/api.md.
 // Screens call these routes for every change; they never write to Supabase directly.
 import { z } from "zod";
-import type { DateRequest, Priority, Task, TaskStatus } from "./domain";
+import type { DateRequest, Priority, Task, TaskStatus, TeamMember } from "./domain";
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
 
@@ -45,6 +45,20 @@ export const AssignOwnerRequest = z.object({
 });
 export interface AssignOwnerResponse {
   task: Task;
+}
+
+// POST /api/team-members  — add a teammate (Team page, Review "Add Sarah"). Never sends an email.
+export const AddMemberRequest = z.object({
+  name: z.string().trim().min(1).max(80),
+  email: z.string().trim().toLowerCase().email(),
+  role: z.enum(["member"]).default("member"),
+  assign_task_ids: z.array(z.string().uuid()).max(50).default([]),
+  added_by: z.string().uuid().nullable().default(null),
+});
+export interface AddMemberResponse {
+  member: TeamMember;
+  assigned: number;
+  existing: boolean;
 }
 
 // POST /api/date-requests/[id]/decide  — approve or decline a new due date

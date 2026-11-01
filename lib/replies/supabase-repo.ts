@@ -1,15 +1,22 @@
 // ReplyRepo backed by Supabase (service-role client).
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Task, TeamMember, Workstream } from "@/lib/contracts/domain";
+import { mailboxKey } from "@/lib/email/address";
 import { throwIf } from "@/lib/server/http";
 import type { MorningEmailRef, ReplyRepo } from "./repo";
 
 export function supabaseReplyRepo(sb: SupabaseClient): ReplyRepo {
   return {
     async findMemberByEmail(email) {
-      const { data, error } = await sb.from("team_members").select("*").ilike("email", email).maybeSingle();
+      // Exact address first; otherwise the one member whose address reaches the same mailbox
+      // (Gmail ignores dots and +tags). If several members share that mailbox, we can't tell who it is: null.
+      const { data, error } = await sb.from("team_members").select("*");
       throwIf(error, "find member");
-      return data as TeamMember | null;
+      const all = (data ?? []) as TeamMember[];
+      const exact = all.find((m) => m.email.toLowerCase() === email.toLowerCase());
+      if (exact) return exact;
+      const same = all.filter((m) => mailboxKey(m.email) === mailboxKey(email));
+      return same.length === 1 ? same[0] : null;
     },
     async findLead() {
       const { data, error } = await sb.from("team_members").select("*").eq("role", "lead").order("created_at").limit(1).maybeSingle();

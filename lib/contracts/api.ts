@@ -1,7 +1,7 @@
 // Request and response shapes for every route in app/api. Documented in docs/api.md.
 // Screens call these routes for every change; they never write to Supabase directly.
 import { z } from "zod";
-import type { DateRequest, Task } from "./domain";
+import type { DateRequest, Priority, Task, TaskStatus } from "./domain";
 
 const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
 
@@ -82,6 +82,16 @@ export interface InboundResponse {
   applied: { task_id: string; field: string; new_value: string | null }[];
   question: string | null;
 }
+
+// GET and POST /api/reply/[code]  — the "reply here" page linked from the morning email
+export interface ReplyPageData {
+  name: string;
+  tasks: { n: number; title: string; priority: Priority; status: TaskStatus; due_date: string | null }[];
+}
+export const ReplyPageRequest = z.object({
+  text: z.string().trim().min(1).max(5000),
+});
+export type ReplyPageResponse = InboundResponse;
 
 /** Every route returns this shape on failure, with an HTTP 4xx/5xx status. */
 export interface ApiError {

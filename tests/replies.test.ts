@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import type { DateRequest, Task, TeamMember, Workstream } from "@/lib/contracts/domain";
 import { ReplyParse } from "@/lib/contracts/ai";
 import { handleInbound } from "@/lib/replies/handle";
+import { loadReplyPage, submitReplyPage } from "@/lib/replies/page";
 import type { ReplyParser } from "@/lib/replies/parse";
 import { buildUserMessage, calendar, readStructured } from "@/lib/replies/parse";
 import type { NewActivity, ReplyRepo } from "@/lib/replies/repo";
@@ -257,6 +258,39 @@ test("a failed follow-up send does not undo the update", async () => {
   const res = await handleInbound(w.repo, fakeAI(demoParse), priyaReply, { today: "2026-11-03", notify: async () => { throw new Error("Gmail down"); } });
   assert.equal(res.status, "applied");
   assert.equal(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
+});
+
+test("the reply page lists the morning email's tasks in order", async () => {
+  const w = makeWorld();
+  const page = await loadReplyPage(w.repo, "abc123");
+  assert.equal(page?.name, "Priya");
+  assert.deepEqual(page?.tasks.map((t) => [t.n, t.title]), [[1, "Launch the new pricing page"], [2, "Finish the partner deck"], [3, "Draft FAQ for support"]]);
+  assert.equal(await loadReplyPage(w.repo, "nope"), null);
+});
+
+test("'1 is done' on the reply page updates the board like an email, logged as reply_page", async () => {
+  const w = makeWorld();
+  const parse = fakeAI({ changes: [{ task_number: 1, new_status: "done", blocker: null, requested_due_date: null, reason: null, quote: "1 is done", confidence: "sure" }], question: null });
+  const res = await submitReplyPage(w.repo, parse, "abc123", "1 is done", { today: "2026-11-03" });
+  assert.equal(res?.status, "applied");
+  assert.equal(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
+  assert.ok(w.log.length > 0 && w.log.every((l) => l.source === "reply_page"));
+});
+
+test("a date asked for on the reply page still waits for approval", async () => {
+  const w = makeWorld();
+  const res = await submitReplyPage(w.repo, fakeAI(demoParse), "abc123", "whatever", { today: "2026-11-03" });
+  assert.equal(res?.status, "applied");
+  assert.equal(w.tasks.find((t) => t.id === "t-deck")!.due_date, "2026-11-05");
+  assert.equal(w.dateRequests.length, 1);
+});
+
+test("two identical updates on the reply page are both handled, and an unknown code changes nothing", async () => {
+  const w = makeWorld();
+  const parse = fakeAI({ changes: [], question: null });
+  assert.equal((await submitReplyPage(w.repo, parse, "abc123", "1 is done", { today: "2026-11-03" }))?.status, "applied");
+  assert.equal((await submitReplyPage(w.repo, parse, "abc123", "1 is done", { today: "2026-11-03" }))?.status, "applied");
+  assert.equal(await submitReplyPage(w.repo, parse, "nope", "1 is done", { today: "2026-11-03" }), null);
 });
 
 test("follow-up wording helpers", () => {

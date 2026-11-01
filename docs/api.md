@@ -11,6 +11,7 @@ Types for every request and response: `lib/contracts/api.ts`. Every error comes 
 | `POST /api/date-requests/[id]/decide` | Approve or decline a new date | Real |
 | `POST /api/emails/send-morning` | "Send morning emails now" (also `GET` for the 8 am job) | Real |
 | `POST /api/inbound` | Gmail bridge delivers a reply | Real (not for screens) |
+| `GET`, `POST /api/reply/[code]` | The "reply here" page: load the tasks of one morning email, send a plain-language update | Real |
 | `GET /api/health` | Shows missing settings, database status and whether the Gmail bridge answers (`gmail_bridge: "ok"`) | Real |
 | `POST /api/dev/test-email` | Sends one test email through the Gmail bridge to a team member (header `x-bridge-secret`) | Real (not for screens) |
 | `GET /api/dev/score-notes?n=01` | Scores the notes reader against a test transcript's answer key (header `x-score-key`) | Real (not for screens) |
@@ -77,6 +78,22 @@ Header `x-bridge-secret: <BRIDGE_SECRET>`.
   { "task_id": "uuid", "field": "date_request", "new_value": "2026-11-11" } ], "question": null }
 ```
 `status` can also be `duplicate`, `unknown_sender`, `no_tasks` or `error`.
+
+### GET /api/reply/[code]
+`code` is the morning email's `reply_code`; the link in the email is the only way in (no login). 404 if the code is unknown.
+```json
+// response
+{ "name": "Priya", "tasks": [ { "n": 1, "title": "Launch the new pricing page", "priority": "high", "status": "in_progress", "due_date": "2026-11-05" } ] }
+```
+
+### POST /api/reply/[code]
+Runs the same reply handling as an email (`handleInbound`), logged with `source = reply_page`. Sends no follow-up email: the page shows the result. Due dates still become date requests.
+```json
+// request
+{ "text": "1 is done" }
+// response: same as /api/inbound
+{ "ok": true, "status": "applied", "applied": [ { "task_id": "uuid", "field": "status", "new_value": "done" } ], "question": null }
+```
 
 ---
 

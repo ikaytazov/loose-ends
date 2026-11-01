@@ -7,7 +7,7 @@
 //   6. Tell each approver about new date requests (issue #16, lib/email/approver-notice.ts).
 import type { InboundEmail, InboundResponse } from "@/lib/contracts/api";
 import type { ReplyChange } from "@/lib/contracts/ai";
-import type { Task, TeamMember } from "@/lib/contracts/domain";
+import type { ActivitySource, Task, TeamMember } from "@/lib/contracts/domain";
 import { bareAddress, findReplyCode, stripQuoted } from "@/lib/email/address";
 import type { ApproverNotice, ApproverNotifier } from "@/lib/email/approver-notice";
 import { orderForEmail } from "@/lib/email/ordering";
@@ -20,7 +20,7 @@ export async function handleInbound(
   repo: ReplyRepo,
   parse: ReplyParser,
   email: InboundEmail,
-  opts: { today: string; notify?: Notifier; notifyApprover?: ApproverNotifier },
+  opts: { today: string; notify?: Notifier; notifyApprover?: ApproverNotifier; source?: ActivitySource },
 ): Promise<InboundResponse> {
   const empty = { applied: [], question: null };
   const fromAddr = bareAddress(email.from);
@@ -76,7 +76,7 @@ export async function handleInbound(
     const items: FollowUpItem[] = [];
     const logs: NewActivity[] = [];
     const notices = new Map<string, ApproverNotice>(); // one email per approver
-    const base = { actor_id: member.id, source: "email" as const, email_id: emailId };
+    const base = { actor_id: member.id, source: opts.source ?? "email", email_id: emailId };
 
     for (const change of parsed.changes) {
       const entry = numbered.find((x) => x.n === change.task_number);

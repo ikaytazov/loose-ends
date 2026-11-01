@@ -133,18 +133,34 @@ Still to do:
    live app. That dry run is also the end-to-end test (#13).
 2. **Follow-through view (#17)** is optional and unassigned. Scene 7 falls back to the Team screen.
 
-## Video plan (Sunday afternoon)
+## Video plan
 
-- **Record with Loom** on a Zoom call (H.T.'s setup). Abir shares the laptop screen as Maya; Iliyan joins and shares
-  his phone screen, or films it, for scenes 3, 4 and 7, so the phone appears live. Loom's free plan allows 5
-  minutes, which covers a 3½-minute video.
-- **Pause Loom** after Priya's reply is sent (scene 4) and resume once the board has updated, so the video doesn't
-  show a minute of waiting. Add a small "1 minute later" caption to stay honest.
-- **Before recording:** reset with `supabase/seed.sql`, send one test morning email to Priya's address and check
-  it arrives, then do one full dry run with a timer.
-- **Length:** about 3½ minutes, no longer than 4.
-- **Fallback:** QuickTime or OBS for the laptop screen plus the phone's own screen recorder, with the voice-over
-  recorded afterwards.
+**One continuous Loom take. No stitching.** Loom's desktop app can pause and resume inside a single video, so the
+whole demo is one recording with one link. Loom's free plan allows 5 minutes, which covers a 3½-minute video. The
+Loom mobile app isn't needed.
+
+**Getting Priya's phone into the same take.** Pick one of these before the dry run:
+
+1. **Zoom screen share (simplest for a group).** Everyone joins one Zoom call. Iliyan shares his iPhone screen from
+   the Zoom app (Share → Screen). Abir drives the app as Maya. Whoever records (H.T.) captures their *whole screen*
+   with Loom and switches between the browser (the app) and the Zoom window (the phone) at scenes 3, 4 and 7.
+2. **Iliyan records it himself.** Priya's inbox is his, so he records on his own laptop: the app in one browser
+   window and his Gmail (or his iPhone mirrored to his Mac) in another. One person, no handovers.
+3. **iPhone mirroring on a Mac.** Mirror the phone into a window (QuickTime with a cable: File → New Movie
+   Recording → pick the iPhone as the camera; or macOS iPhone Mirroring), then record the whole screen with Loom.
+
+**During the take**
+- **Pause Loom** right after Priya's reply is sent (scene 4). Resume once the board has updated, about a minute
+  later, so the video doesn't show the wait. Add a small "1 minute later" caption if you edit.
+- Keep the phone's notifications off, and have Priya's newest "open tasks" email ready to open.
+
+**Before recording:** reset the demo data (step 1 of "Before every take"), send one test morning email to Priya's
+address and check it arrives, reset again, then do one full dry run with a timer.
+
+**Length:** about 3½ minutes, no longer than 4.
+
+**Fallback if Loom fights back:** QuickTime or OBS for the laptop screen plus the phone's own screen recorder, with
+the voice-over recorded afterwards, then joined in any video editor.
 
 ## Deck outline (Sunday afternoon, 6–8 slides)
 

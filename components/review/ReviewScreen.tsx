@@ -7,6 +7,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { errorText, postJson } from "@/components/api";
 import { formatDay } from "@/components/format";
 import { findDuplicate, highlight, type Tracked } from "@/components/review/logic";
+import { AddMemberForm } from "@/components/team/AddMemberForm";
+import { sameName, type AddMemberResponse } from "@/components/team/add-member";
 import { useTeam } from "@/components/use-team";
 import { Button, Card, Eyebrow, Field, inputClass, Notice, PageHead, Pill, Quote } from "@/components/ui";
 import type { ApproveMeetingResponse } from "@/lib/contracts/api";
@@ -23,11 +25,16 @@ type Row = {
   source_sentence: string | null;
   flags: TaskFlag[];
   keep: boolean;
+  // A name from the notes for someone who is not on the team yet. Set by the notes reader (Part A).
+  suggested_owner_name: string | null;
   // Why this proposal looks like something already on the board, or repeats an earlier meeting in the same upload.
   duplicateLabel: string | null;
 };
 
 type Saved = Pick<Row, "id" | "title" | "owner_id" | "workstream_id" | "due_date" | "priority" | "keep">;
+
+// Task gains suggested_owner_name in Part A (migration). Until then the field is simply absent.
+type ProposalTask = Task & { suggested_owner_name?: string | null };
 
 const PRIORITY_LABEL: Record<Priority, string> = { high: "High", medium: "Medium", low: "Low" };
 
@@ -48,7 +55,11 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
   const router = useRouter();
   // The rest of the upload, oldest first. A string key keeps the loader from re-running on every render.
   const queueKey = queue.join(",");
-  const { team, error: teamError } = useTeam();
+  const { team, error: teamError, lead, reload: reloadTeam } = useTeam();
+  const [addingName, setAddingName] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  // The button that opened the add form gets focus back when the form closes.
+  const addOpenerRef = useRef<HTMLElement | null>(null);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [streams, setStreams] = useState<Workstream[]>([]);
   const [rows, setRows] = useState<Row[]>([]);
@@ -104,6 +115,7 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
             source_sentence: p.source_sentence,
             flags: p.flags ?? [],
             keep: duplicateLabel === null,
+            suggested_owner_name: (p as ProposalTask).suggested_owner_name ?? null,
             duplicateLabel,
           };
         });
@@ -157,6 +169,56 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
 
   function update(id: string, patch: Partial<Row>) {
     setRows((list) => list.map((r) => (r.id === id ? { ...r, ...patch } : r)));
+  }
+
+  // Names from the notes that are not on the team yet, with the kept tasks that name them.
+  const newPeople = useMemo(() => {
+    const groups = new Map<string, Row[]>();
+    for (const r of rows) {
+      const name = r.keep ? r.suggested_owner_name?.trim() : null;
+      if (name && !r.owner_id && !(team ?? []).some((m) => sameName(m.name, name))) {
+        groups.set(name, [...(groups.get(name) ?? []), r]);
+      }
+    }
+    return [...groups.entries()].map(([name, tasks]) => ({ name, tasks }));
+  }, [rows, team]);
+
+  function openAdd(name: string, opener: HTMLElement) {
+    addOpenerRef.current = opener;
+    setToast(null);
+    setAddingName(name);
+  }
+
+  function closeAdd() {
+    setAddingName(null);
+    const opener = addOpenerRef.current;
+    setTimeout(() => opener?.focus(), 0); // the opener is rendered again after the form closes
+  }
+
+  // After a successful add: give the tasks to the new person (when the form asked for that) and refresh the team list.
+  function handleAdded(taskIds: string[], res: AddMemberResponse) {
+    if (res.assigned > 0) {
+      setRows((list) =>
+        list.map((r) =>
+          taskIds.includes(r.id)
+            ? {
+                ...r,
+                owner_id: res.member.id,
+                suggested_owner_name: null,
+                flags: r.flags.filter((f) => f !== "no_owner" && (f as string) !== "new_person"),
+              }
+            : r,
+        ),
+      );
+    }
+    reloadTeam();
+    setAddingName(null);
+    const taskWord = res.assigned === 1 ? "task" : "tasks";
+    setToast(
+      res.existing
+        ? `${res.member.name} was already on the team (${res.member.email}). ${res.assigned > 0 ? `${res.assigned} ${taskWord} assigned.` : ""}`.trim()
+        : `${res.member.name} added to the team. ${res.assigned > 0 ? `${res.assigned} ${taskWord} assigned.` : ""}`.trim(),
+    );
   }
 
   function focusRow(id: string) {
@@ -305,6 +367,41 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
 
           {teamError && <Notice tone="danger" title="Could not load the team">{teamError}</Notice>}
 
+          {toast && (
+            <div className="mb-6">
+              <Notice tone="ok" title={toast} />
+            </div>
+          )}
+
+          {newPeople.length > 0 && (
+            <Card className="mb-6 p-5">
+              <Eyebrow>New people in these notes</Eyebrow>
+              <ul className="mt-3 divide-y divide-line-2">
+                {newPeople.map((g) => (
+                  <li key={g.name} className="py-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-semibold">
+                        {g.name} · {g.tasks.length} {g.tasks.length === 1 ? "task" : "tasks"}
+                      </span>
+                      <Button onClick={(e) => openAdd(g.name, e.currentTarget)}>Add {g.name} to the team</Button>
+                    </div>
+                    {addingName === g.name && (
+                      <div className="mt-4">
+                        <AddMemberForm
+                          initialName={g.name}
+                          taskIds={g.tasks.map((t) => t.id)}
+                          addedBy={lead?.id ?? null}
+                          onAdded={(res) => handleAdded(g.tasks.map((t) => t.id), res)}
+                          onCancel={closeAdd}
+                        />
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+
           <div className="grid gap-8 min-[1080px]:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
             <Card className="h-fit p-6 min-[1080px]:sticky min-[1080px]:top-24">
               <Eyebrow>From your notes</Eyebrow>
@@ -343,6 +440,7 @@ export function ReviewScreen({ meetingId, queue }: { meetingId: string; queue: s
                   streams={streams}
                   showErrors={showErrors}
                   onChange={(patch) => update(row.id, patch)}
+                  onAddPerson={openAdd}
                 />
               ))}
             </div>
@@ -400,6 +498,7 @@ function ProposalCard({
   streams,
   showErrors,
   onChange,
+  onAddPerson,
 }: {
   index: number;
   row: Row;
@@ -407,10 +506,13 @@ function ProposalCard({
   streams: Workstream[];
   showErrors: boolean;
   onChange: (patch: Partial<Row>) => void;
+  onAddPerson: (name: string, opener: HTMLElement) => void;
 }) {
   const noOwner = row.flags.includes("no_owner") || !row.owner_id;
   const noDate = row.flags.includes("no_date") || !row.due_date;
   const blankTitle = row.keep && !row.title.trim();
+  const suggested = row.suggested_owner_name?.trim() || null;
+  const suggestedOnTeam = suggested ? team.find((m) => sameName(m.name, suggested)) : undefined;
 
   return (
     <Card className={`p-5 ${row.keep ? "" : "opacity-70"}`}>
@@ -429,6 +531,7 @@ function ProposalCard({
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Owner">
             <select
+              id={`owner-${row.id}`}
               className={`${inputClass} ${noOwner ? "border-warn-line bg-warn-bg" : ""}`}
               value={row.owner_id ?? ""}
               onChange={(e) => onChange({ owner_id: e.target.value || null })}
@@ -441,7 +544,29 @@ function ProposalCard({
                 </option>
               ))}
             </select>
-            {noOwner && <span className="mt-1 block text-[13.5px] font-semibold text-warn">No owner named in the notes</span>}
+            {suggested && !row.owner_id && row.keep && (
+              <span className="mt-2 block rounded-control border border-warn-line bg-warn-bg p-3 text-[14.5px] text-ink">
+                {suggestedOnTeam ? (
+                  <>
+                    <span className="block font-semibold">{suggestedOnTeam.name} is on your team now.</span>
+                    <Button className="mt-2" onClick={() => onChange({ owner_id: suggestedOnTeam.id, suggested_owner_name: null })}>
+                      Assign {suggestedOnTeam.name}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <span className="block font-semibold">{suggested} isn&apos;t on your team yet.</span>
+                    <span className="mt-2 flex flex-wrap gap-2">
+                      <Button onClick={(e) => onAddPerson(suggested, e.currentTarget)}>Add {suggested}</Button>
+                      <Button variant="ghost" onClick={() => document.getElementById(`owner-${row.id}`)?.focus()}>
+                        Choose someone else
+                      </Button>
+                    </span>
+                  </>
+                )}
+              </span>
+            )}
+            {noOwner && !suggested && <span className="mt-1 block text-[13.5px] font-semibold text-warn">No owner named in the notes</span>}
           </Field>
 
           <Field label="Due date">

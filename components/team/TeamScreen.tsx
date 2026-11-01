@@ -3,7 +3,9 @@
 // Team (/team): who owns what, and when each person last replied.
 import { useEffect, useMemo, useState } from "react";
 import { daysSince, formatWhen } from "@/components/format";
-import { Card, Chip, Eyebrow, Notice, PageHead, Pill, inputClass } from "@/components/ui";
+import { AddMemberForm } from "@/components/team/AddMemberForm";
+import type { AddMemberResponse } from "@/components/team/add-member";
+import { Button, Card, Chip, Eyebrow, Notice, PageHead, Pill, inputClass } from "@/components/ui";
 import { errorText } from "@/components/api";
 import { useTeam } from "@/components/use-team";
 import type { TeamMember, Workstream } from "@/lib/contracts/domain";
@@ -13,6 +15,8 @@ type Filter = "all" | "leads" | "no-reply";
 
 // A reply is "recent" if it came within this many days. Older, or none at all, shows as "No update".
 const RECENT_DAYS = 3;
+// Someone added in the last this many days shows a "New" tag.
+const NEW_DAYS = 7;
 
 type Stats = {
   streams: Record<string, string[]>; // owner_id -> workstream names
@@ -43,8 +47,16 @@ async function loadStats(): Promise<Stats> {
   return { streams, open, lastReply };
 }
 
+// The Add teammate button is rendered again once the form closes, so find it by id.
+function focusAddButton() {
+  // Wait for the button to render again after the form closes.
+  setTimeout(() => document.getElementById("add-teammate")?.focus(), 0);
+}
+
 export function TeamScreen() {
-  const { team, error: teamError } = useTeam();
+  const { team, error: teamError, lead, reload } = useTeam();
+  const [adding, setAdding] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [statsError, setStatsError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
@@ -90,6 +102,43 @@ export function TeamScreen() {
 
       {teamError && <Notice tone="danger" title="Could not load the team">{teamError}</Notice>}
       {statsError && <Notice tone="danger" title="Could not load tasks and replies">{statsError}</Notice>}
+
+      {toast && (
+        <div className="mb-5">
+          <Notice tone="ok" title={toast} />
+        </div>
+      )}
+
+      <div className="mb-5">
+        {adding ? (
+          <AddMemberForm
+            initialName=""
+            taskIds={[]}
+            addedBy={lead?.id ?? null}
+            onAdded={(res: AddMemberResponse) => {
+              setAdding(false);
+              reload();
+              setToast(res.existing ? `${res.member.name} was already on the team (${res.member.email}).` : `${res.member.name} added to the team.`);
+              focusAddButton();
+            }}
+            onCancel={() => {
+              setAdding(false);
+              focusAddButton();
+            }}
+          />
+        ) : (
+          <Button
+            id="add-teammate"
+            variant="primary"
+            onClick={() => {
+              setToast(null);
+              setAdding(true);
+            }}
+          >
+            Add teammate
+          </Button>
+        )}
+      </div>
 
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <div role="group" aria-label="Filter team" className="flex flex-wrap gap-2">
@@ -149,6 +198,8 @@ function MemberRow({
 }) {
   const days = daysSince(lastReply);
   const recent = days !== null && days < RECENT_DAYS;
+  const newDays = daysSince(member.created_at);
+  const isNew = newDays !== null && newDays < NEW_DAYS;
 
   return (
     <div className="grid gap-x-4 gap-y-2 px-5 py-4 min-[900px]:grid-cols-[minmax(0,1.4fr)_minmax(0,1.3fr)_auto_minmax(0,1.2fr)_auto_minmax(0,1fr)] min-[900px]:items-center">
@@ -161,6 +212,7 @@ function MemberRow({
             .join("")}
         </span>
         <span className="font-semibold">{member.name}</span>
+        {isNew && <Pill tone="forest">New</Pill>}
       </div>
       <span className="break-all text-[14.5px] text-ink-2">{member.email}</span>
       <span>{member.role === "lead" ? <Pill tone="forest">Lead</Pill> : <Pill>Member</Pill>}</span>
@@ -183,7 +235,7 @@ function MemberRow({
           </span>
         ) : (
           <span className="text-warn">
-            <span aria-hidden>● </span>No update · no reply yet
+            <span aria-hidden>● </span>No reply yet
           </span>
         )}
         {lastReply && !recent && (

@@ -402,3 +402,14 @@ test("a reply carrying someone else's code is never applied to their tasks", asy
   assert.notEqual(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
   assert.notEqual(res.status, "applied");
 });
+
+test("no known reply code: a shared Gmail inbox counts as the member with the plain address", async () => {
+  const { matchMember } = await import("@/lib/replies/supabase-repo");
+  const m = (id: string, email: string): TeamMember => ({ id, name: id, email, role: "member", avatar_url: null, created_at: "" });
+  const demo = [m("maya", demoInbox.maya), m("priya", demoInbox.priya), m("jordan", demoInbox.jordan)];
+  assert.equal(matchMember(demo, "abir.alameddine@gmail.com")?.id, "priya", "dotted sender, plain address wins");
+  assert.equal(matchMember(demo, "abiralameddine+jordan@gmail.com")?.id, "jordan", "exact address first");
+  const noPlain = [m("maya", demoInbox.maya), m("jordan", demoInbox.jordan)];
+  assert.equal(matchMember(noPlain, "abir.alameddine@gmail.com"), null, "several and none plain: can't tell");
+  assert.equal(matchMember(demo, "stranger@x.com"), null);
+});

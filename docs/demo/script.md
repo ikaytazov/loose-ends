@@ -11,7 +11,7 @@ Aim for **about 3½ minutes**. Everything the demo types or pastes already exist
 | **Priya Shah** | Owns Product launch. Gets the morning email, replies from her phone | ikaytazov@gmail.com | Iliyan (his phone is "Priya's phone") |
 | Jordan Lee | Owns Customer onboarding | tellyonu@gmail.com | Valerie (not on camera) |
 | Alex Romero | Owns Operations | jerry.yeoh1270@gmail.com | Jerry (not on camera) |
-| Sam Okafor | Team member | david.kigundu@gmail.com | David (not on camera) |
+| Sam Okafor | Team member | htvaught@gmail.com | H.T. (not on camera) |
 
 Only **Maya's screen** and **Priya's phone** appear on camera. Screen-record the laptop, and screen-record
 (or film) Iliyan's phone for the reply.

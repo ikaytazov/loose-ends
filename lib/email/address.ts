@@ -30,6 +30,17 @@ export function bareAddress(header: string): string {
   return (m ? m[1] : header).trim().toLowerCase();
 }
 
+/**
+ * The inbox an address really reaches. Gmail ignores dots and anything after "+" in the name, so
+ * abir.alameddine@gmail.com, abiralameddine@gmail.com and abiralameddine+maya@gmail.com are one inbox.
+ * Other providers are only lower-cased.
+ */
+export function inboxOf(address: string): string {
+  const [local = "", domain = ""] = bareAddress(address).split("@");
+  if (domain !== "gmail.com" && domain !== "googlemail.com") return `${local}@${domain}`;
+  return `${local.split("+")[0].replace(/\./g, "")}@gmail.com`;
+}
+
 /** Drop the quoted earlier email and signature from a reply, keeping only what the person wrote. */
 export function stripQuoted(text: string): string {
   const lines = text.replace(/\r\n/g, "\n").split("\n");

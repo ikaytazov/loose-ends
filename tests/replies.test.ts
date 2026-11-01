@@ -362,3 +362,44 @@ test("approver email wording: links to Decisions, never looks like a reply the b
   assert.equal(decisionsUrl({ VERCEL_PROJECT_PRODUCTION_URL: "loose-ends.vercel.app" }), "https://loose-ends.vercel.app/decisions");
   assert.equal(decisionsUrl({}), null);
 });
+
+test("Gmail inboxes: dots and +name are the same inbox, other providers are not changed", async () => {
+  const { inboxOf } = await import("@/lib/email/address");
+  assert.equal(inboxOf("Abir <abir.alameddine@gmail.com>"), "abiralameddine@gmail.com");
+  assert.equal(inboxOf("abiralameddine+maya@gmail.com"), "abiralameddine@gmail.com");
+  assert.equal(inboxOf("A.B+x@GoogleMail.com"), "ab@gmail.com");
+  assert.equal(inboxOf("first.last+x@company.com"), "first.last+x@company.com");
+});
+
+test("one Gmail inbox for every character: the reply code decides who is answering", async () => {
+  const w = makeWorld();
+  // As in the demo: every character's email reaches one Gmail inbox, which replies from a dotted address.
+  const shared = { priya: "abiralameddine@gmail.com", jordan: "abiralameddine+jordan@gmail.com", maya: "abiralameddine+maya@gmail.com" };
+  const members = await Promise.all([PRIYA, JORDAN, MAYA].map((id) => w.repo.getMember(id)));
+  members[0]!.email = shared.priya;
+  members[1]!.email = shared.jordan;
+  members[2]!.email = shared.maya;
+  const fromAbir = { ...priyaReply, from: "Abir <abir.alameddine@gmail.com>" };
+
+  const res = await handleInbound(w.repo, fakeAI(demoParse), fromAbir, { today: "2026-11-03" });
+  assert.equal(res.status, "applied", "the dotted address still reaches Priya's inbox");
+  assert.equal(w.tasks.find((t) => t.id === "t-deck")!.status, "blocked");
+  assert.ok(w.log.length > 0 && w.log.every((l) => l.actor_id === PRIYA));
+
+  // A reply to Jordan's morning email from the same inbox is Jordan's, and changes Jordan's list.
+  w.tasks.push({ ...w.tasks[0], id: "t-j", title: "Jordan's task", owner_id: JORDAN, status: "not_started" });
+  w.emails.push({ id: "e-jordan", reply_code: "jjj999", member_id: JORDAN, kind: "morning", task_refs: [{ n: 1, task_id: "t-j" }] });
+  const before = w.log.length;
+  const onlyOne: ReplyParse = { changes: [{ ...demoParse.changes[0], quote: "Done." }], question: null };
+  const res2 = await handleInbound(w.repo, fakeAI(onlyOne), { ...fromAbir, gmail_message_id: "g-j", to: "signalridgeco+le-jjj999@gmail.com" }, { today: "2026-11-03" });
+  assert.equal(res2.status, "applied");
+  assert.equal(w.tasks.find((t) => t.id === "t-j")!.status, "done");
+  assert.ok(w.log.slice(before).every((l) => l.actor_id === JORDAN));
+});
+
+test("a stranger who has a reply code is still an unknown sender", async () => {
+  const w = makeWorld();
+  const res = await handleInbound(w.repo, fakeAI(demoParse), { ...priyaReply, from: "someone@else.com" }, { today: "2026-11-03" });
+  assert.equal(res.status, "unknown_sender");
+  assert.equal(w.tasks.find((t) => t.id === "t-deck")!.status, "not_started");
+});

@@ -8,7 +8,7 @@
 import type { InboundEmail, InboundResponse } from "@/lib/contracts/api";
 import type { ReplyChange } from "@/lib/contracts/ai";
 import type { ActivitySource, Task, TeamMember } from "@/lib/contracts/domain";
-import { bareAddress, findReplyCode, stripQuoted } from "@/lib/email/address";
+import { bareAddress, findReplyCode, inboxOf, stripQuoted } from "@/lib/email/address";
 import type { ApproverNotice, ApproverNotifier } from "@/lib/email/approver-notice";
 import { orderForEmail } from "@/lib/email/ordering";
 import { pickApprover } from "./approver";
@@ -24,11 +24,22 @@ export async function handleInbound(
 ): Promise<InboundResponse> {
   const empty = { applied: [], question: null };
   const fromAddr = bareAddress(email.from);
-  const member = await repo.findMemberByEmail(fromAddr);
 
-  // Which email are they answering? Prefer the code in the address; fall back to their latest morning email.
+  // Which email are they answering, and who is answering? The code in the reply-to address names the morning
+  // email, and that email names the person. We trust it when the sender's inbox is that person's inbox, which
+  // copes with Gmail's dots and "+name" (several demo characters share one Gmail inbox).
+  // Without a code, or when the inboxes differ, fall back to the sender's exact address and their latest email.
   const code = findReplyCode(email.to);
   let morning = code ? await repo.findMorningEmailByCode(code) : null;
+  let member: TeamMember | null = null;
+  if (morning?.member_id) {
+    const addressee = await repo.getMember(morning.member_id);
+    if (addressee && inboxOf(addressee.email) === inboxOf(fromAddr)) member = addressee;
+  }
+  if (!member) {
+    member = await repo.findMemberByEmail(fromAddr);
+    if (morning && morning.member_id !== member?.id) morning = null;
+  }
   if (!morning && member) morning = await repo.latestMorningEmailFor(member.id);
 
   const replyText = stripQuoted(email.text);

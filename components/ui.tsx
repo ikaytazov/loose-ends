@@ -1,5 +1,6 @@
 // Small shared pieces, styled from the design tokens (app/globals.css). Every screen builds on these so cards,
 // headings, chips and callouts look the same everywhere. Status is always shown with text, never colour alone.
+import { Thread } from "@/components/Thread";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 export type Tone = "ok" | "warn" | "danger" | "lime" | "grey" | "forest";
@@ -39,12 +40,16 @@ export function Eyebrow({ children }: { children: ReactNode }) {
 }
 
 // The big serif headline at the top of every screen. Anything that sits above it (a back link) goes before it, not inside.
-export function PageHead({ eyebrow, title, subtitle }: { eyebrow?: string; title: string; subtitle?: ReactNode }) {
+// thread: show the brand thread in the empty top-right of the header (desktop only). Only on the main pages.
+export function PageHead({ eyebrow, title, subtitle, thread = false }: { eyebrow?: string; title: string; subtitle?: ReactNode; thread?: boolean }) {
   return (
-    <header className="mb-8">
-      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
-      <h1 className="mt-1 font-serif text-[clamp(36px,4vw,56px)] leading-[1.05] tracking-[-0.02em] text-ink">{title}</h1>
-      {subtitle && <p className="mt-3 max-w-2xl text-[17px] text-muted">{subtitle}</p>}
+    <header className="relative mb-8">
+      {thread && <Thread className="absolute -right-10 -top-6 z-0 hidden opacity-100 lg:block" />}
+      <div className="relative z-10">
+        {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+        <h1 className="mt-1 font-serif text-[clamp(36px,4vw,56px)] leading-[1.05] tracking-[-0.02em] text-ink">{title}</h1>
+        {subtitle && <p className="mt-3 max-w-2xl text-[17px] text-muted">{subtitle}</p>}
+      </div>
     </header>
   );
 }

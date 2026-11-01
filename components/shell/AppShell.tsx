@@ -90,7 +90,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const sidebar = (
     <nav aria-label="Main" className="on-forest relative flex h-full flex-col overflow-hidden px-3.5 pb-5 pt-7 text-canvas">
       <SideThread />
-      <Link href="/overview" aria-label="Loose Ends, go to overview" className="relative z-10 flex flex-col px-3 pb-7 text-canvas" onClick={() => setDrawerOpen(false)}>
+      <Link href="/" aria-label="Loose Ends, back to the home page" className="relative z-10 flex flex-col px-3 pb-7 text-canvas" onClick={() => setDrawerOpen(false)}>
         <LogoMark />
         <span className="font-serif text-[38px] leading-[0.92] tracking-[-0.01em]">
           Loose

@@ -10,17 +10,17 @@ import type { ReplyParser } from "@/lib/replies/parse";
 import { buildUserMessage, calendar, readStructured } from "@/lib/replies/parse";
 import type { NewActivity, ReplyRepo } from "@/lib/replies/repo";
 import { pickApprover } from "@/lib/replies/approver";
-import { findReplyCode, replyAddress, stripQuoted, bareAddress } from "@/lib/email/address";
+import { findReplyCode, replyAddress, stripQuoted, bareAddress, mailboxKey } from "@/lib/email/address";
 import { orderForEmail } from "@/lib/email/ordering";
 import { buildFollowUp, confirmationLine, isAutoReply, shortDate, FALLBACK_QUESTION, type FollowUp } from "@/lib/replies/follow-up";
 
 const MAYA = "m-maya", PRIYA = "m-priya", JORDAN = "m-jordan";
 
-function makeWorld() {
+function makeWorld(addr: { maya?: string; priya?: string; jordan?: string } = {}) {
   const members: TeamMember[] = [
-    { id: MAYA, name: "Maya", email: "maya@x.com", role: "lead", avatar_url: null, created_at: "" },
-    { id: PRIYA, name: "Priya", email: "priya@x.com", role: "member", avatar_url: null, created_at: "" },
-    { id: JORDAN, name: "Jordan", email: "jordan@x.com", role: "member", avatar_url: null, created_at: "" },
+    { id: MAYA, name: "Maya", email: addr.maya ?? "maya@x.com", role: "lead", avatar_url: null, created_at: "" },
+    { id: PRIYA, name: "Priya", email: addr.priya ?? "priya@x.com", role: "member", avatar_url: null, created_at: "" },
+    { id: JORDAN, name: "Jordan", email: addr.jordan ?? "jordan@x.com", role: "member", avatar_url: null, created_at: "" },
   ];
   const workstreams: Workstream[] = [
     { id: "w-launch", name: "Product launch", goal: null, owner_id: PRIYA, target_date: null, created_at: "" },
@@ -361,4 +361,44 @@ test("approver email wording: links to Decisions, never looks like a reply the b
   assert.equal(decisionsUrl({ APP_URL: "https://le.example/" }), "https://le.example/decisions");
   assert.equal(decisionsUrl({ VERCEL_PROJECT_PRODUCTION_URL: "loose-ends.vercel.app" }), "https://loose-ends.vercel.app/decisions");
   assert.equal(decisionsUrl({}), null);
+});
+
+// ---- Sender matching (Sat night demo bug: Gmail ignores dots, and all characters share one inbox) ----
+
+const demoInbox = { maya: "abiralameddine+maya@gmail.com", priya: "abiralameddine@gmail.com", jordan: "abiralameddine+jordan@gmail.com" };
+
+test("mailboxKey: Gmail dots and +tags reach the same mailbox", () => {
+  assert.equal(mailboxKey("Abir <abir.alameddine@gmail.com>"), "abiralameddine@gmail.com");
+  assert.equal(mailboxKey("abiralameddine+maya@gmail.com"), "abiralameddine@gmail.com");
+  assert.equal(mailboxKey("A.B+x@GoogleMail.com"), "ab@gmail.com");
+  assert.equal(mailboxKey("first.last+tag@company.com"), "first.last@company.com", "dots only ignored for Gmail");
+});
+
+test("a reply from the dotted Gmail address is matched to Priya through the reply code", async () => {
+  const w = makeWorld(demoInbox);
+  const res = await handleInbound(w.repo, fakeAI(demoParse), { ...priyaReply, gmail_message_id: "g-dot", from: "Abir Alameddine <abir.alameddine@gmail.com>" }, { today: "2026-11-03" });
+  assert.equal(res.status, "applied");
+  assert.equal(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
+  assert.equal(w.tasks.find((t) => t.id === "t-deck")!.blocker, "numbers from finance");
+  assert.ok(w.log.every((l) => l.actor_id === PRIYA));
+});
+
+test("one inbox for every character: the reply code decides who is answering", async () => {
+  const w = makeWorld(demoInbox);
+  w.emails.push({ id: "e-maya", reply_code: "maya01", member_id: MAYA, kind: "morning", task_refs: [{ n: 1, task_id: "t-faq" }] });
+  const res = await handleInbound(
+    w.repo,
+    fakeAI({ changes: [{ task_number: 1, new_status: "in_progress", blocker: null, requested_due_date: null, reason: null, quote: "1 is started", confidence: "sure" }], question: null }),
+    { ...priyaReply, gmail_message_id: "g-maya", from: "abir.alameddine@gmail.com", to: "signalridgeco+le-maya01@gmail.com" },
+    { today: "2026-11-03" },
+  );
+  assert.equal(res.status, "applied");
+  assert.equal(w.log[0].actor_id, MAYA, "logged as Maya, the person the email was sent to");
+});
+
+test("a reply carrying someone else's code is never applied to their tasks", async () => {
+  const w = makeWorld(); // Priya's code, but the reply comes from Jordan's own address
+  const res = await handleInbound(w.repo, fakeAI(demoParse), { ...priyaReply, gmail_message_id: "g-jordan", from: "jordan@x.com" }, { today: "2026-11-03" });
+  assert.notEqual(w.tasks.find((t) => t.id === "t-pricing")!.status, "done");
+  assert.notEqual(res.status, "applied");
 });

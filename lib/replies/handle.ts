@@ -8,7 +8,7 @@
 import type { InboundEmail, InboundResponse } from "@/lib/contracts/api";
 import type { ReplyChange } from "@/lib/contracts/ai";
 import type { ActivitySource, Task, TeamMember } from "@/lib/contracts/domain";
-import { bareAddress, findReplyCode, stripQuoted } from "@/lib/email/address";
+import { bareAddress, findReplyCode, mailboxKey, stripQuoted } from "@/lib/email/address";
 import type { ApproverNotice, ApproverNotifier } from "@/lib/email/approver-notice";
 import { orderForEmail } from "@/lib/email/ordering";
 import { pickApprover } from "./approver";
@@ -24,11 +24,21 @@ export async function handleInbound(
 ): Promise<InboundResponse> {
   const empty = { applied: [], question: null };
   const fromAddr = bareAddress(email.from);
-  const member = await repo.findMemberByEmail(fromAddr);
 
-  // Which email are they answering? Prefer the code in the address; fall back to their latest morning email.
+  // Which email are they answering, and so who are they? The code in the reply address names the email we sent,
+  // and that email names the person. We accept it when the reply comes from that person's mailbox: Gmail ignores
+  // dots and +tags, so abir.alameddine@gmail.com may answer an email sent to abiralameddine+maya@gmail.com.
+  // (In the demo every character's email reaches one inbox, so the code is the only way to tell them apart.)
   const code = findReplyCode(email.to);
   let morning = code ? await repo.findMorningEmailByCode(code) : null;
+  let member: TeamMember | null = null;
+  if (morning?.member_id) {
+    const addressee = await repo.getMember(morning.member_id);
+    if (addressee && mailboxKey(addressee.email) === mailboxKey(fromAddr)) member = addressee;
+  }
+  if (!member) member = await repo.findMemberByEmail(fromAddr);
+  // Never apply a reply to someone else's tasks: the email being answered must belong to the sender.
+  if (morning && member && morning.member_id !== member.id) morning = null;
   if (!morning && member) morning = await repo.latestMorningEmailFor(member.id);
 
   const replyText = stripQuoted(email.text);

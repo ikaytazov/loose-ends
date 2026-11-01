@@ -74,7 +74,7 @@ export function ActivityScreen() {
 
   return (
     <>
-      <PageHead thread title="Every change has a trail." subtitle="Each reply, decision and approval, with the exact words behind it. Newest first, in Pacific time." />
+      <PageHead thread="header" title="Every change has a trail." subtitle="Each reply, decision and approval, with the exact words behind it. Newest first, in Pacific time." />
 
       {error && (
         <div className="mb-6 space-y-4">

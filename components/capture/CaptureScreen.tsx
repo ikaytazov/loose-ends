@@ -174,7 +174,7 @@ export function CaptureScreen() {
 
   return (
     <>
-      <PageHead
+      <PageHead thread="short"
         eyebrow="Capture notes"
         title="Turn meetings into follow-through."
         subtitle="Paste or upload each weekly transcript, oldest first. Nothing becomes a task until you approve it on the next screen."

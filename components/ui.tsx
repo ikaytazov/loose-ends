@@ -40,11 +40,11 @@ export function Eyebrow({ children }: { children: ReactNode }) {
 }
 
 // The big serif headline at the top of every screen. Anything that sits above it (a back link) goes before it, not inside.
-// thread: show the brand thread in the empty top-right of the header (desktop only). Only on the main pages.
-export function PageHead({ eyebrow, title, subtitle, thread = false }: { eyebrow?: string; title: string; subtitle?: ReactNode; thread?: boolean }) {
+// thread: the brand thread in the empty top-right of the header (desktop only). "short" suits long titles.
+export function PageHead({ eyebrow, title, subtitle, thread }: { eyebrow?: string; title: string; subtitle?: ReactNode; thread?: "header" | "short" }) {
   return (
     <header className="relative mb-8">
-      {thread && <Thread className="absolute -right-10 -top-6 z-0 hidden opacity-100 lg:block" />}
+      {thread && <Thread variant={thread} className="absolute -right-4 -top-4 z-0 hidden opacity-100 lg:block" />}
       <div className="relative z-10">
         {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
         <h1 className="mt-1 font-serif text-[clamp(36px,4vw,56px)] leading-[1.05] tracking-[-0.02em] text-ink">{title}</h1>

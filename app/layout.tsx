@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Figtree, Newsreader } from "next/font/google";
 import "./globals.css";
 
-// Fonts: no next/font/google here on purpose. Cloud Claude Code sessions cannot reach Google Fonts,
-// so builds there would fail. To use the mockup font, put the font files in the repo and use next/font/local.
+// Brand fonts. next/font downloads them at build time, so builds need access to Google Fonts (Vercel has it).
+const newsreader = Newsreader({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-newsreader", display: "swap" });
+const figtree = Figtree({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-figtree", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Loose Ends",
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`h-full antialiased ${newsreader.variable} ${figtree.variable}`}>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

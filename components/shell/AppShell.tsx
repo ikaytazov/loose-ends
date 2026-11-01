@@ -12,7 +12,7 @@ import { useTeam } from "@/components/use-team";
 import { browserSupabase } from "@/lib/supabase/browser";
 
 const NAV: { href: string; label: string; icon: IconName }[] = [
-  { href: "/", label: "Overview", icon: "home" },
+  { href: "/overview", label: "Overview", icon: "home" },
   { href: "/workstreams", label: "Workstreams", icon: "layers" },
   { href: "/decisions", label: "Decisions", icon: "doc" },
   { href: "/activity", label: "Activity", icon: "activity" },
@@ -22,7 +22,7 @@ const NAV: { href: string; label: string; icon: IconName }[] = [
 
 // The review screen belongs to "Capture notes" and a single workstream to "Workstreams", so keep those highlighted.
 function isActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function LogoMark() {
@@ -90,7 +90,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const sidebar = (
     <nav aria-label="Main" className="on-forest relative flex h-full flex-col overflow-hidden px-3.5 pb-5 pt-7 text-canvas">
       <SideThread />
-      <Link href="/" aria-label="Loose Ends, go to overview" className="relative z-10 flex flex-col px-3 pb-7 text-canvas" onClick={() => setDrawerOpen(false)}>
+      <Link href="/overview" aria-label="Loose Ends, go to overview" className="relative z-10 flex flex-col px-3 pb-7 text-canvas" onClick={() => setDrawerOpen(false)}>
         <LogoMark />
         <span className="font-serif text-[38px] leading-[0.92] tracking-[-0.01em]">
           Loose
